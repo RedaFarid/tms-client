@@ -18,8 +18,12 @@ public class ApplicationContext extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        applicationContext.publishEvent(new ApplicationListener(stage));
-        applicationContext.start();
+        try {
+            applicationContext.publishEvent(new ApplicationListener(stage));
+            applicationContext.start();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
