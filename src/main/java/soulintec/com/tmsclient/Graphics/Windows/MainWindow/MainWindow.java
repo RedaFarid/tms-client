@@ -125,6 +125,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     }
 
     private void graphicsBuild() {
+
         mainLabel.setStyle("-fx-font-weight:normal;-fx-font-style:italic;-fx-text-fill:Darkblue;-fx-font-size:20;");
         mainLabel.setAlignment(Pos.CENTER);
         mainLabel.setTextAlignment(TextAlignment.CENTER);
@@ -186,6 +187,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         root.setBottom(statusbar);
 
         scene = new Scene(root);
+//        scene.getStylesheets().add(Resources.getResource("Styles/MainWindowStyle.css").toString());
 
         window.setScene(scene);
         window.setWidth(1920);

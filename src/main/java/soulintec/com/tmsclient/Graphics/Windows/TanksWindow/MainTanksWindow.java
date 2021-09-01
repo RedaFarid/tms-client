@@ -26,7 +26,6 @@ import javafx.stage.StageStyle;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -987,9 +986,9 @@ public class MainTanksWindow implements ApplicationListener<ApplicationContext.A
                     tank.setPermission(Permissions.valueOf(TankPermissionField.getValue().toString()));
                     tank.setProductID(TankProductNameField.getText());
 
-                    tank.setCorrectionFactor(Double.parseDouble(correctionFactorField.getText()));
-                    tank.setCorrectionTemp(Double.parseDouble(correctionTempField.getText()));
-                    tank.setCorrectedDensity(Double.parseDouble(correctedDensityField.getText()));
+//                    tank.setCorrectionFactor(Double.parseDouble(correctionFactorField.getText()));
+//                    tank.setCorrectionTemp(Double.parseDouble(correctionTempField.getText()));
+//                    tank.setCorrectedDensity(Double.parseDouble(correctedDensityField.getText()));
 
                     tankService.save(tank);
                 }, () -> {
@@ -1014,10 +1013,10 @@ public class MainTanksWindow implements ApplicationListener<ApplicationContext.A
                             Double.parseDouble(TankLevelField.getText()),
                             Double.parseDouble(TankVolumeField.getText()),
 
-                            Double.parseDouble(correctedDensityField.getText()),
-                            Double.parseDouble(correctionFactorField.getText()),
-                            Double.parseDouble(correctionTempField.getText()),
-                            Double.parseDouble(currentTempField.getText()),
+//                            Double.parseDouble(correctedDensityField.getText()),
+//                            Double.parseDouble(correctionFactorField.getText()),
+//                            Double.parseDouble(correctionTempField.getText()),
+//                            Double.parseDouble(currentTempField.getText()),
 
                             Double.parseDouble(TankMassField.getText()),
 
@@ -1108,41 +1107,42 @@ public class MainTanksWindow implements ApplicationListener<ApplicationContext.A
         };
     }
 
-    @Scheduled(fixedDelay = 500)
+    @Scheduled(fixedDelay = 20000)
     public void cyclicUpdate() {
-//        if (tankslist != null) {
-//            final Map<Long, TankDTO> tankDTOMap = Lists.newArrayList(tankService.findAll()).stream().collect(Collectors.toMap(TankDTO::getId, Function.identity()));
-//            for (TankTableObject item : tankslist) {
-//                try {
-//                    final TankDTO tank = tankDTOMap.get(item.getId());
-//
-//                    item.setVolume(tank.getVolume());
-//                    item.setLevel(tank.getLevel());
-//                    item.setMass(tank.getMass());
-//
-//                    item.setCapacity(tank.getCapacity());
-//
-//                    item.setTotalmass(tank.getTotalMass());
-//                    item.setProductID(tank.getProductID());
-//                    item.setReservedMassForLot(tank.getReservedMassForLot());
-//                    item.setLowLevel(tank.getLowLevel());
-//                    item.setHightLevel(tank.getHightLevel());
-//                    item.setHeight(tank.getHeight());
-//                    item.setRedius(tank.getRedius());
-//                    item.setPermission(tank.getPermission());
-//                    item.setStatus(tank.getStatus());
-//
+//        System.err.println(tankService.findAll());
+        if (tankslist != null) {
+            final Map<Long, TankDTO> tankDTOMap = Lists.newArrayList(tankService.findAll()).stream().collect(Collectors.toMap(TankDTO::getId, Function.identity()));
+            for (TankTableObject item : tankslist) {
+                try {
+                    final TankDTO tank = tankDTOMap.get(item.getId());
+
+                    item.setVolume(tank.getVolume());
+                    item.setLevel(tank.getLevel());
+                    item.setMass(tank.getMass());
+
+                    item.setCapacity(tank.getCapacity());
+
+                    item.setTotalmass(tank.getTotalMass());
+                    item.setProductID(tank.getProductID());
+                    item.setReservedMassForLot(tank.getReservedMassForLot());
+                    item.setLowLevel(tank.getLowLevel());
+                    item.setHightLevel(tank.getHightLevel());
+                    item.setHeight(tank.getHeight());
+                    item.setRedius(tank.getRedius());
+                    item.setPermission(tank.getPermission());
+                    item.setStatus(tank.getStatus());
+
 //                    item.setCorrectionFactor(tank.getCorrectionFactor());
 //                    item.setCorrectionTemp(tank.getCorrectionTemp());
 //                    item.setCurrentTemperature(tank.getCurrentTemperature());
 //                    item.setCorrectedDensity(tank.getCorrectedDensity());
 //                    item.setCalcuatedDensity(tank.getCalcuatedDensity());
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 
@@ -1208,8 +1208,10 @@ public class MainTanksWindow implements ApplicationListener<ApplicationContext.A
         public static TankTableObject createFromDTO(TankDTO tankDTO){
                 return new TankTableObject(tankDTO.getId(), tankDTO.getName(), tankDTO.getCapacity(), tankDTO.getLevel(), tankDTO.getVolume(),
                          tankDTO.getTotalMass(), tankDTO.getMass(), tankDTO.getReservedMassForLot(), tankDTO.getLowLevel(), tankDTO.getHightLevel(),
-                        tankDTO.getHeight(), tankDTO.getRedius(), tankDTO.getPermission(), tankDTO.getStatus(), tankDTO.getProductID(),
-                        tankDTO.getCorrectionFactor(), tankDTO.getCorrectionTemp(), tankDTO.getCorrectedDensity(), tankDTO.getCurrentTemperature(), tankDTO.getCalcuatedDensity());
+                        tankDTO.getHeight(), tankDTO.getRedius(), tankDTO.getPermission(), tankDTO.getStatus(), tankDTO.getProductID(),0.0,0.0,0.0,0.0,0.0
+//                        tankDTO.getCorrectionFactor(), tankDTO.getCorrectionTemp(), tankDTO.getCorrectedDensity(), tankDTO.getCurrentTemperature(),
+//                        tankDTO.getCalcuatedDensity()
+                );
             }
 
         public long getId() {

@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import soulintec.com.tmsclient.Entities.ProductDTO;
 import soulintec.com.tmsclient.Entities.TankDTO;
+import soulintec.com.tmsclient.Graphics.Controls.Utilities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -19,10 +21,8 @@ public class TanksService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public void getTanks() {
-//
+//    public void getTanks() {
 //        ResponseEntity<Tanks> forEntity = restTemplate.getForEntity("http://192.168.0.7:8086/tank", Tanks.class);
-//
 //        Tanks body = forEntity.getBody();
 
 //        System.err.println("\n\n\n\n\n");
@@ -33,7 +33,7 @@ public class TanksService {
 //        ResponseEntity<LogDTO> logDTOResponseEntity = restTemplate.postForEntity("http://192.168.0.7:8086/addTank", new LogDTO(1L, LogIdentifier.Error, "fdef", "dfmaelfm", "vfsfvs", LocalDateTime.now(), true), LogDTO.class);
 //        System.out.println(logDTOResponseEntity.getBody());
 
-    }
+//    }
 
     public long existsByProductId(String text) {
         return 0;
@@ -44,7 +44,10 @@ public class TanksService {
     }
 
     public  List<TankDTO> findAll() {
-        return null;
+        ResponseEntity<Tanks> forEntity = restTemplate.getForEntity(Utilities.iP +"/tank", Tanks.class);
+        Tanks body = forEntity.getBody();
+
+        return body.getTanks();
     }
 
     public Optional<TankDTO> findByTankName(String tankId) {
@@ -58,5 +61,10 @@ public class TanksService {
     public void deleteByTankName(String text) {
     }
 
-
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Tanks{
+        private List<TankDTO> tanks;
+    }
 }
