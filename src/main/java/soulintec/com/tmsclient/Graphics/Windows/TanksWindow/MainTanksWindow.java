@@ -32,7 +32,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
 import soulintec.com.tmsclient.Entities.Permissions;
-import soulintec.com.tmsclient.Entities.ProductDTO;
+import soulintec.com.tmsclient.Entities.MaterialDTO;
 import soulintec.com.tmsclient.Entities.TankDTO;
 import soulintec.com.tmsclient.Entities.TankStatus;
 import soulintec.com.tmsclient.Graphics.Controls.DataEntryPartitionTitled;
@@ -40,7 +40,7 @@ import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedTextField;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.Utils.EnhancedTableRow;
-import soulintec.com.tmsclient.Services.ProductService;
+import soulintec.com.tmsclient.Services.MaterialService;
 import soulintec.com.tmsclient.Services.TanksService;
 
 import java.math.BigDecimal;
@@ -127,12 +127,12 @@ public class MainTanksWindow implements ApplicationListener<ApplicationContext.A
 
 
 
-    private ObservableList<ProductDTO> ContextProductList = FXCollections.observableArrayList();
-    private TableView<ProductDTO> ContextProductTableView = new TableView<>();
-    private TableColumn<ProductDTO, String> ContextProductNameColumn = new TableColumn<>("Name");
-    private TableColumn<ProductDTO, String> ContextProductStockIDColumn = new TableColumn<>("Stock ID");
-    private TableColumn<ProductDTO, String> ContextProductSpecificGravityColumn = new TableColumn<>("Specific Gravity");
-    private TableColumn<ProductDTO, String> ContextProductDescriptionColumn = new TableColumn<>("Description");
+    private ObservableList<MaterialDTO> ContextProductList = FXCollections.observableArrayList();
+    private TableView<MaterialDTO> ContextProductTableView = new TableView<>();
+    private TableColumn<MaterialDTO, String> ContextProductNameColumn = new TableColumn<>("Name");
+    private TableColumn<MaterialDTO, String> ContextProductStockIDColumn = new TableColumn<>("Stock ID");
+    private TableColumn<MaterialDTO, String> ContextProductSpecificGravityColumn = new TableColumn<>("Specific Gravity");
+    private TableColumn<MaterialDTO, String> ContextProductDescriptionColumn = new TableColumn<>("Description");
 
     private EnhancedButton InsertTank = new EnhancedButton("Insert new tank");
     private EnhancedButton DeleteTank = new EnhancedButton("Delete selected tank");
@@ -243,7 +243,7 @@ public class MainTanksWindow implements ApplicationListener<ApplicationContext.A
     private TanksService tankService;
 
     @Autowired
-    private ProductService productService;
+    private MaterialService materialService;
 
     @Autowired
     private TanksController controller;
@@ -919,11 +919,11 @@ public class MainTanksWindow implements ApplicationListener<ApplicationContext.A
 
 
                     if (StringUtils.isNoneBlank(TankProductNameField.getText())) {
-                        ProductDTO selectedProduct = productService.findByName(TankProductNameField.getText());
-                        ContextProductnameFieldField.setText(selectedProduct.getName());
-                        ContextProductStockIDField.setText(selectedProduct.getStockID());
-                        ContextProductSpecficGravityField.setText(String.valueOf(selectedProduct.getSpecificGravity()));
-                        ContextProductDescriptionField.setText(selectedProduct.getDescription());
+//                        MaterialDTO selectedProduct = materialService.findByName(TankProductNameField.getText());
+//                        ContextProductnameFieldField.setText(selectedProduct.getName());
+//                        ContextProductStockIDField.setText(selectedProduct.getStockID());
+//                        ContextProductSpecficGravityField.setText(String.valueOf(selectedProduct.getSpecificGravity()));
+//                        ContextProductDescriptionField.setText(selectedProduct.getDescription());
                     }
 
                     tabContainer.setCursor(Cursor.DEFAULT);
@@ -940,12 +940,12 @@ public class MainTanksWindow implements ApplicationListener<ApplicationContext.A
         TankProductNameField.setOnMouseClicked(this::onRunProductContextWidow);
         ContextProductTableView.setOnMouseClicked(action -> {
             if (action.getClickCount() == 2) {
-                ProductDTO selected = ContextProductTableView.getSelectionModel().getSelectedItem();
+                MaterialDTO selected = ContextProductTableView.getSelectionModel().getSelectedItem();
 
                 TankProductNameField.setText(String.valueOf(selected.getName()));
                 ContextProductnameFieldField.setText(selected.getName());
-                ContextProductStockIDField.setText(selected.getStockID());
-                ContextProductSpecficGravityField.setText(String.valueOf(selected.getSpecificGravity()));
+//                ContextProductStockIDField.setText(selected.getStockID());
+//                ContextProductSpecficGravityField.setText(String.valueOf(selected.getSpecificGravity()));
                 ContextProductDescriptionField.setText(selected.getDescription());
 
                 contextProductStage.close();
@@ -1053,7 +1053,7 @@ public class MainTanksWindow implements ApplicationListener<ApplicationContext.A
 
     @Async
     private void onRunProductContextWidow(MouseEvent action) {
-        ContextProductList = FXCollections.observableArrayList(Lists.newArrayList(productService.findAll()));
+//        ContextProductList = FXCollections.observableArrayList(Lists.newArrayList(materialService.findAll()));
         Platform.runLater(new Runnable() {
             @Override
             public void run() {

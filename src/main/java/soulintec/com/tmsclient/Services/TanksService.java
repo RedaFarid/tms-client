@@ -6,12 +6,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import soulintec.com.tmsclient.Entities.ProductDTO;
 import soulintec.com.tmsclient.Entities.TankDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;

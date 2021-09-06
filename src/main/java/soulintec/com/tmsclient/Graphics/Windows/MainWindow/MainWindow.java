@@ -34,6 +34,7 @@ import soulintec.com.tmsclient.Graphics.Windows.*;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.IconicButton;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.WindowInterfaceMessages;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.windowReferenceNode;
+import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsWindow;
 import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.MainTanksWindow;
 
 @Log4j2
@@ -92,7 +93,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private final int MAX_NUM_NOTIFICATIONS_LINES = 1;
 
     @Autowired
-    ProductsWindow productsWindow;
+    MaterialsWindow materialsWindow;
 
     @Autowired
     ClientWindow clientWindow;
@@ -253,8 +254,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             root.setCenter(driversWindow.getRoot());
         });
         products.setOnIconClicked((String param) -> {
-            productsWindow.update();
-            root.setCenter(productsWindow.getRoot());
+            materialsWindow.update();
+            root.setCenter(materialsWindow.getRoot());
         });
         trucks.setOnIconClicked((String param) -> {
             truckWindow.update();
