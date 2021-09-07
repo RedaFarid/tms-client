@@ -1,696 +1,343 @@
 package soulintec.com.tmsclient.Graphics.Windows;
 
-import com.google.common.collect.Lists;
 import javafx.application.Platform;
+import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
-import soulintec.com.tmsclient.Entities.ClientDTO;
-import soulintec.com.tmsclient.Entities.ClientLocationsDTO;
 import soulintec.com.tmsclient.Graphics.Controls.DataEntryPartitionTitled;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
+import soulintec.com.tmsclient.Graphics.Controls.EnhancedLongField;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedTextField;
+import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientsController;
+import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientsModel;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Services.ClientsService;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Component
 public class ClientWindow implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
-    private DataEntryPartitionTitled clientsDataentery = new DataEntryPartitionTitled("Client");;
-    private DataEntryPartitionTitled locationsDataenetery = new DataEntryPartitionTitled("Location");;
-    private DataEntryPartitionTitled selectedClientData = new DataEntryPartitionTitled("Selected client");
+    private ClientsController controller;
+    private ClientsModel model;
 
-    private Tab clientstab = new Tab("Clients Management");
-    private Tab locationstab = new Tab("Locations Mnagement");
-    private VBox clientsPane = new VBox();
-    private VBox locationspane = new VBox();
+    protected static MainWindow initialStage;
 
-    private VBox clientsvbox = new VBox();
-    private ToolBar clientshbox = new ToolBar();
-    private VBox locationsvbox = new VBox();
-    private ToolBar locationshbox = new ToolBar();
-    private Label headerLabel = new Label("Clients");
+    private DataEntryPartitionTitled dataEntryPartitionTitled;
 
-    private BorderPane root = new BorderPane();
-    private TabPane tabContainer = new TabPane();
+    private VBox clientstab;
+    private VBox clientsPane;
 
-    private Stage mainStage = null;
-    private Stage contextstage;
+    private VBox clientsVbox;
+    private ToolBar clientsHbox;
+    private Label headerLabel;
 
-    private TableFilter<ClientDTO> clientsTableFilter;
-    private TableFilter<ClientLocationsDTO> locationsTableFilter;
-    private TableFilter<ClientDTO> contextTableFilter;
+    private BorderPane root;
+    private TabPane tabContainer;
 
-    private ObservableList<ClientDTO> ClientsList = FXCollections.observableArrayList();
-    private TableView<ClientDTO> ClientsTableView = new TableView<>();
-    private TableColumn<ClientDTO, Long> ClientIDColumn = new TableColumn<>("ID");
-    private TableColumn<ClientDTO, String> ClientNameColumn = new TableColumn<>("Name");
-    private TableColumn<ClientDTO, String> ClientMainOfficeColumn = new TableColumn<>("Office Address");
-    private TableColumn<ClientDTO, String> ClientContactNameColumn = new TableColumn<>("Contact name");
-    private TableColumn<ClientDTO, String> ClientContactTelNumberColumn = new TableColumn<>("Tel Number");
-    private TableColumn<ClientDTO, String> ClientContactEmailColumn = new TableColumn<>("Email");
+    private Stage mainStage;
 
-    private ObservableList<ClientDTO> ContextClientsList = FXCollections.observableArrayList();
-    private TableView<ClientDTO> ContextClientsTableView = new TableView<>();
-    private TableColumn<ClientDTO, Long> ContextClientIDColumn = new TableColumn<>("ID");
-    private TableColumn<ClientDTO, String> ContextClientNameColumn = new TableColumn<>("Name");
-    private TableColumn<ClientDTO, String> ContextClientMainOfficeColumn = new TableColumn<>("Office Address");
-    private TableColumn<ClientDTO, String> ContextClientContactNameColumn = new TableColumn<>("Contact name");
-    private TableColumn<ClientDTO, String> ContextClientContactTelNumberColumn = new TableColumn<>("Tel Number");
-    private TableColumn<ClientDTO, String> ContextClientContactEmailColumn = new TableColumn<>("Email");
+    private TableFilter<ClientsModel.TableObject> clientsTableFilter;
 
-    private ObservableList<ClientLocationsDTO> locationsList = FXCollections.observableArrayList();
-    private TableView<ClientLocationsDTO> LocationsTableView = new TableView<>();
-    private TableColumn<ClientLocationsDTO, Long> LocationIDColumn = new TableColumn<>("ID");
-    private TableColumn<ClientLocationsDTO, String> LocationClientColumn = new TableColumn<>("Client");
-    private TableColumn<ClientLocationsDTO, String> LocationNameColumn = new TableColumn<>("Location");
-    private TableColumn<ClientLocationsDTO, String> LocationAddressColumn = new TableColumn<>("Address");
-    private TableColumn<ClientLocationsDTO, String> LocationContactNameColumn = new TableColumn<>("Contact name");
-    private TableColumn<ClientLocationsDTO, String> LocationContactTelNumberColumn = new TableColumn<>("Tel Number");
-    private TableColumn<ClientLocationsDTO, String> LocationContactEmailColumn = new TableColumn<>("Email");
+    private TableView<ClientsModel.TableObject> table;
+    private TableColumn<ClientsModel.TableObject, LongProperty> clientIDColumn;
+    private TableColumn<ClientsModel.TableObject, StringProperty> clientNameColumn;
+    private TableColumn<ClientsModel.TableObject, StringProperty> clientMainOfficeColumn;
+    private TableColumn<ClientsModel.TableObject, StringProperty> clientContactNameColumn;
+    private TableColumn<ClientsModel.TableObject, StringProperty> clientContactTelNumberColumn;
+    private TableColumn<ClientsModel.TableObject, StringProperty> cientContactEmailColumn;
+    private TableColumn<ClientsModel.TableObject, StringProperty> createdByColumn;
+    private TableColumn<ClientsModel.TableObject, StringProperty> onTerminalColumn;
+    private TableColumn<ClientsModel.TableObject, ObjectProperty<LocalDateTime>> creationDateColumn;
+    private TableColumn<ClientsModel.TableObject, ObjectProperty<LocalDateTime>> modifyDateColumn;
 
-    private EnhancedButton InsertClient = new EnhancedButton("Create new client");
-    private EnhancedButton DeleteClient = new EnhancedButton("Delete selected client");
-    private EnhancedButton UpdateClient = new EnhancedButton("Update selected client");
-    private EnhancedButton report = new EnhancedButton("Show Report");
-    private EnhancedButton InsertLocation = new EnhancedButton("Create new location");
-    private EnhancedButton DeleteLocation = new EnhancedButton("Delete selected location");
-    private EnhancedButton UpdateLocation = new EnhancedButton("Update selected location");
-    private EnhancedButton ReportLocation = new EnhancedButton("Show Report");
-    private Label IDClientsLabel = new Label();
-    private Label nameLabel = new Label("Name :");
-    private Label MainOfficeAdressLabel = new Label("Office Address :");
-    private Label ContactNameLabel = new Label("Contact name :");
-    private Label ContactTelNumberLabel = new Label("Tel Number :");
-    private Label ContactEmailLabel = new Label("Email :");
+    private EnhancedButton insertClient;
+    private EnhancedButton deleteClient;
+    private EnhancedButton updateClient;
+    private EnhancedButton report;
 
-    private Label LocationIDLabel = new Label();
-    private Label LocationClientIDLabel = new Label("Client ID");
-    private Label LocationNameLabel = new Label("Location Name");
-    private Label LocationAdressLabel = new Label("Location Address");
-    private Label LocationContactNameLabel = new Label("Contact name");
-    private Label LocationContactTelNumberLabel = new Label("Tel Number");
-    private Label LocationContactEmailLabel = new Label("Email");
+    private Label idLabel;
+    private Label nameLabel;
+    private Label mainOfficeAdressLabel;
+    private Label contactNameLabel;
+    private Label contactTelNumberLabel;
+    private Label contactEmailLabel;
+    private Label creationDateLabel;
+    private Label modificationLabel;
+    private Label onTerminalLabel;
+    private Label createdByLabel;
 
-    private Label contextINameLabel = new Label();
-    private Label contextOfficeAddressLabel = new Label("");
-    private Label ContextContactNumLabel = new Label("");
-    private Label ContextTelNumberLabel = new Label("");
-    private Label ContextEmailLabel = new Label("");
-
-    private Label contextLocationNameLabel = new Label("Name :");
-    private Label contextLocationAdressLabel = new Label("Office Address :");
-    private Label contextLocationContactNameLabel = new Label("Contact name :");
-    private Label contextLocationContactTelNumberLabel = new Label("Tel Number :");
-    private Label contextLocationContactEmailLabel = new Label("Email :");
-
-    private EnhancedTextField nameField = new EnhancedTextField();
-    private EnhancedTextField MainOfficeAdressField = new EnhancedTextField();
-    private EnhancedTextField ContactNameField = new EnhancedTextField();
-    private EnhancedTextField ContactTelNumberField = new EnhancedTextField();
-    private EnhancedTextField ContactEmailField = new EnhancedTextField();
-
-    private EnhancedTextField LocationclientIDField = new EnhancedTextField();
-    private EnhancedTextField LocationnameField = new EnhancedTextField();
-    private EnhancedTextField LocationAdressField = new EnhancedTextField();
-    private EnhancedTextField LocationContactNameField = new EnhancedTextField();
-    private EnhancedTextField LocationContactTelNumberField = new EnhancedTextField();
-    private EnhancedTextField LocationContactEmailField = new EnhancedTextField();
-
-    private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
-    private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
+    private EnhancedLongField idField;
+    private EnhancedTextField nameField;
+    private EnhancedTextField mainOfficeAdressField;
+    private EnhancedTextField contactNameField;
+    private EnhancedTextField contactTelNumberField;
+    private EnhancedTextField contactEmailField;
+    private EnhancedTextField creationDateField;
+    private EnhancedTextField modificationDateField;
+    private EnhancedTextField createdByField;
+    private EnhancedTextField onTerminalField;
 
     @Autowired
     ClientsService clientService;
 
-
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
         mainStage = event.getStage();
-        contextstage = new Stage();
-
+        initialization();
         userAuthorities();
         graphicsBuilder();
         actionHandling();
     }
+
+    private void initialization() {
+        initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
+        controller = ApplicationContext.applicationContext.getBean(ClientsController.class);
+        model = controller.getModel();
+        initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
+
+        dataEntryPartitionTitled = new DataEntryPartitionTitled("Client");
+        clientstab = new VBox();
+        clientsPane = new VBox();
+        clientsVbox = new VBox();
+        clientsHbox = new ToolBar();
+        headerLabel = new Label("Clients");
+
+        root = new BorderPane();
+        tabContainer = new TabPane();
+
+        table = new TableView<>();
+
+        clientIDColumn = new TableColumn<>("ID");
+        clientNameColumn = new TableColumn<>("Name");
+        clientMainOfficeColumn = new TableColumn<>("Office Address");
+        clientContactNameColumn = new TableColumn<>("Contact name");
+        clientContactTelNumberColumn = new TableColumn<>("Tel Number");
+        cientContactEmailColumn = new TableColumn<>("Email");
+        createdByColumn = new TableColumn<>("Created By");
+        onTerminalColumn = new TableColumn<>("On Terminal");
+        creationDateColumn = new TableColumn<>("Creation Date");
+        modifyDateColumn = new TableColumn<>("Modification Date");
+
+        insertClient = new EnhancedButton("Create new client");
+        deleteClient = new EnhancedButton("Delete selected client");
+        updateClient = new EnhancedButton("Update selected client");
+        report = new EnhancedButton("Show Report");
+
+        idLabel = new Label("Id");
+        nameLabel = new Label("Name :");
+        mainOfficeAdressLabel = new Label("Office Address :");
+        contactNameLabel = new Label("Contact name :");
+        contactTelNumberLabel = new Label("Tel Number :");
+        contactEmailLabel = new Label("Email :");
+        creationDateLabel = new Label("Creation Date :");
+        modificationLabel = new Label("Modification Date :");
+        onTerminalLabel = new Label("On Terminal :");
+        createdByLabel = new Label("Created By :");
+
+        idField = new EnhancedLongField();
+        nameField = new EnhancedTextField();
+        mainOfficeAdressField = new EnhancedTextField();
+        contactNameField = new EnhancedTextField();
+        contactTelNumberField = new EnhancedTextField();
+        contactEmailField = new EnhancedTextField();
+        creationDateField = new EnhancedTextField();
+        modificationDateField = new EnhancedTextField();
+        createdByField = new EnhancedTextField();
+        onTerminalField = new EnhancedTextField();
+    }
+
     private void userAuthorities() {
-        
+
     }
 
     private void graphicsBuilder() {
 
-        clientsGraphicsBuilder();
-        locationsGraphicBuilder();
-        contextTableCreation();
-
-        tabContainer.getTabs().addAll(clientstab, locationstab);
-
         root.setTop(headerLabel);
-        root.setCenter(tabContainer);
+        root.setCenter(clientstab);
         root.setPadding(new Insets(10));
-    }
-    private void clientsGraphicsBuilder() {
+
         headerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:white;-fx-font-size:25;");
         headerLabel.setAlignment(Pos.CENTER);
         headerLabel.setTextAlignment(TextAlignment.CENTER);
-        headerLabel.prefWidthProperty().bind(tabContainer.widthProperty());
+        headerLabel.prefWidthProperty().bind(root.widthProperty());
         headerLabel.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE.darker(), CornerRadii.EMPTY, Insets.EMPTY)));
 
         //control buttons configuration
-        InsertClient.setPrefWidth(150);
-        DeleteClient.setPrefWidth(150);
-        UpdateClient.setPrefWidth(150);
+        insertClient.setPrefWidth(150);
+        deleteClient.setPrefWidth(150);
+        updateClient.setPrefWidth(150);
         report.setPrefWidth(150);
         //dataentery region configuration
-        IDClientsLabel.setAlignment(Pos.CENTER);
 
+        idLabel.setPrefWidth(150);
         nameLabel.setPrefWidth(150);
-        MainOfficeAdressLabel.setPrefWidth(150);
-        ContactNameLabel.setPrefWidth(150);
-        ContactTelNumberLabel.setPrefWidth(150);
-        ContactEmailLabel.setPrefWidth(150);
+        mainOfficeAdressLabel.setPrefWidth(150);
+        contactNameLabel.setPrefWidth(150);
+        contactTelNumberLabel.setPrefWidth(150);
+        contactEmailLabel.setPrefWidth(150);
+        creationDateLabel.setPrefWidth(150);
+        modificationLabel.setPrefWidth(150);
+        createdByLabel.setPrefWidth(150);
+        onTerminalLabel.setPrefWidth(150);
 
+        idLabel.setTextAlignment(TextAlignment.RIGHT);
         nameLabel.setTextAlignment(TextAlignment.RIGHT);
-        MainOfficeAdressLabel.setTextAlignment(TextAlignment.RIGHT);
-        ContactNameLabel.setTextAlignment(TextAlignment.RIGHT);
-        ContactTelNumberLabel.setTextAlignment(TextAlignment.RIGHT);
-        ContactEmailLabel.setTextAlignment(TextAlignment.RIGHT);
+        mainOfficeAdressLabel.setTextAlignment(TextAlignment.RIGHT);
+        contactNameLabel.setTextAlignment(TextAlignment.RIGHT);
+        contactTelNumberLabel.setTextAlignment(TextAlignment.RIGHT);
+        contactEmailLabel.setTextAlignment(TextAlignment.RIGHT);
+        creationDateLabel.setTextAlignment(TextAlignment.RIGHT);
+        modificationLabel.setTextAlignment(TextAlignment.RIGHT);
+        createdByLabel.setTextAlignment(TextAlignment.RIGHT);
+        onTerminalLabel.setTextAlignment(TextAlignment.RIGHT);
 
+        idLabel.setAlignment(Pos.BASELINE_RIGHT);
         nameLabel.setAlignment(Pos.BASELINE_RIGHT);
-        MainOfficeAdressLabel.setAlignment(Pos.BASELINE_RIGHT);
-        ContactNameLabel.setAlignment(Pos.BASELINE_RIGHT);
-        ContactTelNumberLabel.setAlignment(Pos.BASELINE_RIGHT);
-        ContactEmailLabel.setAlignment(Pos.BASELINE_RIGHT);
+        mainOfficeAdressLabel.setAlignment(Pos.BASELINE_RIGHT);
+        contactNameLabel.setAlignment(Pos.BASELINE_RIGHT);
+        contactTelNumberLabel.setAlignment(Pos.BASELINE_RIGHT);
+        contactEmailLabel.setAlignment(Pos.BASELINE_RIGHT);
+        creationDateLabel.setAlignment(Pos.BASELINE_RIGHT);
+        modificationLabel.setAlignment(Pos.BASELINE_RIGHT);
+        createdByLabel.setAlignment(Pos.BASELINE_RIGHT);
+        onTerminalLabel.setAlignment(Pos.BASELINE_RIGHT);
 
+        idLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         nameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        MainOfficeAdressLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        ContactNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        ContactTelNumberLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        ContactEmailLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        mainOfficeAdressLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        contactNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        contactTelNumberLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        contactEmailLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        creationDateLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        modificationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        createdByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        onTerminalLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
-        IDClientsLabel.setPrefWidth(50);
-        MainOfficeAdressField.setPrefWidth(150);
-        ContactNameField.setPrefWidth(150);
-        ContactTelNumberField.setPrefWidth(150);
-        ContactEmailField.setPrefWidth(150);
-        nameField.setPrefWidth(150);
-
-        //restriction declaration
-        MainOfficeAdressField.setPrefWidth(250);
-        ContactNameField.setPrefWidth(250);
-        ContactTelNumberField.setPrefWidth(250);
-        ContactEmailField.setPrefWidth(250);
+        idField.setPrefWidth(250);
+//        mainOfficeAdressField.setPrefWidth(650);
+        contactNameField.setPrefWidth(250);
+        contactTelNumberField.setPrefWidth(250);
+//        contactEmailField.setPrefWidth(650);
         nameField.setPrefWidth(250);
+        creationDateField.setPrefWidth(250);
+        modificationDateField.setPrefWidth(250);
+        createdByField.setPrefWidth(250);
+        onTerminalField.setPrefWidth(250);
 
         //restriction handling
         nameField.setRestrict("[a-zA-Z-_ ]");
         nameField.setMaxLength(45);
-        MainOfficeAdressField.setRestrict("[a-zA-Z-_ ]");
-        MainOfficeAdressField.setMaxLength(45);
-        ContactNameField.setRestrict("[a-zA-Z-_ ]");
-        ContactNameField.setMaxLength(14);
-        ContactTelNumberField.setRestrict("[0-9]");
-        ContactTelNumberField.setMaxLength(11);
-        ContactEmailField.setRestrict("[a-zA-Z0-9-_.@]");
-        ContactEmailField.setMaxLength(30);
+        mainOfficeAdressField.setRestrict("[a-zA-Z-_ ]");
+        mainOfficeAdressField.setMaxLength(45);
+        contactNameField.setRestrict("[a-zA-Z-_ ]");
+        contactNameField.setMaxLength(14);
+        contactTelNumberField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("[0-9]*")) {
+                contactTelNumberField.setText(oldValue);
+            }
+        });
+        contactTelNumberField.setMaxLength(11);
+        contactEmailField.setMaxLength(30);
 
-        clientsDataentery.add(nameLabel, 1, 2);
-        clientsDataentery.add(MainOfficeAdressLabel, 3, 2);
-        clientsDataentery.add(ContactNameLabel, 1, 3);
-        clientsDataentery.add(ContactTelNumberLabel, 3, 3);
-        clientsDataentery.add(ContactEmailLabel, 1, 4);
+        dataEntryPartitionTitled.add(idLabel, 1, 1);
+        dataEntryPartitionTitled.add(idField, 2, 1);
 
-        clientsDataentery.add(IDClientsLabel, 1, 1);
-        clientsDataentery.add(nameField, 2, 2);
-        clientsDataentery.add(MainOfficeAdressField, 4, 2);
-        clientsDataentery.add(ContactNameField, 2, 3);
-        clientsDataentery.add(ContactTelNumberField, 4, 3);
-        clientsDataentery.add(ContactEmailField, 2, 4);
+        dataEntryPartitionTitled.add(nameLabel, 3, 1);
+        dataEntryPartitionTitled.add(nameField, 4, 1);
 
-        //table configuration
-        ClientIDColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
-        ClientNameColumn.setCellValueFactory(new PropertyValueFactory<>("Name"));
-        ClientMainOfficeColumn.setCellValueFactory(new PropertyValueFactory<>("MainOfficeAdress"));
-        ClientContactNameColumn.setCellValueFactory(new PropertyValueFactory<>("ContactName"));
-        ClientContactTelNumberColumn.setCellValueFactory(new PropertyValueFactory<>("ContactTelNumber"));
-        ClientContactEmailColumn.setCellValueFactory(new PropertyValueFactory<>("ContactEmail"));
+        dataEntryPartitionTitled.add(mainOfficeAdressLabel, 5, 1);
+        dataEntryPartitionTitled.add(mainOfficeAdressField, 6, 1, 3, 1);
 
-        ClientsTableView.getColumns().addAll(ClientIDColumn, ClientNameColumn, ClientMainOfficeColumn, ClientContactNameColumn, ClientContactTelNumberColumn, ClientContactEmailColumn);
-        ClientsTableView.prefHeightProperty().bind(tabContainer.heightProperty().subtract(clientsvbox.heightProperty()));
-        ClientsTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        ClientsTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        ClientsTableView.setItems(getClientsList());
-        clientsTableFilter = TableFilter.forTableView(ClientsTableView).apply();
+        dataEntryPartitionTitled.add(contactNameLabel, 1, 2);
+        dataEntryPartitionTitled.add(contactNameField, 2, 2);
 
-        clientsDataentery.setVgap(5);
-        clientsDataentery.setHgap(5);
+        dataEntryPartitionTitled.add(contactTelNumberLabel, 3, 2);
+        dataEntryPartitionTitled.add(contactTelNumberField, 4, 2);
 
-        clientshbox.getItems().addAll(InsertClient, UpdateClient, DeleteClient, report);
+        dataEntryPartitionTitled.add(contactEmailLabel, 5, 2);
+        dataEntryPartitionTitled.add(contactEmailField, 6, 2, 3, 1);
 
-        clientsvbox.getChildren().addAll(clientsDataentery, clientshbox);
-        clientsvbox.setPadding(new Insets(5));
-        clientsvbox.setSpacing(5);
+        dataEntryPartitionTitled.add(creationDateLabel, 1, 3);
+        dataEntryPartitionTitled.add(creationDateField, 2, 3);
 
-        clientsPane.getChildren().add(clientsvbox);
-        clientsPane.getChildren().add(ClientsTableView);
+        dataEntryPartitionTitled.add(modificationLabel, 3, 3);
+        dataEntryPartitionTitled.add(modificationDateField, 4, 3);
 
-        clientstab.setContent(clientsPane);
-        clientstab.setClosable(false);
+        dataEntryPartitionTitled.add(createdByLabel, 5, 3);
+        dataEntryPartitionTitled.add(createdByField, 6, 3);
 
-    }
-    private void locationsGraphicBuilder() {
-
-        //control buttons configuration
-        InsertLocation.setPrefWidth(150);
-        DeleteLocation.setPrefWidth(150);
-        UpdateLocation.setPrefWidth(150);
-        ReportLocation.setPrefWidth(150);
-        //dataentery region configuration
-        LocationIDLabel.setAlignment(Pos.CENTER);
-
-        LocationClientIDLabel.setPrefWidth(150);
-        LocationNameLabel.setPrefWidth(150);
-        LocationAdressLabel.setPrefWidth(150);
-        LocationContactNameLabel.setPrefWidth(150);
-        LocationContactTelNumberLabel.setPrefWidth(150);
-        LocationContactEmailLabel.setPrefWidth(150);
-
-        LocationClientIDLabel.setTextAlignment(TextAlignment.RIGHT);
-        LocationNameLabel.setTextAlignment(TextAlignment.RIGHT);
-        LocationAdressLabel.setTextAlignment(TextAlignment.RIGHT);
-        LocationContactNameLabel.setTextAlignment(TextAlignment.RIGHT);
-        LocationContactTelNumberLabel.setTextAlignment(TextAlignment.RIGHT);
-        LocationContactEmailLabel.setTextAlignment(TextAlignment.RIGHT);
-
-        LocationClientIDLabel.setAlignment(Pos.BASELINE_RIGHT);
-        LocationNameLabel.setAlignment(Pos.BASELINE_RIGHT);
-        LocationAdressLabel.setAlignment(Pos.BASELINE_RIGHT);
-        LocationContactNameLabel.setAlignment(Pos.BASELINE_RIGHT);
-        LocationContactTelNumberLabel.setAlignment(Pos.BASELINE_RIGHT);
-        LocationContactEmailLabel.setAlignment(Pos.BASELINE_RIGHT);
-
-        LocationClientIDLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        LocationNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        LocationAdressLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        LocationContactNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        LocationContactTelNumberLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        LocationContactEmailLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-
-        LocationclientIDField.setPrefWidth(150);
-        LocationnameField.setPrefWidth(250);
-        LocationAdressField.setPrefWidth(250);
-        LocationContactNameField.setPrefWidth(250);
-        LocationContactTelNumberField.setPrefWidth(250);
-        LocationContactEmailField.setPrefWidth(250);
-
-        //restriction handling
-        LocationnameField.setRestrict("[a-zA-Z-_ ]");
-        LocationnameField.setMaxLength(45);
-        LocationAdressField.setRestrict("[a-zA-Z-_ ]");
-        LocationAdressField.setMaxLength(45);
-        LocationContactNameField.setRestrict("[a-zA-Z-_ ]");
-        LocationContactNameField.setMaxLength(14);
-        LocationContactTelNumberField.setRestrict("[0-9]");
-        LocationContactTelNumberField.setMaxLength(11);
-        LocationContactEmailField.setRestrict("[a-zA-Z0-9-_.@]");
-        LocationContactEmailField.setMaxLength(30);
-
-        locationsDataenetery.add(LocationClientIDLabel, 1, 2);
-        locationsDataenetery.add(LocationNameLabel, 3, 2);
-        locationsDataenetery.add(LocationAdressLabel, 1, 3);
-        locationsDataenetery.add(LocationContactNameLabel, 3, 3);
-        locationsDataenetery.add(LocationContactTelNumberLabel, 1, 4);
-        locationsDataenetery.add(LocationContactEmailLabel, 3, 4);
-
-//        locationsDataenetery.add(LocationIDLabel, 1, 1);
-        locationsDataenetery.add(LocationclientIDField, 2, 2);
-        locationsDataenetery.add(LocationnameField, 4, 2);
-        locationsDataenetery.add(LocationAdressField, 2, 3);
-        locationsDataenetery.add(LocationContactNameField, 4, 3);
-        locationsDataenetery.add(LocationContactTelNumberField, 2, 4);
-        locationsDataenetery.add(LocationContactEmailField, 4, 4);
-
-        //selected client data
-        contextLocationNameLabel.setPrefWidth(150);
-        contextLocationAdressLabel.setPrefWidth(150);
-        contextLocationContactNameLabel.setPrefWidth(150);
-        contextLocationContactTelNumberLabel.setPrefWidth(150);
-        contextLocationContactEmailLabel.setPrefWidth(150);
-
-        contextLocationNameLabel.setTextAlignment(TextAlignment.RIGHT);
-        contextLocationAdressLabel.setTextAlignment(TextAlignment.RIGHT);
-        contextLocationContactNameLabel.setTextAlignment(TextAlignment.RIGHT);
-        contextLocationContactTelNumberLabel.setTextAlignment(TextAlignment.RIGHT);
-        contextLocationContactEmailLabel.setTextAlignment(TextAlignment.RIGHT);
-
-        contextLocationNameLabel.setAlignment(Pos.BASELINE_RIGHT);
-        contextLocationAdressLabel.setAlignment(Pos.BASELINE_RIGHT);
-        contextLocationContactNameLabel.setAlignment(Pos.BASELINE_RIGHT);
-        contextLocationContactTelNumberLabel.setAlignment(Pos.BASELINE_RIGHT);
-        contextLocationContactEmailLabel.setAlignment(Pos.BASELINE_RIGHT);
-
-        contextLocationNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        contextLocationAdressLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        contextLocationContactNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        contextLocationContactTelNumberLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        contextLocationContactEmailLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-
-        contextINameLabel.setPrefWidth(250);
-        contextOfficeAddressLabel.setPrefWidth(250);
-        ContextContactNumLabel.setPrefWidth(250);
-        ContextTelNumberLabel.setPrefWidth(250);
-        ContextEmailLabel.setPrefWidth(250);
-
-        contextLocationNameLabel.setTextAlignment(TextAlignment.LEFT);
-        contextLocationAdressLabel.setTextAlignment(TextAlignment.LEFT);
-        contextLocationContactNameLabel.setTextAlignment(TextAlignment.LEFT);
-        contextLocationContactTelNumberLabel.setTextAlignment(TextAlignment.LEFT);
-        contextLocationContactEmailLabel.setTextAlignment(TextAlignment.LEFT);
-
-        contextINameLabel.setTextAlignment(TextAlignment.RIGHT);
-        contextOfficeAddressLabel.setTextAlignment(TextAlignment.RIGHT);
-        ContextContactNumLabel.setTextAlignment(TextAlignment.RIGHT);
-        ContextTelNumberLabel.setTextAlignment(TextAlignment.RIGHT);;
-        ContextEmailLabel.setTextAlignment(TextAlignment.RIGHT);
-
-        selectedClientData.add(contextLocationNameLabel, 1, 1);
-        selectedClientData.add(contextLocationAdressLabel, 3, 1);
-        selectedClientData.add(contextLocationContactNameLabel, 1, 2);
-        selectedClientData.add(contextLocationContactTelNumberLabel, 3, 2);
-        selectedClientData.add(contextLocationContactEmailLabel, 5, 1);
-
-        selectedClientData.add(contextINameLabel, 2, 1);
-        selectedClientData.add(contextOfficeAddressLabel, 4, 1);
-        selectedClientData.add(ContextContactNumLabel, 2, 2);
-        selectedClientData.add(ContextTelNumberLabel, 4, 2);
-        selectedClientData.add(ContextEmailLabel, 6, 1);
+        dataEntryPartitionTitled.add(onTerminalLabel, 7, 3);
+        dataEntryPartitionTitled.add(onTerminalField, 8, 3);
 
         //table configuration
-        LocationIDColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
-        LocationClientColumn.setCellValueFactory(new PropertyValueFactory<>("ClientID"));
-        LocationNameColumn.setCellValueFactory(new PropertyValueFactory<>("LocationName"));
-        LocationAddressColumn.setCellValueFactory(new PropertyValueFactory<>("LocationAdress"));
-        LocationContactNameColumn.setCellValueFactory(new PropertyValueFactory<>("ContactName"));
-        LocationContactTelNumberColumn.setCellValueFactory(new PropertyValueFactory<>("ContactTelNumber"));
-        LocationContactEmailColumn.setCellValueFactory(new PropertyValueFactory<>("ContactEmail"));
+        clientIDColumn.setCellValueFactory(new PropertyValueFactory<>("clientIdColumn"));
+        clientNameColumn.setCellValueFactory(new PropertyValueFactory<>("nameColumn"));
+        clientMainOfficeColumn.setCellValueFactory(new PropertyValueFactory<>("mainOfficeAddressColumn"));
+        clientContactNameColumn.setCellValueFactory(new PropertyValueFactory<>("contactNameColumn"));
+        clientContactTelNumberColumn.setCellValueFactory(new PropertyValueFactory<>("contactTelNumberColumn"));
+        cientContactEmailColumn.setCellValueFactory(new PropertyValueFactory<>("contactEmailColumn"));
+        creationDateColumn.setCellValueFactory(new PropertyValueFactory<>("creationDateColumn"));
+        modifyDateColumn.setCellValueFactory(new PropertyValueFactory<>("modifyDateColumn"));
+        createdByColumn.setCellValueFactory(new PropertyValueFactory<>("createdByColumn"));
+        onTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
 
-        LocationsTableView.getColumns().addAll(LocationIDColumn, LocationClientColumn, LocationNameColumn, LocationAddressColumn,
-                LocationContactNameColumn, LocationContactTelNumberColumn, LocationContactEmailColumn);
-        LocationsTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        LocationsTableView.prefHeightProperty().bind(tabContainer.heightProperty().subtract(locationsvbox.heightProperty()));
-        LocationsTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        LocationsTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        LocationsTableView.setItems(getLocationsList());
-        locationsTableFilter = TableFilter.forTableView(LocationsTableView).apply();
+        table.getColumns().addAll(clientIDColumn, clientNameColumn, clientMainOfficeColumn, clientContactNameColumn, clientContactTelNumberColumn, cientContactEmailColumn, creationDateColumn, modifyDateColumn, createdByColumn, onTerminalColumn);
+        table.prefHeightProperty().bind(root.heightProperty().subtract(clientsVbox.heightProperty()));
+        table.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setItems(controller.getDataList());
+        clientsTableFilter = TableFilter.forTableView(table).apply();
 
+        dataEntryPartitionTitled.setVgap(5);
+        dataEntryPartitionTitled.setHgap(5);
 
-        selectedClientData.setVgap(5);
-        selectedClientData.setHgap(5);
+        clientsHbox.getItems().addAll(insertClient, updateClient, deleteClient);
 
-        locationshbox.getItems().addAll(InsertLocation, UpdateLocation, DeleteLocation, ReportLocation);
+        clientsVbox.getChildren().addAll(dataEntryPartitionTitled, clientsHbox);
+        clientsVbox.setPadding(new Insets(5));
+        clientsVbox.setSpacing(5);
 
-        locationsvbox.getChildren().addAll(selectedClientData, locationsDataenetery, locationshbox);
-        locationsvbox.setPadding(new Insets(5));
-        locationsvbox.setSpacing(5);
+        clientsPane.getChildren().add(clientsVbox);
+        clientsPane.getChildren().add(table);
 
-        locationstab.setContent(locationspane);
-        locationstab.setClosable(false);
+        clientstab.getChildren().add(clientsPane);
 
-        locationspane.getChildren().add(locationsvbox);
-        locationspane.getChildren().add(LocationsTableView);
-
-        locationstab.setContent(locationspane);
-        locationstab.setClosable(false);
-    }
-    private void contextTableCreation() {
-        //table configuration
-        ContextClientIDColumn.setCellValueFactory(new PropertyValueFactory<>("ID"));
-        ContextClientNameColumn.setCellValueFactory(new PropertyValueFactory<>("Name"));
-        ContextClientMainOfficeColumn.setCellValueFactory(new PropertyValueFactory<>("MainOfficeAdress"));
-        ContextClientContactNameColumn.setCellValueFactory(new PropertyValueFactory<>("ContactName"));
-        ContextClientContactTelNumberColumn.setCellValueFactory(new PropertyValueFactory<>("ContactTelNumber"));
-        ContextClientContactEmailColumn.setCellValueFactory(new PropertyValueFactory<>("ContactEmail"));
-
-        ContextClientsTableView.getColumns().clear();
-        ContextClientsTableView.getColumns().addAll(ContextClientIDColumn, ContextClientMainOfficeColumn, ContextClientContactNameColumn,
-                ContextClientContactTelNumberColumn, ContextClientContactEmailColumn, ContextClientNameColumn);
-        ContextClientsTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        contextTableFilter = TableFilter.forTableView(ContextClientsTableView).apply();
-
-        Pane pane = new Pane(ContextClientsTableView);
-        pane.setBorder(new Border(new BorderStroke(Color.ORANGE, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(2))));
-        pane.setPadding(new Insets(2, 2, 2, 2));
-        contextstage.setScene(new Scene(pane));
-        contextstage.initStyle(StageStyle.UNDECORATED);
-        contextstage.initOwner(mainStage);
-
-        ContextClientsTableView.prefWidthProperty().bind(contextstage.widthProperty());
-        ContextClientsTableView.prefHeightProperty().bind(contextstage.heightProperty());
+        idField.longValueProperty().bindBidirectional(model.clientIdProperty());
+        nameField.textProperty().bindBidirectional(model.nameProperty());
+        mainOfficeAdressField.textProperty().bindBidirectional(model.mainOfficeAddressProperty());
+        contactNameField.textProperty().bindBidirectional(model.contactNameProperty());
+        contactTelNumberField.textProperty().bindBidirectional(model.contactTelNumberProperty());
+        contactEmailField.textProperty().bindBidirectional(model.contactEmailProperty());
+        createdByField.textProperty().bindBidirectional(model.createdByProperty());
+        onTerminalField.textProperty().bindBidirectional(model.onTerminalProperty());
+        modificationDateField.textProperty().bindBidirectional(model.modifyDateProperty());
+        creationDateField.textProperty().bindBidirectional(model.creationDateProperty());
     }
 
     private void actionHandling() {
-        clientsActionHandling();
-        locationsActionHandling();
-    }
-    private void clientsActionHandling() {
-        InsertClient.setOnMouseClicked(this::onCreateNewClient);
-        DeleteClient.setOnMouseClicked(this::onDeleteClient);
-        UpdateClient.setOnMouseClicked(this::onUpdateClient);
+        insertClient.setOnMouseClicked(controller::onInsert);
+        deleteClient.setOnMouseClicked(controller::onDelete);
+        updateClient.setOnMouseClicked(controller::onUpdate);
 
-        ClientsTableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<ClientDTO>) c -> {
-            try {
-                if (!c.getList().isEmpty()) {
-                    ClientDTO selected = c.getList().get(0);
-                    IDClientsLabel.setText(String.valueOf(selected.getID()));
-                    nameField.setText(selected.getName());
-                    MainOfficeAdressField.setText(selected.getMainOfficeAdress());
-                    ContactNameField.setText(selected.getContactName());
-                    ContactTelNumberField.setText(selected.getContactTelNumber());
-                    ContactEmailField.setText(selected.getContactEmail());
-                }
-            } catch (Exception e) {
-                showErrorWindowForException("Error reading selected client", e);
-            }
-        });
-    }
-    private void locationsActionHandling() {
-        InsertLocation.setOnMouseClicked(this::onCreateLocation);
-        DeleteLocation.setOnMouseClicked(this::onDeleteLocation);
-        UpdateLocation.setOnMouseClicked(this::onUpdateLocation);
-
-        LocationsTableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<ClientLocationsDTO>) c -> {
-            try {
-                if (!c.getList().isEmpty()) {
-                    ClientLocationsDTO selected = c.getList().get(0);
-
-                    LocationIDLabel.setText(String.valueOf(selected.getID()));
-                    LocationclientIDField.setText(String.valueOf(selected.getClientID()));
-                    LocationnameField.setText(selected.getLocationName());
-                    LocationAdressField.setText(selected.getLocationAdress());
-                    LocationContactNameField.setText(selected.getContactName());
-                    LocationContactTelNumberField.setText(selected.getContactTelNumber());
-                    LocationContactEmailField.setText(selected.getContactEmail());
-
-                    clientService.findById(selected.getClientID()).ifPresent(selectedClient -> {
-                        LocationclientIDField.setText(String.valueOf(selectedClient.getID()));
-                        contextINameLabel.setText(selectedClient.getName());
-                        contextOfficeAddressLabel.setText(selectedClient.getMainOfficeAdress());
-                        ContextContactNumLabel.setText(selectedClient.getContactName());
-                        ContextTelNumberLabel.setText(selectedClient.getContactTelNumber());
-                        ContextEmailLabel.setText(selectedClient.getContactEmail());
-                    });
-
-                }
-            } catch (Exception e) {
-                showErrorWindowForException("Error reading selected location", e);
-            }
-        });
-
-        LocationclientIDField.setOnMouseClicked(action -> {
-            ContextClientsList = FXCollections.observableArrayList(Lists.newArrayList(clientService.findAll()));
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    ContextClientsTableView.getItems().clear();
-                    ContextClientsTableView.setItems(ContextClientsList);
-                    contextstage.setWidth(900);
-                    contextstage.setHeight(500);
-                    contextstage.setX(action.getScreenX());
-                    contextstage.setY(action.getScreenY());
-                    contextstage.setResizable(true);
-                    contextstage.show();
-                }
-            });
-        });
-
-        mainStage.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
-            if (contextstage.isShowing()) {
-                contextstage.close();
-            }
-        });
-
-        ContextClientsTableView.setOnMouseClicked(action -> {
-            if (action.getClickCount() == 2) {
-                ClientDTO selected = ContextClientsTableView.getSelectionModel().getSelectedItem();
-                LocationclientIDField.setText(String.valueOf(selected.getID()));
-                contextINameLabel.setText(selected.getName());
-                contextOfficeAddressLabel.setText(selected.getMainOfficeAdress());
-                ContextContactNumLabel.setText(selected.getContactName());
-                ContextTelNumberLabel.setText(selected.getContactTelNumber());
-                ContextEmailLabel.setText(selected.getContactEmail());
-
-                contextstage.close();
-            }
-        });
-    }
-
-
-
-    @Async
-    private void onUpdateLocation(MouseEvent mouseEvent) {
-        try {
-            if ((LocationclientIDField.getText().length() > 0) && (LocationnameField.getText().length() > 0) && (LocationAdressField.getText().length() > 0)
-                    && (LocationContactNameField.getText().length() > 0) && (LocationContactTelNumberField.getText().length() > 0)
-                    && (LocationContactEmailField.getText().length() > 0)) {
-                ClientLocationsDTO location = new ClientLocationsDTO(Long.parseLong(LocationIDLabel.getText()), Long.parseLong(LocationclientIDField.getText()),
-                        LocationnameField.getText(), LocationAdressField.getText(), LocationContactNameField.getText(), LocationContactTelNumberField.getText(),
-                        LocationContactEmailField.getText());
-
-                clientService.saveLocation(location);
-
-                update();
-
-            } else {
-                showErrorWindow("Error updating data", "Please check entered data .. No possible empty fields");
-            }
-
-        } catch (Exception e) {
-            showErrorWindowForException("Error updating location", e);
-        }
-    }
-
-    @Async
-    private void onDeleteLocation(MouseEvent mouseEvent) {
-        try {
-            clientService.deleteById(Long.parseLong(LocationIDLabel.getText()));
-            update();
-        } catch (Exception e){
-            showErrorWindowForException("Error deleting location", e);
-        }
-    }
-
-    @Async
-    private void onCreateLocation(MouseEvent mouseEvent) {
-        try {
-            if ((LocationclientIDField.getText().length() > 0) && (LocationnameField.getText().length() > 0) && (LocationAdressField.getText().length() > 0)
-                    && (LocationContactNameField.getText().length() > 0) && (LocationContactTelNumberField.getText().length() > 0)
-                    && (LocationContactEmailField.getText().length() > 0)) {
-                ClientLocationsDTO location = new ClientLocationsDTO(Long.parseLong(LocationclientIDField.getText()), LocationnameField.getText(),
-                        LocationAdressField.getText(), LocationContactNameField.getText(), LocationContactTelNumberField.getText(),
-                        LocationContactEmailField.getText());
-
-                clientService.saveLocation(location);
-                update();
-            } else {
-                showErrorWindow("Error inserting data", "Please check entered data .. No possible empty fields");
-            }
-        } catch (Exception e) {
-            showErrorWindowForException("Error inserting location", e);
-        }
-    }
-
-
-    @Async
-    private void onUpdateClient(MouseEvent mouseEvent) {
-        if ((nameField.getText().length() > 0) && (MainOfficeAdressField.getText().length() > 0) && (ContactNameField.getText().length() > 0)
-                && (ContactTelNumberField.getText().length() > 0) && (ContactEmailField.getText().length() > 0)) {
-
-            ClientDTO client = new ClientDTO(Long.parseLong(IDClientsLabel.getText()), nameField.getText(), MainOfficeAdressField.getText(),
-                    ContactNameField.getText(), ContactTelNumberField.getText(), ContactEmailField.getText());
-            clientService.save(client);
-        } else {
-            showErrorWindow("Error updating data", "Please check entered data .. No possible empty fields");
-        }
-    }
-
-    @Async
-    private void onDeleteClient(MouseEvent mouseEvent) {
-        try {
-            clientService.deleteById(Long.parseLong(IDClientsLabel.getText()));
-            clientService.deleteByClientName(Long.parseLong(IDClientsLabel.getText()));
-
-            update();
-        }catch (Exception e){
-            showErrorWindowForException("Error deleting client", e);
-        }
-    }
-
-    @Async
-    private void onCreateNewClient(MouseEvent mouseEvent) {
-        try {
-            if ((nameField.getText().length() > 0) && (MainOfficeAdressField.getText().length() > 0) && (ContactNameField.getText().length() > 0)
-                    && (ContactTelNumberField.getText().length() > 0) && (ContactEmailField.getText().length() > 0)) {
-                ClientDTO client = new ClientDTO(nameField.getText(), MainOfficeAdressField.getText(), ContactNameField.getText(),
-                        ContactTelNumberField.getText(), ContactEmailField.getText());
-                clientService.save(client);
-            } else {
-                showErrorWindow("Error inserting data", "Please check entered data .. No possible empty fields");
-            }
-            update();
-        } catch (Exception e) {
-            showErrorWindowForException("Error inserting client", e);
-        }
-    }
-
-
-
-    @Async
-    public void update() {
-        List<ClientDTO> dataBaseList = clientService.findAll();
-        List<ClientLocationsDTO> locationsDataBaseList = clientService.findAllLocations();
-        Platform.runLater(() -> {
-            getClientsList().removeAll(
-                    dataBaseList
-                            .stream()
-                            .filter(item -> !getClientsList().contains(item))
-                            .collect(this::getClientsList, ObservableList::add, ObservableList::addAll)
-                            .stream()
-                            .filter(tableListItem -> dataBaseList.stream().noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem)))
-                            .collect(Collectors.toList()));
-
-            getLocationsList().removeAll(
-                    locationsDataBaseList
-                            .stream()
-                            .filter(item -> !getLocationsList().contains(item))
-                            .collect(this::getLocationsList, ObservableList::add, ObservableList::addAll)
-                            .stream()
-                            .filter(tableListItem -> locationsDataBaseList.stream().noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem)))
-                            .collect(Collectors.toList()));
+        table.setOnMouseClicked((a) -> {
+            controller.onTableSelection(table.getSelectionModel().getSelectedItems());
         });
     }
 
@@ -698,34 +345,83 @@ public class ClientWindow implements ApplicationListener<ApplicationContext.Appl
         return root;
     }
 
-    private ObservableList<ClientDTO> getClientsList() {
-        return ClientsList;
-    }
-    private ObservableList<ClientLocationsDTO> getLocationsList() {
-        return locationsList;
-    }
-
-    protected void showErrorWindow(String header, String content){
+    public static void showErrorWindow(String header, String content) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText(header);
             alert.setContentText(content);
             alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(mainStage);
+            alert.initOwner(initialStage.getInitialStage());
             alert.initModality(Modality.WINDOW_MODAL);
             alert.show();
         });
     }
-    protected void showErrorWindowForException(String header, Throwable e) {
+
+    public static void showErrorWindowForException(String header, Throwable e) {
         Platform.runLater(() -> {
             ExceptionDialog exceptionDialog = new ExceptionDialog(e);
             exceptionDialog.setHeaderText(header);
             exceptionDialog.getDialogPane().setMaxWidth(500);
-            exceptionDialog.initOwner(mainStage);
+            exceptionDialog.initOwner(initialStage.getInitialStage());
             exceptionDialog.initModality(Modality.WINDOW_MODAL);
             exceptionDialog.show();
 
         });
+    }
+
+    protected static void showErrorWindowForException(String header, Throwable e, Stage stage) {
+        Platform.runLater(() -> {
+            ExceptionDialog exceptionDialog = new ExceptionDialog(e);
+            exceptionDialog.setHeaderText(header);
+            exceptionDialog.getDialogPane().setMaxWidth(500);
+            exceptionDialog.initOwner(stage);
+            exceptionDialog.initModality(Modality.WINDOW_MODAL);
+            exceptionDialog.show();
+
+        });
+    }
+
+    protected static void showErrorWindowOneTime(String header, String content, Stage stage) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(header);
+            alert.setContentText(content);
+            alert.getDialogPane().setMaxWidth(500);
+            alert.initOwner(stage);
+            alert.initModality(Modality.WINDOW_MODAL);
+            alert.show();
+        });
+    }
+
+    public static void showWarningWindow(String header, String content) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setHeaderText(header);
+            alert.setContentText(content);
+            alert.getDialogPane().setMaxWidth(500);
+            alert.initOwner(initialStage.getInitialStage());
+            alert.initModality(Modality.WINDOW_MODAL);
+            alert.show();
+        });
+    }
+
+    protected static void showInformationWindow(String header, String content, Stage stage) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Notification");
+            alert.setHeaderText(header);
+            alert.setContentText(content);
+            alert.getDialogPane().setMaxWidth(500);
+            alert.initOwner(stage);
+            alert.initModality(Modality.NONE);
+            alert.show();
+        });
+    }
+
+    public void update() {
+        controller.updateDataList();
     }
 }

@@ -24,7 +24,7 @@ public class IconicButton extends HBox {
     final private double width = 300;
 
 
-    private Background normalBackground = new Background(new BackgroundFill(Color.LIGHTBLUE, new CornerRadii(0), Insets.EMPTY));
+    private Background normalBackground = new Background(new BackgroundFill(Color.CADETBLUE, new CornerRadii(0), Insets.EMPTY));
 
     public IconicButton(String windowIconRef) {
         this.windowIconRef = windowIconRef;

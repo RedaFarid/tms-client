@@ -4,11 +4,9 @@ package soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow;
 import javafx.application.Platform;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -24,7 +22,6 @@ import javafx.stage.Stage;
 import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -36,10 +33,8 @@ import soulintec.com.tmsclient.Graphics.Controls.EnhancedLongField;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedTextField;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Services.MaterialService;
-import soulintec.com.tmsclient.Services.TanksService;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.Executor;
 
 @Component
 public class MaterialsWindow implements ApplicationListener<ApplicationContext.ApplicationListener> {
@@ -91,14 +86,6 @@ public class MaterialsWindow implements ApplicationListener<ApplicationContext.A
 
     @Autowired
     private MaterialService materialService;
-
-    @Autowired
-    private TanksService tankService;
-
-
-    @Autowired(required = false)
-    @Qualifier
-    private Executor executor;
 
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
@@ -209,7 +196,7 @@ public class MaterialsWindow implements ApplicationListener<ApplicationContext.A
         creationDateField.setPrefWidth(250);
         modificationDateField.setPrefWidth(250);
         createdByField.setPrefWidth(250);
-        onTerminalLabel.setPrefWidth(250);
+        onTerminalField.setPrefWidth(250);
 
         //restriction handling
         nameField.setRestrict("[a-zA-Z-_/. ]");
@@ -370,7 +357,6 @@ public class MaterialsWindow implements ApplicationListener<ApplicationContext.A
 
     protected static void showErrorWindowForException(String header, Throwable e, Stage stage) {
         Platform.runLater(() -> {
-            System.out.println(stage);
             ExceptionDialog exceptionDialog = new ExceptionDialog(e);
             exceptionDialog.setHeaderText(header);
             exceptionDialog.getDialogPane().setMaxWidth(500);

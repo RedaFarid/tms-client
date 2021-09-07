@@ -97,7 +97,7 @@ public class MaterialController {
         String save = materialService.save(materialDTO);
 
         if (save == null) {
-            MaterialsWindow.showErrorWindow("Error", "Error saving new material");
+            MaterialsWindow.showErrorWindow("Error", "Error updating material");
         }
         updateDataList();
         resetModel();

@@ -38,8 +38,8 @@ public class windowReferenceNode extends HBox {
 
     private Label label = new Label();
 
-    private Background normalBackground = new Background(new BackgroundFill(Color.LIGHTBLUE, new CornerRadii(0), Insets.EMPTY));
-    private Background logoffBackground = new Background(new BackgroundFill(Color.LIGHTBLUE, new CornerRadii(0.1), Insets.EMPTY));
+    private Background normalBackground = new Background(new BackgroundFill(Color.CADETBLUE, new CornerRadii(0), Insets.EMPTY));
+    private Background logoffBackground = new Background(new BackgroundFill(Color.CADETBLUE, new CornerRadii(0.1), Insets.EMPTY));
     private Background activeBackground = new Background(new BackgroundFill(Color.ORANGERED, new CornerRadii(0), Insets.EMPTY));
     private Background focusedBackground = new Background(new BackgroundFill(Color.ORANGE, new CornerRadii(0), Insets.EMPTY));
 

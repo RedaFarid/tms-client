@@ -147,7 +147,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         buttonsview.setMinWidth(SIDE_BAR_COLLAPSED_HEIGHT);
         buttonsview.setSpacing(0);
         buttonsview.setPadding(new Insets(20, 0, 20, 0));
-        buttonsview.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+        buttonsview.setBackground(new Background(new BackgroundFill(Color.CADETBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
         buttonsview.getChildren().add(Iconic);
         buttonsview.getChildren().add(new Separator());
         buttonsview.getChildren().add(logger);
@@ -180,8 +180,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         clock.setRunning(true);
 
         fastActionsBar.getItems().addAll(logIn, logOut, new Separator(), DashBoardButton, new Separator(), exit, currentUserLabel, clock /*, clock */);
-        fastActionsBar.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
-        fastActionsBar.setBorder(new Border(new BorderStroke(Color.LIGHTBLUE.darker(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 0, 1, 0))));
+        fastActionsBar.setBackground(new Background(new BackgroundFill(Color.CADETBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+        fastActionsBar.setBorder(new Border(new BorderStroke(Color.CADETBLUE.darker(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 0, 1, 0))));
 
         root.setTop(fastActionsBar);
         root.setLeft(buttonsview);
