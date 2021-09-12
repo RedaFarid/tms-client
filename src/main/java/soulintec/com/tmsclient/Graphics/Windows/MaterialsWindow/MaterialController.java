@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.MaterialDTO;
+import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientWindow;
 import soulintec.com.tmsclient.Services.MaterialService;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class MaterialController {
             MaterialsWindow.showWarningWindow("Missing Data", "Please enter material");
             return;
         }
-
+        if (!materialService.findByName(name).isPresent()) {
         MaterialDTO materialDTO = new MaterialDTO();
         materialDTO.setName(name);
         materialDTO.setDescription(desc);
@@ -71,6 +72,10 @@ public class MaterialController {
         }
         updateDataList();
         resetModel();
+        }
+        else {
+            MaterialsWindow.showErrorWindow("Error inserting data", "Material already exist , please check entered data");
+        }
     }
 
     @Async

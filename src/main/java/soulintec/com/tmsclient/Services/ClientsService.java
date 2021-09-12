@@ -38,6 +38,12 @@ public class ClientsService {
         return Optional.ofNullable(forEntity.getBody());
     }
 
+    public Optional<ClientDTO> findByName(String  name) {
+        ResponseEntity<ClientDTO> forEntity = restTemplate.getForEntity(Utilities.iP +"/clientByName/"+name, ClientDTO.class);
+
+        return Optional.ofNullable(forEntity.getBody());
+    }
+
     public String deleteById(Long id) {
         ResponseEntity<String> deleteResponseEntity = restTemplate.postForEntity(Utilities.iP +"/deleteClientById",id,  String.class);
         return deleteResponseEntity.getBody();

@@ -31,6 +31,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
 import soulintec.com.tmsclient.Graphics.Windows.*;
+import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientWindow;
+import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversWindow;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.IconicButton;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.WindowInterfaceMessages;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.windowReferenceNode;

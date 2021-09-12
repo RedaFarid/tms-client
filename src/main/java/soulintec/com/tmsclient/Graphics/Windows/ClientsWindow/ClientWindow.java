@@ -1,4 +1,4 @@
-package soulintec.com.tmsclient.Graphics.Windows;
+package soulintec.com.tmsclient.Graphics.Windows.ClientsWindow;
 
 import javafx.application.Platform;
 import javafx.beans.property.LongProperty;
@@ -24,8 +24,6 @@ import soulintec.com.tmsclient.Graphics.Controls.DataEntryPartitionTitled;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedLongField;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedTextField;
-import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientsController;
-import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientsModel;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Services.ClientsService;
 
@@ -110,7 +108,6 @@ public class ClientWindow implements ApplicationListener<ApplicationContext.Appl
         initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
         controller = ApplicationContext.applicationContext.getBean(ClientsController.class);
         model = controller.getModel();
-        initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
 
         dataEntryPartitionTitled = new DataEntryPartitionTitled("Client");
         clientstab = new VBox();
@@ -140,7 +137,7 @@ public class ClientWindow implements ApplicationListener<ApplicationContext.Appl
         updateClient = new EnhancedButton("Update selected client");
         report = new EnhancedButton("Show Report");
 
-        idLabel = new Label("Id");
+        idLabel = new Label("Id :");
         nameLabel = new Label("Name :");
         mainOfficeAdressLabel = new Label("Office Address :");
         contactNameLabel = new Label("Contact name :");

@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.ClientDTO;
-import soulintec.com.tmsclient.Graphics.Windows.ClientWindow;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsWindow;
 import soulintec.com.tmsclient.Services.ClientsService;
 
@@ -85,20 +84,25 @@ public class ClientsController {
             return;
         }
 
-        ClientDTO clientDTO = new ClientDTO();
-        clientDTO.setName(name);
-        clientDTO.setContactName(contactName);
-        clientDTO.setContactTelNumber(contactTel);
-        clientDTO.setContactEmail(contactEmail);
-        clientDTO.setMainOfficeAddress(mainOffice);
+        if (!clientsService.findByName(name).isPresent()) {
+            ClientDTO clientDTO = new ClientDTO();
+            clientDTO.setName(name);
+            clientDTO.setContactName(contactName);
+            clientDTO.setContactTelNumber(contactTel);
+            clientDTO.setContactEmail(contactEmail);
+            clientDTO.setMainOfficeAddress(mainOffice);
 
-        String save = clientsService.save(clientDTO);
+            String save = clientsService.save(clientDTO);
 
-        if (save == null) {
-            MaterialsWindow.showErrorWindow("Error", "Error saving new client");
+            if (save == null) {
+                MaterialsWindow.showErrorWindow("Error", "Error saving new client");
+            }
+            updateDataList();
+            resetModel();
         }
-        updateDataList();
-        resetModel();
+        else {
+                    ClientWindow.showErrorWindow("Error inserting data", "Client already exist , please check entered data");
+                }
     }
 
     @Async

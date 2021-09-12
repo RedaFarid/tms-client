@@ -30,8 +30,10 @@ public class MaterialService {
         return body.getMaterials();
     }
 
-    public MaterialDTO findByName(String text) {
-        return null;
+    public Optional<MaterialDTO> findByName(String name) {
+        ResponseEntity<MaterialDTO> forEntity = restTemplate.getForEntity(Utilities.iP +"/materialByName/"+name, MaterialDTO.class);
+
+        return Optional.ofNullable(forEntity.getBody());
     }
 
     public Optional<MaterialDTO> findById(Long id) {

@@ -9,7 +9,6 @@ import lombok.ToString;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
 @Data
 @ToString
 @AllArgsConstructor
@@ -17,19 +16,28 @@ import java.time.LocalDateTime;
 public class DriverDTO {
 
     private Long id;
-    private String LicenceNumber;
-    private String Name;
-    private LocalDate LicenceExpirationDate;
-    private String MobileNumber;
-    private String Permissions;
-    private String Comment;
+    private String licenseNumber;
+    private String name;
+    private LocalDate licenceExpirationDate;
 
-    public DriverDTO(String licenceNumber, String name, LocalDate licenceExpirationDate, String mobileNumber, String permissions, String comment) {
-        LicenceNumber = licenceNumber;
-        Name = name;
-        LicenceExpirationDate = licenceExpirationDate;
-        MobileNumber = mobileNumber;
-        Permissions = permissions;
-        Comment = comment;
+    private String mobileNumber;
+    private Permissions permissions;
+    private String comment;
+    private LocalDateTime creationDate;
+    private LocalDateTime modifyDate;
+    private String createdBy;
+    private String onTerminal;
+
+    public DriverDTO(String licenseNumber, String name, LocalDate licenceExpirationDate, String mobileNumber, Permissions permissions, String comment, LocalDateTime creationDate, LocalDateTime modifyDate, String createdBy, String onTerminal) {
+        this.licenseNumber = licenseNumber;
+        this.name = name;
+        this.licenceExpirationDate = licenceExpirationDate;
+        this.mobileNumber = mobileNumber;
+        this.permissions = permissions;
+        this.comment = comment;
+        this.creationDate = creationDate;
+        this.modifyDate = modifyDate;
+        this.createdBy = createdBy;
+        this.onTerminal = onTerminal;
     }
 }
