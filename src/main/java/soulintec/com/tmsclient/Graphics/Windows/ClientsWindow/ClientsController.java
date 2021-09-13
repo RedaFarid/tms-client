@@ -41,6 +41,7 @@ public class ClientsController {
                 model.setClientId(clientDTO.getId());
                 model.setName(clientDTO.getName());
                 model.setContactEmail(clientDTO.getContactEmail());
+                model.setContactTelNumber(clientDTO.getContactTelNumber());
                 model.setMainOfficeAddress(clientDTO.getMainOfficeAddress());
                 model.setContactTelNumber(clientDTO.getContactTelNumber());
                 model.setContactName(clientDTO.getContactName());
