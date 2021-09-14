@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.MaterialDTO;
-import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientWindow;
 import soulintec.com.tmsclient.Services.MaterialService;
 
 import java.util.List;

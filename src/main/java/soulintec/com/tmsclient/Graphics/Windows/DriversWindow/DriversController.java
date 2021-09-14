@@ -99,6 +99,7 @@ public class DriversController {
             driverDTO.setLicenceExpirationDate(licenceExpirationDate);
             driverDTO.setMobileNumber(mobileNumber);
             driverDTO.setPermissions(model.getPermissions());
+            driverDTO.setComment(model.getComment());
 
             String save = driverService.save(driverDTO);
 
@@ -121,6 +122,7 @@ public class DriversController {
         LocalDate licenceExpirationDate = model.getLicenceExpirationDate();
         String mobileNumber = model.getMobileNumber();
         Permissions permissions = model.getPermissions();
+
 
         if (StringUtils.isBlank(name)) {
             DriversWindow.showWarningWindow("Missing Data", "Please enter name");
@@ -149,6 +151,7 @@ public class DriversController {
         driverDTO.setLicenceExpirationDate(licenceExpirationDate);
         driverDTO.setMobileNumber(mobileNumber);
         driverDTO.setPermissions(model.getPermissions());
+        driverDTO.setComment(model.getComment());
 
         String save = driverService.save(driverDTO);
 
