@@ -1,5 +1,6 @@
 package soulintec.com.tmsclient.Services;
 
+import javafx.collections.FXCollections;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import soulintec.com.tmsclient.Entities.ClientDTO;
 import soulintec.com.tmsclient.Entities.DriverDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
+import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversWindow;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,9 +27,23 @@ public class DriverService {
     }
 
     public List<DriverDTO> findAll() {
-        ResponseEntity<Drivers> forEntity = restTemplate.getForEntity(Utilities.iP +"/drivers", Drivers.class);
-        Drivers body = forEntity.getBody();
-        return body.getDrivers();
+
+        Drivers body= null;
+        List<DriverDTO> driverDTOS = FXCollections.observableArrayList();
+        try{
+            ResponseEntity<Drivers> forEntity = restTemplate.getForEntity(Utilities.iP +"/drivers", Drivers.class);
+            body = forEntity.getBody();
+
+        }catch (Exception e){
+            DriversWindow.showErrorWindow("Error loading data" , e.getMessage());
+        }
+        if (body.getException() == null){
+            return body.getDrivers();
+        }
+        else {
+            DriversWindow.showErrorWindow("Error loading data" , body.getException().getMessage());
+            return driverDTOS;
+        }
     }
 
     public Optional<DriverDTO> findById(Long id) {
@@ -53,5 +68,6 @@ public class DriverService {
     @NoArgsConstructor
     public static class Drivers{
         private List<DriverDTO> drivers;
+        private Exception exception;
     }
 }

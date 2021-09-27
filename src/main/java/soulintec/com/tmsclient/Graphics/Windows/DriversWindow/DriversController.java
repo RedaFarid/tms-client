@@ -15,6 +15,7 @@ import soulintec.com.tmsclient.Entities.Permissions;
 import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientWindow;
 import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientsModel;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsWindow;
+import soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow.TruckWindow;
 import soulintec.com.tmsclient.Services.DriverService;
 
 import java.time.LocalDate;
@@ -103,13 +104,16 @@ public class DriversController {
 
             String save = driverService.save(driverDTO);
 
-            if (save == null || save == "") {
-                DriversWindow.showErrorWindow("Error", "Error saving new driver");
+            if (save.equals("saved")) {
+                DriversWindow.showInformationWindow("Info", save);
+                updateDataList();
+
+            } else {
+                DriversWindow.showErrorWindow("Error updating data", save);
             }
-            updateDataList();
+
             resetModel();
-        }
-        else {
+        } else {
             DriversWindow.showErrorWindow("Error inserting data", "Driver already exist , please check entered data");
         }
     }
@@ -155,10 +159,13 @@ public class DriversController {
 
         String save = driverService.save(driverDTO);
 
-        if (save == null || save == "") {
-            DriversWindow.showErrorWindow("Error", "Error updating driver");
+        if (save.equals("saved")) {
+            DriversWindow.showInformationWindow("Info", save);
+            updateDataList();
+
+        } else {
+            DriversWindow.showErrorWindow("Error updating data", save);
         }
-        updateDataList();
         resetModel();
     }
 
@@ -166,10 +173,13 @@ public class DriversController {
     public void onDelete(MouseEvent mouseEvent) {
         long id = model.getDriverId();
         String deletedById = driverService.deleteById(id);
-        if (deletedById == null) {
-            MaterialsWindow.showErrorWindow("Error", "Error deleting selected driver");
+        if (deletedById.equals("deleted")) {
+            DriversWindow.showInformationWindow("Info", deletedById);
+            updateDataList();
+
+        } else {
+            DriversWindow.showErrorWindow("Error deleting record", deletedById);
         }
-        updateDataList();
         resetModel();
     }
 
