@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.MaterialDTO;
+import soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow.TruckWindow;
 import soulintec.com.tmsclient.Services.MaterialService;
 
 import java.util.List;
@@ -60,19 +61,21 @@ public class MaterialController {
             return;
         }
         if (!materialService.findByName(name).isPresent()) {
-        MaterialDTO materialDTO = new MaterialDTO();
-        materialDTO.setName(name);
-        materialDTO.setDescription(desc);
+            MaterialDTO materialDTO = new MaterialDTO();
+            materialDTO.setName(name);
+            materialDTO.setDescription(desc);
 
-        String save = materialService.save(materialDTO);
+            String save = materialService.save(materialDTO);
 
-        if (save == null) {
-            MaterialsWindow.showErrorWindow("Error", "Error saving new material");
-        }
-        updateDataList();
-        resetModel();
-        }
-        else {
+            if (save.equals("saved")) {
+                MaterialsWindow.showInformationWindow("Info", save);
+                updateDataList();
+
+            } else {
+                MaterialsWindow.showErrorWindow("Error inserting data", save);
+            }
+            resetModel();
+        } else {
             MaterialsWindow.showErrorWindow("Error inserting data", "Material already exist , please check entered data");
         }
     }
@@ -100,10 +103,13 @@ public class MaterialController {
 
         String save = materialService.save(materialDTO);
 
-        if (save == null) {
-            MaterialsWindow.showErrorWindow("Error", "Error updating material");
+        if (save.equals("saved")) {
+            MaterialsWindow.showInformationWindow("Info", save);
+            updateDataList();
+
+        } else {
+            MaterialsWindow.showErrorWindow("Error updating data", save);
         }
-        updateDataList();
         resetModel();
     }
 
@@ -111,10 +117,13 @@ public class MaterialController {
     public void onDelete(MouseEvent mouseEvent) {
         long materialId = model.getMaterialId();
         String deletedById = materialService.deleteById(materialId);
-        if (deletedById == null) {
-            MaterialsWindow.showErrorWindow("Error", "Error deleting selected material");
+        if (deletedById.equals("deleted")) {
+            MaterialsWindow.showInformationWindow("Info", deletedById);
+            updateDataList();
+
+        } else {
+            MaterialsWindow.showErrorWindow("Error deleting record", deletedById);
         }
-        updateDataList();
         resetModel();
     }
 

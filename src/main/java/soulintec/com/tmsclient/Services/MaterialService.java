@@ -1,5 +1,6 @@
 package soulintec.com.tmsclient.Services;
 
+import javafx.collections.FXCollections;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import soulintec.com.tmsclient.Entities.MaterialDTO;
+import soulintec.com.tmsclient.Entities.TruckContainerDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
+import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsWindow;
+import soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow.TruckWindow;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,9 +29,22 @@ public class MaterialService {
     }
 
     public List<MaterialDTO> findAll() {
-        ResponseEntity<Materials> forEntity = restTemplate.getForEntity(Utilities.iP +"/material", Materials.class);
-       Materials body = forEntity.getBody();
-        return body.getMaterials();
+        Materials body= null;
+        List<MaterialDTO> materials = FXCollections.observableArrayList();
+        try{
+            ResponseEntity<Materials> forEntity = restTemplate.getForEntity(Utilities.iP +"/material", Materials.class);
+            body = forEntity.getBody();
+
+        }catch (Exception e){
+            MaterialsWindow.showErrorWindow("Error loading data" , e.getMessage());
+        }
+        if (body.getException() == null){
+            return body.getMaterials();
+        }
+        else {
+            MaterialsWindow.showErrorWindow("Error loading data" , body.getException().getMessage());
+            return materials;
+        }
     }
 
     public Optional<MaterialDTO> findByName(String name) {
@@ -52,5 +69,6 @@ public class MaterialService {
     @NoArgsConstructor
     public static class Materials {
         private List<MaterialDTO> materials;
+        private Exception exception;
     }
 }
