@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.ClientDTO;
-import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsWindow;
-import soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow.TruckWindow;
 import soulintec.com.tmsclient.Services.ClientsService;
 
 import java.util.List;
@@ -51,7 +49,7 @@ public class ClientsController {
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
-                ClientWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected client");
+                ClientView.showErrorWindow("Data doesn't exist", "Error getting data for selected client");
             });
         }
     }
@@ -66,23 +64,23 @@ public class ClientsController {
         String contactName = model.getContactName();
 
         if (StringUtils.isBlank(name)) {
-            ClientWindow.showWarningWindow("Missing Data", "Please enter name");
+            ClientView.showWarningWindow("Missing Data", "Please enter name");
             return;
         }
         if (StringUtils.isBlank(contactEmail)) {
-            ClientWindow.showWarningWindow("Missing Data", "Please enter email");
+            ClientView.showWarningWindow("Missing Data", "Please enter email");
             return;
         }
         if (StringUtils.isBlank(mainOffice)) {
-            ClientWindow.showWarningWindow("Missing Data", "Please enter main office");
+            ClientView.showWarningWindow("Missing Data", "Please enter main office");
             return;
         }
         if (StringUtils.isBlank(contactTel)) {
-            ClientWindow.showWarningWindow("Missing Data", "Please enter phone number");
+            ClientView.showWarningWindow("Missing Data", "Please enter phone number");
             return;
         }
         if (StringUtils.isBlank(contactName)) {
-            ClientWindow.showWarningWindow("Missing Data", "Please enter  contact name");
+            ClientView.showWarningWindow("Missing Data", "Please enter  contact name");
             return;
         }
 
@@ -96,16 +94,16 @@ public class ClientsController {
 
             String save = clientsService.save(clientDTO);
             if (save.equals("saved")) {
-                ClientWindow.showInformationWindow("Info", save);
+                ClientView.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
-                ClientWindow.showErrorWindow("Error inserting data", save);
+                ClientView.showErrorWindow("Error inserting data", save);
             }
             resetModel();
         }
         else {
-                    ClientWindow.showErrorWindow("Error inserting data", "Client already exist , please check entered data");
+                    ClientView.showErrorWindow("Error inserting data", "Client already exist , please check entered data");
                 }
     }
 
@@ -119,28 +117,28 @@ public class ClientsController {
         String contactName = model.getContactName();
 
         if (id == 0) {
-            ClientWindow.showWarningWindow("Missing Data", "Please select client");
+            ClientView.showWarningWindow("Missing Data", "Please select client");
             return;
         }
 
         if (StringUtils.isBlank(name)) {
-            ClientWindow.showWarningWindow("Missing Data", "Please enter name");
+            ClientView.showWarningWindow("Missing Data", "Please enter name");
             return;
         }
         if (StringUtils.isBlank(contactEmail)) {
-            ClientWindow.showWarningWindow("Missing Data", "Please enter email");
+            ClientView.showWarningWindow("Missing Data", "Please enter email");
             return;
         }
         if (StringUtils.isBlank(mainOffice)) {
-            ClientWindow.showWarningWindow("Missing Data", "Please enter main office");
+            ClientView.showWarningWindow("Missing Data", "Please enter main office");
             return;
         }
         if (StringUtils.isBlank(contactTel)) {
-            ClientWindow.showWarningWindow("Missing Data", "Please enter phone number");
+            ClientView.showWarningWindow("Missing Data", "Please enter phone number");
             return;
         }
         if (StringUtils.isBlank(contactName)) {
-            ClientWindow.showWarningWindow("Missing Data", "Please enter  contact name");
+            ClientView.showWarningWindow("Missing Data", "Please enter  contact name");
             return;
         }
 
@@ -155,11 +153,11 @@ public class ClientsController {
         String save = clientsService.save(clientDTO);
 
         if (save.equals("saved")) {
-            ClientWindow.showInformationWindow("Info", save);
+            ClientView.showInformationWindow("Info", save);
             updateDataList();
 
         } else {
-            ClientWindow.showErrorWindow("Error updating data", save);
+            ClientView.showErrorWindow("Error updating data", save);
         }
         resetModel();
     }
@@ -170,11 +168,11 @@ public class ClientsController {
         long id = model.getClientId();
         String deletedById = clientsService.deleteById(id);
         if (deletedById.equals("deleted")) {
-            ClientWindow.showInformationWindow("Info", deletedById);
+            ClientView.showInformationWindow("Info", deletedById);
             updateDataList();
 
         } else {
-            ClientWindow.showErrorWindow("Error deleting record", deletedById);
+            ClientView.showErrorWindow("Error deleting record", deletedById);
         }
         resetModel();
     }

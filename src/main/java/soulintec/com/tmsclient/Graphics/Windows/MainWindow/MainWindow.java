@@ -30,14 +30,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
-import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientWindow;
-import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversWindow;
+import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientView;
+import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.IconicButton;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.WindowInterfaceMessages;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.windowReferenceNode;
-import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsWindow;
+import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsView;
 import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.MainTanksWindow;
-import soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow.TruckWindow;
+import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 
 @Log4j2
 @Component
@@ -95,21 +95,21 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private final int MAX_NUM_NOTIFICATIONS_LINES = 1;
 
     @Autowired
-    MaterialsWindow materialsWindow;
+    MaterialsView materialsView;
 
     @Autowired
-    ClientWindow clientWindow;
+    ClientView clientView;
 
 
 
     @Autowired
-    DriversWindow driversWindow;
+    DriversView driversView;
 
     @Autowired
     MainTanksWindow mainTanksWindow;
 
     @Autowired
-    TruckWindow truckWindow;
+    TruckView truckView;
 
     private Notifications notifications;
 
@@ -248,20 +248,20 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             mainTanksWindow.update();
         });
         clients.setOnIconClicked((String param) -> {
-            clientWindow.update();
-            root.setCenter(clientWindow.getTabContainer());
+            clientView.update();
+            root.setCenter(clientView.getTabContainer());
         });
         drivers.setOnIconClicked((String param) -> {
-            driversWindow.update();
-            root.setCenter(driversWindow.getRoot());
+            driversView.update();
+            root.setCenter(driversView.getRoot());
         });
         products.setOnIconClicked((String param) -> {
-            materialsWindow.update();
-            root.setCenter(materialsWindow.getRoot());
+            materialsView.update();
+            root.setCenter(materialsView.getRoot());
         });
         trucks.setOnIconClicked((String param) -> {
-            truckWindow.update();
-            root.setCenter(truckWindow.getTabContainer());
+            truckView.update();
+            root.setCenter(truckView.getTabContainer());
         });
     }
 

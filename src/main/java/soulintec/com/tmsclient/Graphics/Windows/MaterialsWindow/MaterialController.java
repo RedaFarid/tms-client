@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.MaterialDTO;
-import soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow.TruckWindow;
 import soulintec.com.tmsclient.Services.MaterialService;
 
 import java.util.List;
@@ -45,7 +44,7 @@ public class MaterialController {
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
-                MaterialsWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected material");
+                MaterialsView.showErrorWindow("Data doesn't exist", "Error getting data for selected material");
             });
         }
     }
@@ -57,7 +56,7 @@ public class MaterialController {
         String desc = model.getDescription();
 
         if (StringUtils.isBlank(name)) {
-            MaterialsWindow.showWarningWindow("Missing Data", "Please enter material");
+            MaterialsView.showWarningWindow("Missing Data", "Please enter material");
             return;
         }
         if (!materialService.findByName(name).isPresent()) {
@@ -68,15 +67,15 @@ public class MaterialController {
             String save = materialService.save(materialDTO);
 
             if (save.equals("saved")) {
-                MaterialsWindow.showInformationWindow("Info", save);
+                MaterialsView.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
-                MaterialsWindow.showErrorWindow("Error inserting data", save);
+                MaterialsView.showErrorWindow("Error inserting data", save);
             }
             resetModel();
         } else {
-            MaterialsWindow.showErrorWindow("Error inserting data", "Material already exist , please check entered data");
+            MaterialsView.showErrorWindow("Error inserting data", "Material already exist , please check entered data");
         }
     }
 
@@ -87,12 +86,12 @@ public class MaterialController {
         Long id = model.getMaterialId();
 
         if (id == 0) {
-            MaterialsWindow.showWarningWindow("Missing Data", "Please select material");
+            MaterialsView.showWarningWindow("Missing Data", "Please select material");
             return;
         }
 
         if (StringUtils.isBlank(name)) {
-            MaterialsWindow.showWarningWindow("Missing Data", "Please enter material");
+            MaterialsView.showWarningWindow("Missing Data", "Please enter material");
             return;
         }
 
@@ -104,11 +103,11 @@ public class MaterialController {
         String save = materialService.save(materialDTO);
 
         if (save.equals("saved")) {
-            MaterialsWindow.showInformationWindow("Info", save);
+            MaterialsView.showInformationWindow("Info", save);
             updateDataList();
 
         } else {
-            MaterialsWindow.showErrorWindow("Error updating data", save);
+            MaterialsView.showErrorWindow("Error updating data", save);
         }
         resetModel();
     }
@@ -118,11 +117,11 @@ public class MaterialController {
         long materialId = model.getMaterialId();
         String deletedById = materialService.deleteById(materialId);
         if (deletedById.equals("deleted")) {
-            MaterialsWindow.showInformationWindow("Info", deletedById);
+            MaterialsView.showInformationWindow("Info", deletedById);
             updateDataList();
 
         } else {
-            MaterialsWindow.showErrorWindow("Error deleting record", deletedById);
+            MaterialsView.showErrorWindow("Error deleting record", deletedById);
         }
         resetModel();
     }

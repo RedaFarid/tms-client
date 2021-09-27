@@ -1,4 +1,4 @@
-package soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow;
+package soulintec.com.tmsclient.Graphics.Windows.TruckWindow;
 
 import javafx.application.Platform;
 import javafx.beans.property.LongProperty;
@@ -11,7 +11,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
@@ -20,7 +19,6 @@ import javafx.stage.Stage;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
 import soulintec.com.tmsclient.Entities.Permissions;
@@ -36,11 +34,12 @@ import soulintec.com.tmsclient.Services.TruckTrailerService;
 import java.time.LocalDateTime;
 
 @Component
-public class TruckWindow implements ApplicationListener<ApplicationContext.ApplicationListener> {
-
+public class TruckView implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private TruckController controller;
     private TruckContainerModel containerModel;
+    private TruckTrailerModel trailerModel;
+
 
     protected static MainWindow initialStage;
 
@@ -49,27 +48,34 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
 
     private Tab trailersTab;
     private Tab containersTab;
+
     private VBox trailersPane;
     private VBox containersPane;
 
     private VBox trailersVbox;
     private ToolBar trailersHbox;
+
     private VBox containersVvox;
     private ToolBar containersHbox;
 
     private BorderPane root;
     private TabPane tabContainer;
+    private TabPane tabTrailer;
     private Label headerLabel;
 
     private Stage mainWindow;
 
-    private TableView<TruckTrailerDTO> trailersTableView;
-    private TableColumn<TruckTrailerDTO, LongProperty> trailerIdColumn;
-    private TableColumn<TruckTrailerDTO, StringProperty> trailerNumberColumn;
-    private TableColumn<TruckTrailerDTO, StringProperty> trailerLicenceNumberColumn;
-    private TableColumn<TruckTrailerDTO, StringProperty> trailerLicenceExpirationDateColumn;
-    private TableColumn<TruckTrailerDTO, StringProperty> permissionsColumn;
-    private TableColumn<TruckTrailerDTO, StringProperty> commentColumn;
+    private TableView<TruckTrailerModel.TableObject> trailersTableView;
+    private TableColumn<TruckTrailerModel.TableObject, LongProperty> trailerIdColumn;
+    private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerNumColumn;
+    private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerLicenceColumn;
+    private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerLicenceExpirationDateColumn;
+    private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerPermissionsColumn;
+    private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerCommentColumn;
+    private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerCreatedByColumn;
+    private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerOnTerminalColumn;
+    private TableColumn<TruckTrailerModel.TableObject, ObjectProperty<LocalDateTime>> trailerCreationDateColumn;
+    private TableColumn<TruckTrailerModel.TableObject, ObjectProperty<LocalDateTime>> trailerModifyDateColumn;
 
     private TableView<TruckContainerModel.TableObject> containersTableView;
     private TableColumn<TruckContainerModel.TableObject, LongProperty> containerIdColumn;
@@ -87,7 +93,7 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
     private EnhancedButton insertTrailer;
     private EnhancedButton deleteTrailer;
     private EnhancedButton updateTrailer;
-    private EnhancedButton report;
+    private EnhancedButton trailerReport;
 
     private EnhancedButton insertContainer;
     private EnhancedButton deleteContainer;
@@ -96,10 +102,14 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
 
     private Label trailerIdLabel;
     private Label trailerNumberLabel;
-    private Label trailerLicenceNumberLabel;
+    private Label trailerLicenceLabel;
     private Label trailerLicenceExpirationDateLabel;
     private Label trailerPermissionLabel;
     private Label trailerCommentLabel;
+    private Label trailerCreationDateLabel;
+    private Label trailerModificationLabel;
+    private Label trailerOnTerminalLabel;
+    private Label trailerCreatedByLabel;
 
     private Label containerIdLabel;
     private Label containerNumberLabel;
@@ -113,12 +123,16 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
     private Label containerOnTerminalLabel;
     private Label containerCreatedByLabel;
 
-    private EnhancedTextField trailerIdField;
+    private EnhancedLongField trailerIdField;
     private EnhancedTextField trailerNumberField;
     private EnhancedTextField trailerLicenceNumberField;
     private DatePicker trailerLicenceExpirationDateField;
     private ComboBox trailerPermissionField;
     private EnhancedTextField trailerCommentField;
+    private EnhancedTextField trailerCreationDateField;
+    private EnhancedTextField trailerModificationDateField;
+    private EnhancedTextField trailerCreatedByField;
+    private EnhancedTextField trailerOnTerminalField;
 
     private EnhancedLongField containerIdField;
     private EnhancedTextField containerNumberField;
@@ -151,6 +165,7 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
         initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
         controller = ApplicationContext.applicationContext.getBean(TruckController.class);
         containerModel = controller.getTruckContainerModel();
+        trailerModel = controller.getTruckTrailerModel();
 
         trailersDataEntry = new DataEntryPartitionTitled("Trailer");
         containersDataEntry = new DataEntryPartitionTitled("Container");
@@ -172,30 +187,42 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
         //Trailers
         trailersTableView = new TableView<>();
         trailerIdColumn = new TableColumn<>("Trailer Id");
-        trailerNumberColumn = new TableColumn<>("Trailer Number");
-        trailerLicenceNumberColumn = new TableColumn<>("Licence Num");
-        trailerLicenceExpirationDateColumn = new TableColumn<>("Licence Expiry");
-        permissionsColumn = new TableColumn<>("Permission");
-        commentColumn = new TableColumn<>("Comment");
+        trailerNumColumn = new TableColumn<>("Number");
+        trailerLicenceColumn = new TableColumn<>("Licence");
+        trailerLicenceExpirationDateColumn = new TableColumn<>("LicenceExpiration date");
+        trailerPermissionsColumn = new TableColumn<>("Permissions");
+        trailerCommentColumn = new TableColumn<>("Comment");
+        trailerCreatedByColumn = new TableColumn<>("Created By");
+        trailerOnTerminalColumn = new TableColumn<>("On Terminal");
+        trailerCreationDateColumn = new TableColumn<>("Creation Date");
+        trailerModifyDateColumn = new TableColumn<>("Modification Date");
 
         insertTrailer = new EnhancedButton("Insert new trailer");
         deleteTrailer = new EnhancedButton("Delete selected trailer");
         updateTrailer = new EnhancedButton("Update selected trailer");
-        report = new EnhancedButton("Show Report");
+        trailerReport = new EnhancedButton("Show Report");
 
         trailerIdLabel = new Label("Trailer Id :");
         trailerNumberLabel = new Label("Trailer Number :");
-        trailerLicenceNumberLabel = new Label("Licence number :");
+        trailerLicenceLabel = new Label("Licence Number :");
         trailerLicenceExpirationDateLabel = new Label("Licence Expiry :");
         trailerPermissionLabel = new Label("Permission :");
         trailerCommentLabel = new Label("Comment :");
+        trailerCreationDateLabel = new Label("Creation Date :");
+        trailerModificationLabel = new Label("Modification Date :");
+        trailerOnTerminalLabel = new Label("On Terminal :");
+        trailerCreatedByLabel = new Label("Created By :");
 
-        trailerIdField = new EnhancedTextField();
+        trailerIdField = new EnhancedLongField();
         trailerNumberField = new EnhancedTextField();
         trailerLicenceNumberField = new EnhancedTextField();
         trailerLicenceExpirationDateField = new DatePicker();
         trailerPermissionField = new ComboBox();
         trailerCommentField = new EnhancedTextField();
+        trailerCreationDateField = new EnhancedTextField();
+        trailerModificationDateField = new EnhancedTextField();
+        trailerCreatedByField = new EnhancedTextField();
+        trailerOnTerminalField = new EnhancedTextField();
 
         //Containers
         containersTableView = new TableView<>();
@@ -241,12 +268,17 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
         containerOnTerminalField = new EnhancedTextField();
     }
 
-
     private void userAuthorities() {
 
     }
 
     private  void graphicsBuilder() {
+        headerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:white;-fx-font-size:25;");
+        headerLabel.setAlignment(Pos.CENTER);
+        headerLabel.setTextAlignment(TextAlignment.CENTER);
+        headerLabel.prefWidthProperty().bind(root.widthProperty());
+        headerLabel.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE.darker(), CornerRadii.EMPTY, Insets.EMPTY)));
+
         trailersGraphicsBuilder();
         containersGraphicBuilder();
 
@@ -257,88 +289,137 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
         root.setPadding(new Insets(10));
     }
     private  void trailersGraphicsBuilder() {
-        headerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:white;-fx-font-size:25;");
-        headerLabel.setAlignment(Pos.CENTER);
-        headerLabel.setTextAlignment(TextAlignment.CENTER);
-        headerLabel.prefWidthProperty().bind(tabContainer.widthProperty());
-        headerLabel.setBackground(new Background(new BackgroundFill(Color.LIGHTBLUE.darker(), CornerRadii.EMPTY, Insets.EMPTY)));
-
         //control buttons configuration
-        insertTrailer.setPrefWidth(150);
-        deleteTrailer.setPrefWidth(150);
-        updateTrailer.setPrefWidth(150);
-        report.setPrefWidth(150);
-        
+        insertTrailer.setPrefWidth(160);
+        deleteTrailer.setPrefWidth(160);
+        updateTrailer.setPrefWidth(160);
+        trailerReport.setPrefWidth(160);
+
         //dataentery region configuration
         trailerIdLabel.setPrefWidth(150);
         trailerNumberLabel.setPrefWidth(150);
-        trailerLicenceNumberLabel.setPrefWidth(150);
+        trailerLicenceLabel.setPrefWidth(150);
         trailerLicenceExpirationDateLabel.setPrefWidth(150);
         trailerPermissionLabel.setPrefWidth(150);
         trailerCommentLabel.setPrefWidth(150);
+        trailerCreatedByLabel.setPrefWidth(150);
+        trailerOnTerminalLabel.setPrefWidth(150);
+        trailerModificationLabel.setPrefWidth(150);
+        trailerCreationDateLabel.setPrefWidth(150);
 
         trailerIdLabel.setTextAlignment(TextAlignment.RIGHT);
         trailerNumberLabel.setTextAlignment(TextAlignment.RIGHT);
-        trailerLicenceNumberLabel.setTextAlignment(TextAlignment.RIGHT);
+        trailerLicenceLabel.setTextAlignment(TextAlignment.RIGHT);
         trailerLicenceExpirationDateLabel.setTextAlignment(TextAlignment.RIGHT);
         trailerPermissionLabel.setTextAlignment(TextAlignment.RIGHT);
         trailerCommentLabel.setTextAlignment(TextAlignment.RIGHT);
+        trailerCreatedByLabel.setTextAlignment(TextAlignment.RIGHT);
+        trailerOnTerminalLabel.setTextAlignment(TextAlignment.RIGHT);
+        trailerModificationLabel.setTextAlignment(TextAlignment.RIGHT);
+        trailerCreationDateLabel.setTextAlignment(TextAlignment.RIGHT);
 
         trailerIdLabel.setAlignment(Pos.BASELINE_RIGHT);
         trailerNumberLabel.setAlignment(Pos.BASELINE_RIGHT);
-        trailerLicenceNumberLabel.setAlignment(Pos.BASELINE_RIGHT);
+        trailerLicenceLabel.setAlignment(Pos.BASELINE_RIGHT);
         trailerLicenceExpirationDateLabel.setAlignment(Pos.BASELINE_RIGHT);
         trailerPermissionLabel.setAlignment(Pos.BASELINE_RIGHT);
         trailerCommentLabel.setAlignment(Pos.BASELINE_RIGHT);
+        trailerCreatedByLabel.setAlignment(Pos.BASELINE_RIGHT);
+        trailerOnTerminalLabel.setAlignment(Pos.BASELINE_RIGHT);
+        trailerModificationLabel.setAlignment(Pos.BASELINE_RIGHT);
+        trailerCreationDateLabel.setAlignment(Pos.BASELINE_RIGHT);
 
         trailerIdLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         trailerNumberLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        trailerLicenceNumberLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        trailerLicenceLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         trailerLicenceExpirationDateLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         trailerPermissionLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         trailerCommentLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-
+        trailerCreatedByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        trailerOnTerminalLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        trailerModificationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        trailerCreationDateLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
         trailerIdField.setPrefWidth(250);
+        trailerNumberField.setPrefWidth(250);
         trailerLicenceNumberField.setPrefWidth(250);
         trailerLicenceExpirationDateField.setPrefWidth(250);
         trailerPermissionField.setPrefWidth(250);
         trailerCommentField.setPrefWidth(250);
-        trailerNumberField.setPrefWidth(250);
+        trailerCreatedByField.setPrefWidth(250);
+        trailerCreationDateField.setPrefWidth(250);
+        trailerOnTerminalField.setPrefWidth(250);
+        trailerModificationDateField.setPrefWidth(250);
+
+        trailerIdField.setEditable(false);
+        trailerCreatedByField.setEditable(false);
+        trailerCreationDateField.setEditable(false);
+        trailerOnTerminalField.setEditable(false);
+        trailerModificationDateField.setEditable(false);
 
         //restriction handling
         trailerLicenceNumberField.setRestrict("[0-9]");
+        trailerLicenceNumberField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("[0-9]*")) {
+                trailerLicenceNumberField.setText(oldValue);
+            }
+        });
         trailerLicenceNumberField.setMaxLength(14);
         trailerNumberField.setMaxLength(14);
+        trailerNumberField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue!=null){
+                if (!newValue.matches("[0-9]*")) {
+                    trailerNumberField.setText(oldValue);
+                }
+            }
+        });
         trailerCommentField.setMaxLength(500);
 
-        //disabling aditable datepickers
-        trailerLicenceExpirationDateField.setEditable(false);
+        //positioning labels and fields
+        trailersDataEntry.add(trailerIdLabel, 1, 1);
+        trailersDataEntry.add(trailerIdField, 2, 1);
+        trailersDataEntry.add(trailerNumberLabel, 3, 1);
+        trailersDataEntry.add(trailerNumberField, 4, 1);
+        trailersDataEntry.add(trailerLicenceLabel, 5, 1);
+        trailersDataEntry.add(trailerLicenceNumberField, 6, 1);
 
-        trailersDataEntry.add(trailerIdLabel, 5, 2);
-        trailersDataEntry.add(trailerNumberLabel, 1, 2);
-        trailersDataEntry.add(trailerLicenceNumberLabel, 3, 2);
-        trailersDataEntry.add(trailerLicenceExpirationDateLabel, 1, 3);
-        trailersDataEntry.add(trailerPermissionLabel, 3, 3);
-        trailersDataEntry.add(trailerCommentLabel, 1, 4);
+        trailersDataEntry.add(trailerPermissionLabel, 1, 2);
+        trailersDataEntry.add(trailerPermissionField, 2, 2);
+        trailersDataEntry.add(trailerLicenceExpirationDateLabel, 3, 2);
+        trailersDataEntry.add(trailerLicenceExpirationDateField, 4, 2);
+        trailersDataEntry.add(trailerCommentLabel, 5, 2);
+        trailersDataEntry.add(trailerCommentField, 6, 2,3,1);
 
-        trailersDataEntry.add(trailerIdField, 6, 2);
-        trailersDataEntry.add(trailerNumberField, 2, 2);
-        trailersDataEntry.add(trailerLicenceNumberField, 4, 2);
-        trailersDataEntry.add(trailerLicenceExpirationDateField, 2, 3);
-        trailersDataEntry.add(trailerPermissionField, 4, 3);
-        trailersDataEntry.add(trailerCommentField, 2, 4);
+        trailersDataEntry.add(trailerCreationDateLabel, 1, 3);
+        trailersDataEntry.add(trailerCreationDateField, 2, 3);
+        trailersDataEntry.add(trailerModificationLabel, 3, 3);
+        trailersDataEntry.add(trailerModificationDateField, 4, 3);
+        trailersDataEntry.add(trailerCreatedByLabel, 5, 3);
+        trailersDataEntry.add(trailerCreatedByField, 6, 3);
+        trailersDataEntry.add(trailerOnTerminalLabel, 7, 3);
+        trailersDataEntry.add(trailerOnTerminalField, 8, 3);
+
+        trailerPermissionField.getItems().addAll(FXCollections.observableArrayList(Permissions.values()));
 
         //table configuration
-        trailerIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        trailerNumberColumn.setCellValueFactory(new PropertyValueFactory<>("TrailerNumber"));
-        trailerLicenceNumberColumn.setCellValueFactory(new PropertyValueFactory<>("LicenceNumber"));
-        trailerLicenceExpirationDateColumn.setCellValueFactory(new PropertyValueFactory<>("LicenceExpirationDate"));
-        permissionsColumn.setCellValueFactory(new PropertyValueFactory<>("Permissions"));
-        commentColumn.setCellValueFactory(new PropertyValueFactory<>("Comment"));
+        trailerIdColumn.setCellValueFactory(new PropertyValueFactory<>("truckTrailerIdColumn"));
+        trailerNumColumn.setCellValueFactory(new PropertyValueFactory<>("trailerNumberColumn"));
+        trailerLicenceColumn.setCellValueFactory(new PropertyValueFactory<>("licenseNumberColumn"));
+        trailerLicenceExpirationDateColumn.setCellValueFactory(new PropertyValueFactory<>("licenceExpirationDateColumn"));
+        trailerPermissionsColumn.setCellValueFactory(new PropertyValueFactory<>("permissionsColumn"));
+        trailerCommentColumn.setCellValueFactory(new PropertyValueFactory<>("commentColumn"));
+        trailerCreatedByColumn.setCellValueFactory(new PropertyValueFactory<>("createdByColumn"));
+        trailerOnTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
+        trailerCreationDateColumn.setCellValueFactory(new PropertyValueFactory<>("creationDateColumn"));
+        trailerModifyDateColumn.setCellValueFactory(new PropertyValueFactory<>("modifyDateColumn"));
 
-        trailersTableView.getColumns().addAll(trailerIdColumn, trailerNumberColumn, trailerLicenceNumberColumn, trailerLicenceExpirationDateColumn, permissionsColumn);
+        trailersTableView.getColumns().addAll(trailerIdColumn, trailerNumColumn, trailerLicenceColumn, trailerLicenceExpirationDateColumn,
+                trailerPermissionsColumn, trailerCommentColumn, trailerCreationDateColumn,
+                trailerModifyDateColumn, trailerCreatedByColumn, trailerOnTerminalColumn);
+        trailersTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        trailersTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         trailersTableView.prefHeightProperty().bind(tabContainer.heightProperty().subtract(trailersVbox.heightProperty()));
+        trailersTableView.setItems(controller.getTruckTrailerDataList());
 
         trailersHbox.getItems().addAll(insertTrailer, updateTrailer, deleteTrailer);
         trailersHbox.setPadding(new Insets(10, 10, 10, 10));
@@ -348,12 +429,26 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
         trailersVbox.setSpacing(10);
         trailersVbox.setAlignment(Pos.CENTER);
 
+        trailersTab.setContent(trailersPane);
+        trailersTab.setClosable(false);
+
         trailersPane.getChildren().add(trailersVbox);
         trailersPane.getChildren().add(trailersTableView);
         trailersPane.setPadding(new Insets(10));
 
         trailersTab.setContent(trailersPane);
         trailersTab.setClosable(false);
+
+        trailerIdField.longValueProperty().bindBidirectional(trailerModel.truckTrailerIdProperty());
+        trailerNumberField.textProperty().bindBidirectional(trailerModel.trailerNumberProperty());
+        trailerLicenceNumberField.textProperty().bindBidirectional(trailerModel.licenseNumberProperty());
+        trailerLicenceExpirationDateField.valueProperty().bindBidirectional(trailerModel.licenceExpirationDateProperty());
+        trailerPermissionField.valueProperty().bindBidirectional(trailerModel.permissionsProperty());
+        trailerCommentField.textProperty().bindBidirectional(trailerModel.commentProperty());
+        trailerCreatedByField.textProperty().bindBidirectional(trailerModel.createdByProperty());
+        trailerOnTerminalField.textProperty().bindBidirectional(trailerModel.onTerminalProperty());
+        trailerModificationDateField.textProperty().bindBidirectional(trailerModel.modifyDateProperty());
+        trailerCreationDateField.textProperty().bindBidirectional(trailerModel.creationDateProperty());
     }
     private  void containersGraphicBuilder() {
         //control buttons configuration
@@ -422,6 +517,12 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
         containerCreationDateField.setPrefWidth(250);
         containerOnTerminalField.setPrefWidth(250);
         containerModificationDateField.setPrefWidth(250);
+
+        containerIdField.setEditable(false);
+        containerCreatedByField.setEditable(false);
+        containerCreationDateField.setEditable(false);
+        containerOnTerminalField.setEditable(false);
+        containerModificationDateField.setEditable(false);
 
         //restriction handling
         containerLicenceNumberField.setRestrict("[0-9]");
@@ -529,29 +630,17 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
         containersActionHandling();
     }
     private  void trailersActionHandling() {
-        insertTrailer.setOnMouseClicked(this::onCreateTrailer);
-        deleteTrailer.setOnMouseClicked(this::onDeleteTrailer);
-        updateTrailer.setOnMouseClicked(this::onUpdateTrailer);
+        insertTrailer.setOnMouseClicked(controller::onInsertTruckTrailer);
+        deleteTrailer.setOnMouseClicked(controller::onTrailerDelete);
+        updateTrailer.setOnMouseClicked(controller::onUpdateTruckTrailer);
 
-        trailersTableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TruckTrailerDTO>) action -> {
-            try {
-                if (action.getList().size() > 0) {
-                    TruckTrailerDTO selected = trailersTableView.getSelectionModel().getSelectedItem();
-                    trailerIdField.setText(String.valueOf(selected.getId()));
-                    trailerNumberField.setText(selected.getTrailerNumber());
-                    trailerLicenceNumberField.setText(selected.getLicenceNumber());
-                    trailerLicenceExpirationDateField.setValue(selected.getLicenceExpirationDate());
-                    trailerPermissionField.setValue(selected.getPermissions());
-                    trailerCommentField.setText(selected.getComment());
-                }
-            } catch (Exception e) {
-                showErrorWindow("Error Importing data", "Please select table row again");
-            }
+        trailersTableView.setOnMouseClicked((a) -> {
+            controller.onTruckTrailerTableSelection(trailersTableView.getSelectionModel().getSelectedItems());
         });
     }
     private  void containersActionHandling() {
         insertContainer.setOnMouseClicked(controller::onInsertTruckContainer);
-        deleteContainer.setOnMouseClicked(controller::onDelete);
+        deleteContainer.setOnMouseClicked(controller::onContainerDelete);
         updateContainer.setOnMouseClicked(controller::onUpdateTruckContainer);
 
         containersTableView.setOnMouseClicked((a) -> {
@@ -559,55 +648,10 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
         });
     }
 
-    @Async
-    private void onCreateTrailer(MouseEvent action) {
-//        if ((trailerNumberField.getText().length() > 0) && (trailerLicenceNumberField.getText().length() > 0)) {
-//            if ((truckTrailerService.findByLicence(Long.parseLong(trailerLicenceNumberField.getText())).isEmpty())) {
-//                TruckTrailerDTO trailer = new TruckTrailerDTO(trailerNumberField.getText(), trailerLicenceNumberField.getText(),
-//                      trailerLicenceExpirationDateField.getValue(), trailerPermissionField.getSelectionModel().getSelectedItem().toString(),
-//                        trailerCommentField.getText());
-//                truckTrailerService.save(trailer);
-//                update();
-//            } else {
-//                showErrorWindow("Error Inserting data", "Truck Trailer already exist , please check entered data ...");
-//            }
-//        } else {
-//            showErrorWindow("Error inserting data", "Please check entered data .. No possible empty fields");
-//        }
-    }
-
-    @Async
-    private void onDeleteTrailer(MouseEvent action) {
-        try {
-                truckTrailerService.deleteById(Long.parseLong(trailerNumberField.getText()));
-                update();
-
-        }catch (Exception e){
-            showErrorWindowForException("Error deleting trailer", e);
-        }
-    }
-
-    @Async
-    private void onUpdateTrailer(MouseEvent action) {
-//        if ((TrailerNumberField.getText().length() > 0) && (TrailerLicenceNumberField.getText().length() > 0)) {
-//            if (truckTrailerService.findById(Long.parseLong(TrailerIdField.getText())).isPresent()) {
-//                TruckTrailerDTO trailer = new TruckTrailerDTO(Long.parseLong(TrailerIdField.getText()), TrailerNumberField.getText(), TrailerLicenceNumberField.getText(),
-//                       TrailerLicenceExpirationDateField.getValue(), TrailerPermissionField.getSelectionModel().getSelectedItem().toString(),
-//                        TrailerCommentField.getText());
-//
-//                truckTrailerService.save(trailer);
-//                update();
-//            } else {
-//                showErrorWindow("Error Inserting data", "Truck Trailer not exist , please check entered data ...");
-//            }
-//        } else {
-//            showErrorWindow("Error updating data", "Please check entered data .. No possible empty fields");
-//        }
-    }
-
-    @Async
     public  void update() {
-       controller.updateDataList();
+        controller.updateTrailerDataList();
+        controller.updateContainerDataList();
+
     }
 
     public Node getTabContainer() {

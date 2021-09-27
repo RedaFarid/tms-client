@@ -1,20 +1,19 @@
-package soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow;
+package soulintec.com.tmsclient.Graphics.Windows.TruckWindow;
 
 import com.google.common.base.Objects;
 import javafx.beans.property.*;
 import soulintec.com.tmsclient.Entities.Permissions;
-import soulintec.com.tmsclient.Entities.TruckContainerDTO;
+import soulintec.com.tmsclient.Entities.TruckTrailerDTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class TruckContainerModel {
+public class TruckTrailerModel {
 
-    private final LongProperty truckContainerId = new SimpleLongProperty();
-    private final StringProperty containerNumber = new SimpleStringProperty();
+    private final LongProperty truckTrailerId = new SimpleLongProperty();
+    private final StringProperty trailerNumber = new SimpleStringProperty();
     private final StringProperty licenseNumber = new SimpleStringProperty("");
     private final ObjectProperty<LocalDate> licenceExpirationDate = new SimpleObjectProperty<>();
-    private final DoubleProperty maximumWeightConstrain = new SimpleDoubleProperty();
     private final ObjectProperty<Permissions> permissions = new SimpleObjectProperty<>();
     private final StringProperty comment = new SimpleStringProperty("");
     private final StringProperty modifyDate = new SimpleStringProperty();
@@ -22,28 +21,28 @@ public class TruckContainerModel {
     private final StringProperty createdBy = new SimpleStringProperty();
     private final StringProperty onTerminal = new SimpleStringProperty();
 
-    public long getTruckContainerId() {
-        return truckContainerId.get();
+    public long getTruckTrailerId() {
+        return truckTrailerId.get();
     }
 
-    public LongProperty truckContainerIdProperty() {
-        return truckContainerId;
+    public LongProperty truckTrailerIdProperty() {
+        return truckTrailerId;
     }
 
-    public void setTruckContainerId(long truckContainerId) {
-        this.truckContainerId.set(truckContainerId);
+    public void setTruckTrailerId(long truckTrailerId) {
+        this.truckTrailerId.set(truckTrailerId);
     }
 
-    public String getContainerNumber() {
-        return containerNumber.get();
+    public String getTrailerNumber() {
+        return trailerNumber.get();
     }
 
-    public StringProperty containerNumberProperty() {
-        return containerNumber;
+    public StringProperty trailerNumberProperty() {
+        return trailerNumber;
     }
 
-    public void setContainerNumber(String containerNumber) {
-        this.containerNumber.set(containerNumber);
+    public void setTrailerNumber(String trailerNumber) {
+        this.trailerNumber.set(trailerNumber);
     }
 
     public String getLicenseNumber() {
@@ -68,18 +67,6 @@ public class TruckContainerModel {
 
     public void setLicenceExpirationDate(LocalDate licenceExpirationDate) {
         this.licenceExpirationDate.set(licenceExpirationDate);
-    }
-
-    public double getMaximumWeightConstrain() {
-        return maximumWeightConstrain.get();
-    }
-
-    public DoubleProperty maximumWeightConstrainProperty() {
-        return maximumWeightConstrain;
-    }
-
-    public void setMaximumWeightConstrain(double maximumWeightConstrain) {
-        this.maximumWeightConstrain.set(maximumWeightConstrain);
     }
 
     public Permissions getPermissions() {
@@ -154,13 +141,12 @@ public class TruckContainerModel {
         this.onTerminal.set(onTerminal);
     }
 
-    public static class TableObject implements Comparable<TruckContainerModel.TableObject>{
+    public static class TableObject implements Comparable<TruckTrailerModel.TableObject>{
 
-        private final LongProperty truckContainerIdColumn;
-        private final StringProperty containerNumberColumn;
+        private final LongProperty truckTrailerIdColumn;
+        private final StringProperty trailerNumberColumn;
         private final StringProperty licenseNumberColumn;
         private final ObjectProperty<LocalDate> licenceExpirationDateColumn;
-        private final DoubleProperty maximumWeightConstrainColumn;
         private final ObjectProperty<Permissions> permissionsColumn;
         private final StringProperty commentColumn;
         private final ObjectProperty<LocalDateTime> creationDateColumn;
@@ -168,12 +154,11 @@ public class TruckContainerModel {
         private final StringProperty createdByColumn;
         private final StringProperty onTerminalColumn;
 
-        public TableObject(LongProperty truckContainerIdColumn, StringProperty containerNumberColumn, StringProperty licenseNumberColumn, ObjectProperty<LocalDate> licenceExpirationDateColumn, DoubleProperty maximumWeightConstrainColumn, ObjectProperty<Permissions> permissionsColumn, StringProperty commentColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn) {
-            this.truckContainerIdColumn = truckContainerIdColumn;
-            this.containerNumberColumn = containerNumberColumn;
+        public TableObject(LongProperty truckTrailerIdColumn, StringProperty trailerNumberColumn, StringProperty licenseNumberColumn, ObjectProperty<LocalDate> licenceExpirationDateColumn, ObjectProperty<Permissions> permissionsColumn, StringProperty commentColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn) {
+            this.truckTrailerIdColumn = truckTrailerIdColumn;
+            this.trailerNumberColumn = trailerNumberColumn;
             this.licenseNumberColumn = licenseNumberColumn;
             this.licenceExpirationDateColumn = licenceExpirationDateColumn;
-            this.maximumWeightConstrainColumn = maximumWeightConstrainColumn;
             this.permissionsColumn = permissionsColumn;
             this.commentColumn = commentColumn;
             this.creationDateColumn = creationDateColumn;
@@ -182,28 +167,28 @@ public class TruckContainerModel {
             this.onTerminalColumn = onTerminalColumn;
         }
 
-        public long getTruckContainerIdColumn() {
-            return truckContainerIdColumn.get();
+        public long getTruckTrailerIdColumn() {
+            return truckTrailerIdColumn.get();
         }
 
-        public LongProperty truckContainerIdColumnProperty() {
-            return truckContainerIdColumn;
+        public LongProperty truckTrailerIdColumnProperty() {
+            return truckTrailerIdColumn;
         }
 
-        public void setTruckContainerIdColumn(long truckContainerIdColumn) {
-            this.truckContainerIdColumn.set(truckContainerIdColumn);
+        public void setTruckTrailerIdColumn(long truckTrailerIdColumn) {
+            this.truckTrailerIdColumn.set(truckTrailerIdColumn);
         }
 
-        public String getContainerNumberColumn() {
-            return containerNumberColumn.get();
+        public String getTrailerNumberColumn() {
+            return trailerNumberColumn.get();
         }
 
-        public StringProperty containerNumberColumnProperty() {
-            return containerNumberColumn;
+        public StringProperty trailerNumberColumnProperty() {
+            return trailerNumberColumn;
         }
 
-        public void setContainerNumberColumn(String containerNumberColumn) {
-            this.containerNumberColumn.set(containerNumberColumn);
+        public void setTrailerNumberColumn(String trailerNumberColumn) {
+            this.trailerNumberColumn.set(trailerNumberColumn);
         }
 
         public String getLicenseNumberColumn() {
@@ -228,18 +213,6 @@ public class TruckContainerModel {
 
         public void setLicenceExpirationDateColumn(LocalDate licenceExpirationDateColumn) {
             this.licenceExpirationDateColumn.set(licenceExpirationDateColumn);
-        }
-
-        public double getMaximumWeightConstrainColumn() {
-            return maximumWeightConstrainColumn.get();
-        }
-
-        public DoubleProperty maximumWeightConstrainColumnProperty() {
-            return maximumWeightConstrainColumn;
-        }
-
-        public void setMaximumWeightConstrainColumn(double maximumWeightConstrainColumn) {
-            this.maximumWeightConstrainColumn.set(maximumWeightConstrainColumn);
         }
 
         public Permissions getPermissionsColumn() {
@@ -313,19 +286,19 @@ public class TruckContainerModel {
         public void setOnTerminalColumn(String onTerminalColumn) {
             this.onTerminalColumn.set(onTerminalColumn);
         }
-        public static TruckContainerModel.TableObject createFromTruckContainerDTO(TruckContainerDTO truckContainerDTO) {
-            return new TruckContainerModel.TableObject(
-                    new SimpleLongProperty(truckContainerDTO.getId()),
-                    new SimpleStringProperty(truckContainerDTO.getContainerNumber()),
-                    new SimpleStringProperty(truckContainerDTO.getLicenceNumber()),
-                    new SimpleObjectProperty<>(truckContainerDTO.getLicenceExpirationDate()),
-                    new SimpleDoubleProperty(truckContainerDTO.getMaximumWeightConstrain()),
-                    new SimpleObjectProperty<>(truckContainerDTO.getPermissions()),
-                    new SimpleStringProperty(truckContainerDTO.getComment()),
-                    new SimpleObjectProperty<>(truckContainerDTO.getCreationDate()),
-                    new SimpleObjectProperty<>(truckContainerDTO.getModifyDate()),
-                    new SimpleStringProperty(truckContainerDTO.getCreatedBy()),
-                    new SimpleStringProperty(truckContainerDTO.getOnTerminal()));
+
+        public static TruckTrailerModel.TableObject createFromTruckTrailerDTO(TruckTrailerDTO truckTrailerDTO) {
+            return new TruckTrailerModel.TableObject(
+                    new SimpleLongProperty(truckTrailerDTO.getId()),
+                    new SimpleStringProperty(truckTrailerDTO.getTrailerNumber()),
+                    new SimpleStringProperty(truckTrailerDTO.getLicenceNumber()),
+                    new SimpleObjectProperty<>(truckTrailerDTO.getLicenceExpirationDate()),
+                    new SimpleObjectProperty<>(truckTrailerDTO.getPermissions()),
+                    new SimpleStringProperty(truckTrailerDTO.getComment()),
+                    new SimpleObjectProperty<>(truckTrailerDTO.getCreationDate()),
+                    new SimpleObjectProperty<>(truckTrailerDTO.getModifyDate()),
+                    new SimpleStringProperty(truckTrailerDTO.getCreatedBy()),
+                    new SimpleStringProperty(truckTrailerDTO.getOnTerminal()));
         }
 
         @Override
@@ -333,11 +306,10 @@ public class TruckContainerModel {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             TableObject that = (TableObject) o;
-            return Objects.equal(truckContainerIdColumn.getValue(), that.truckContainerIdColumn.getValue()) &&
-                    Objects.equal(containerNumberColumn.getValue(), that.containerNumberColumn.getValue()) &&
+            return Objects.equal(truckTrailerIdColumn.getValue(), that.truckTrailerIdColumn.getValue()) &&
+                    Objects.equal(trailerNumberColumn.getValue(), that.trailerNumberColumn.getValue()) &&
                     Objects.equal(licenseNumberColumn.getValue(), that.licenseNumberColumn.getValue()) &&
                     Objects.equal(licenceExpirationDateColumn.getValue(), that.licenceExpirationDateColumn.getValue()) &&
-                    Objects.equal(maximumWeightConstrainColumn.getValue(), that.maximumWeightConstrainColumn.getValue()) &&
                     Objects.equal(permissionsColumn.getValue(), that.permissionsColumn.getValue()) &&
                     Objects.equal(commentColumn.getValue(), that.commentColumn.getValue()) &&
                     Objects.equal(creationDateColumn.getValue(), that.creationDateColumn.getValue()) &&
@@ -348,8 +320,8 @@ public class TruckContainerModel {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(truckContainerIdColumn.getValue(), containerNumberColumn.getValue(), licenseNumberColumn.getValue(),
-                    licenceExpirationDateColumn.getValue(), maximumWeightConstrainColumn.getValue(), permissionsColumn.getValue(),
+            return Objects.hashCode(truckTrailerIdColumn.getValue(), trailerNumberColumn.getValue(), licenseNumberColumn.getValue(),
+                    licenceExpirationDateColumn.getValue(), permissionsColumn.getValue(),
                     commentColumn.getValue(), creationDateColumn.getValue(), modifyDateColumn.getValue(), createdByColumn.getValue(), onTerminalColumn.getValue());
         }
 

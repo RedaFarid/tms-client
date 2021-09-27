@@ -35,7 +35,7 @@ import soulintec.com.tmsclient.Services.DriverService;
 import java.time.LocalDateTime;
 
 @Component
-public class DriversWindow implements ApplicationListener<ApplicationContext.ApplicationListener> {
+public class DriversView implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private DriversController controller;
     private DriversModel model;
@@ -233,6 +233,12 @@ public class DriversWindow implements ApplicationListener<ApplicationContext.App
         modificationDateField.setPrefWidth(250);
         createdByField.setPrefWidth(250);
         onTerminalField.setPrefWidth(250);
+
+        idField.setEditable(false);
+        creationDateField.setEditable(false);
+        modificationDateField.setEditable(false);
+        createdByField.setEditable(false);
+        onTerminalField.setEditable(false);
 
         //restriction handling
         nameField.setRestrict("[a-zA-Z ]");

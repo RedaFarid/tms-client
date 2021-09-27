@@ -9,10 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import soulintec.com.tmsclient.Entities.MaterialDTO;
-import soulintec.com.tmsclient.Entities.TruckContainerDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
-import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsWindow;
-import soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow.TruckWindow;
+import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsView;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,13 +34,13 @@ public class MaterialService {
             body = forEntity.getBody();
 
         }catch (Exception e){
-            MaterialsWindow.showErrorWindow("Error loading data" , e.getMessage());
+            MaterialsView.showErrorWindow("Error loading data" , e.getMessage());
         }
         if (body.getException() == null){
             return body.getMaterials();
         }
         else {
-            MaterialsWindow.showErrorWindow("Error loading data" , body.getException().getMessage());
+            MaterialsView.showErrorWindow("Error loading data" , body.getException().getMessage());
             return materials;
         }
     }

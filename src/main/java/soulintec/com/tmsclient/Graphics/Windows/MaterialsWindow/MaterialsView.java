@@ -37,7 +37,7 @@ import soulintec.com.tmsclient.Services.MaterialService;
 import java.time.LocalDateTime;
 
 @Component
-public class MaterialsWindow implements ApplicationListener<ApplicationContext.ApplicationListener> {
+public class MaterialsView implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private MaterialController controller;
     private MaterialsModel model;
@@ -197,6 +197,12 @@ public class MaterialsWindow implements ApplicationListener<ApplicationContext.A
         modificationDateField.setPrefWidth(250);
         createdByField.setPrefWidth(250);
         onTerminalField.setPrefWidth(250);
+
+        idField.setEditable(false);
+        creationDateField.setEditable(false);
+        modificationDateField.setEditable(false);
+        createdByField.setEditable(false);
+        onTerminalField.setEditable(false);
 
         //restriction handling
         nameField.setRestrict("[a-zA-Z-_/. ]");

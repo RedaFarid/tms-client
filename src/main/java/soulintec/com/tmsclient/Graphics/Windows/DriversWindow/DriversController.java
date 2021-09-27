@@ -9,13 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
-import soulintec.com.tmsclient.Entities.ClientDTO;
 import soulintec.com.tmsclient.Entities.DriverDTO;
 import soulintec.com.tmsclient.Entities.Permissions;
-import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientWindow;
-import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientsModel;
-import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsWindow;
-import soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow.TruckWindow;
 import soulintec.com.tmsclient.Services.DriverService;
 
 import java.time.LocalDate;
@@ -58,7 +53,7 @@ public class DriversController {
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
-                DriversWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected driver");
+                DriversView.showErrorWindow("Data doesn't exist", "Error getting data for selected driver");
             });
         }
     }
@@ -73,23 +68,23 @@ public class DriversController {
         Permissions permissions = model.getPermissions();
 
         if (StringUtils.isBlank(name)) {
-            DriversWindow.showWarningWindow("Missing Data", "Please enter name");
+            DriversView.showWarningWindow("Missing Data", "Please enter name");
             return;
         }
         if (StringUtils.isBlank(licenceNumber)) {
-            DriversWindow.showWarningWindow("Missing Data", "Please enter licence number");
+            DriversView.showWarningWindow("Missing Data", "Please enter licence number");
             return;
         }
         if (StringUtils.isBlank(mobileNumber)) {
-            DriversWindow.showWarningWindow("Missing Data", "Please enter mobile number");
+            DriversView.showWarningWindow("Missing Data", "Please enter mobile number");
             return;
         }
         if (licenceExpirationDate == null) {
-            DriversWindow.showWarningWindow("Missing Data", "Please enter expiration date");
+            DriversView.showWarningWindow("Missing Data", "Please enter expiration date");
             return;
         }
         if (Objects.isNull(permissions)) {
-            DriversWindow.showWarningWindow("Missing Data", "Please select permission");
+            DriversView.showWarningWindow("Missing Data", "Please select permission");
             return;
         }
 
@@ -105,16 +100,16 @@ public class DriversController {
             String save = driverService.save(driverDTO);
 
             if (save.equals("saved")) {
-                DriversWindow.showInformationWindow("Info", save);
+                DriversView.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
-                DriversWindow.showErrorWindow("Error updating data", save);
+                DriversView.showErrorWindow("Error updating data", save);
             }
 
             resetModel();
         } else {
-            DriversWindow.showErrorWindow("Error inserting data", "Driver already exist , please check entered data");
+            DriversView.showErrorWindow("Error inserting data", "Driver already exist , please check entered data");
         }
     }
 
@@ -129,23 +124,23 @@ public class DriversController {
 
 
         if (StringUtils.isBlank(name)) {
-            DriversWindow.showWarningWindow("Missing Data", "Please enter name");
+            DriversView.showWarningWindow("Missing Data", "Please enter name");
             return;
         }
         if (StringUtils.isBlank(licenceNumber)) {
-            DriversWindow.showWarningWindow("Missing Data", "Please enter licence number");
+            DriversView.showWarningWindow("Missing Data", "Please enter licence number");
             return;
         }
         if (StringUtils.isBlank(mobileNumber)) {
-            DriversWindow.showWarningWindow("Missing Data", "Please enter mobile number");
+            DriversView.showWarningWindow("Missing Data", "Please enter mobile number");
             return;
         }
         if (licenceExpirationDate == null) {
-            DriversWindow.showWarningWindow("Missing Data", "Please enter expiration date");
+            DriversView.showWarningWindow("Missing Data", "Please enter expiration date");
             return;
         }
         if (Objects.isNull(permissions)) {
-            DriversWindow.showWarningWindow("Missing Data", "Please select permission");
+            DriversView.showWarningWindow("Missing Data", "Please select permission");
             return;
         }
         DriverDTO driverDTO = new DriverDTO();
@@ -160,11 +155,11 @@ public class DriversController {
         String save = driverService.save(driverDTO);
 
         if (save.equals("saved")) {
-            DriversWindow.showInformationWindow("Info", save);
+            DriversView.showInformationWindow("Info", save);
             updateDataList();
 
         } else {
-            DriversWindow.showErrorWindow("Error updating data", save);
+            DriversView.showErrorWindow("Error updating data", save);
         }
         resetModel();
     }
@@ -174,11 +169,11 @@ public class DriversController {
         long id = model.getDriverId();
         String deletedById = driverService.deleteById(id);
         if (deletedById.equals("deleted")) {
-            DriversWindow.showInformationWindow("Info", deletedById);
+            DriversView.showInformationWindow("Info", deletedById);
             updateDataList();
 
         } else {
-            DriversWindow.showErrorWindow("Error deleting record", deletedById);
+            DriversView.showErrorWindow("Error deleting record", deletedById);
         }
         resetModel();
     }

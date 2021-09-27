@@ -1,7 +1,6 @@
 package soulintec.com.tmsclient.Services;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import soulintec.com.tmsclient.Entities.TruckContainerDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
-import soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow.TruckWindow;
+import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,13 +36,13 @@ public class TruckContainerService {
         body = forEntity.getBody();
 
         }catch (Exception e){
-            TruckWindow.showErrorWindow("Error loading data" , e.getMessage());
+            TruckView.showErrorWindow("Error loading data" , e.getMessage());
         }
         if (body.getException() == null){
             return body.getTruckContainer();
         }
         else {
-            TruckWindow.showErrorWindow("Error loading data" , body.getException().getMessage());
+            TruckView.showErrorWindow("Error loading data" , body.getException().getMessage());
             return truckContainerDTOS;
         }
 

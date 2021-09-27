@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import soulintec.com.tmsclient.Entities.DriverDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
-import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversWindow;
+import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,13 +35,13 @@ public class DriverService {
             body = forEntity.getBody();
 
         }catch (Exception e){
-            DriversWindow.showErrorWindow("Error loading data" , e.getMessage());
+            DriversView.showErrorWindow("Error loading data" , e.getMessage());
         }
         if (body.getException() == null){
             return body.getDrivers();
         }
         else {
-            DriversWindow.showErrorWindow("Error loading data" , body.getException().getMessage());
+            DriversView.showErrorWindow("Error loading data" , body.getException().getMessage());
             return driverDTOS;
         }
     }

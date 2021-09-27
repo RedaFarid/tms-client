@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -15,11 +16,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class TruckTrailerDTO {
     private Long id;
-    private String TrailerNumber  ;
-    private String LicenceNumber  ;
-    private LocalDate LicenceExpirationDate  ;
-    private String Permissions;
-    private String Comment  ;
+    private String trailerNumber;
+    private String licenceNumber;
+    private LocalDate licenceExpirationDate;
+    private Permissions permissions;
     private String comment;
     private LocalDateTime creationDate;
     private LocalDateTime modifyDate;

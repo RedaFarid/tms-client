@@ -10,10 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import soulintec.com.tmsclient.Entities.ClientDTO;
-import soulintec.com.tmsclient.Entities.TruckContainerDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
-import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientWindow;
-import soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow.TruckWindow;
+import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientView;
+import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,13 +37,13 @@ public class ClientsService {
             body = forEntity.getBody();
 
         }catch (Exception e){
-            ClientWindow.showErrorWindow("Error loading data" , e.getMessage());
+            ClientView.showErrorWindow("Error loading data" , e.getMessage());
         }
         if (body.getException() == null){
             return body.getClient();
         }
         else {
-            TruckWindow.showErrorWindow("Error loading data" , body.getException().getMessage());
+            TruckView.showErrorWindow("Error loading data" , body.getException().getMessage());
             return clientDTOS;
         }
     }

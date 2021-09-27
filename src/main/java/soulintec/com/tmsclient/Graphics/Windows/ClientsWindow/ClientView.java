@@ -30,7 +30,7 @@ import soulintec.com.tmsclient.Services.ClientsService;
 import java.time.LocalDateTime;
 
 @Component
-public class ClientWindow implements ApplicationListener<ApplicationContext.ApplicationListener> {
+public class ClientView implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private ClientsController controller;
     private ClientsModel model;
@@ -193,6 +193,12 @@ public class ClientWindow implements ApplicationListener<ApplicationContext.Appl
         modificationLabel.setPrefWidth(150);
         createdByLabel.setPrefWidth(150);
         onTerminalLabel.setPrefWidth(150);
+
+        idField.setEditable(false);
+        creationDateField.setEditable(false);
+        modificationDateField.setEditable(false);
+        createdByField.setEditable(false);
+        onTerminalField.setEditable(false);
 
         idLabel.setTextAlignment(TextAlignment.RIGHT);
         nameLabel.setTextAlignment(TextAlignment.RIGHT);
