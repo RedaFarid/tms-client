@@ -1,5 +1,6 @@
 package soulintec.com.tmsclient.Services;
 
+import javafx.collections.FXCollections;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import soulintec.com.tmsclient.Entities.ClientDTO;
+import soulintec.com.tmsclient.Entities.TruckContainerDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
+import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientWindow;
+import soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow.TruckWindow;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,9 +31,22 @@ public class ClientsService {
     }
 
     public List<ClientDTO> findAll() {
-        ResponseEntity<Clients> forEntity = restTemplate.getForEntity(Utilities.iP +"/clients",Clients.class);
-        Clients body = forEntity.getBody();
-        return body.getClient();
+        Clients body= null;
+        List<ClientDTO> clientDTOS = FXCollections.observableArrayList();
+        try{
+            ResponseEntity<Clients> forEntity = restTemplate.getForEntity(Utilities.iP +"/clients", Clients.class);
+            body = forEntity.getBody();
+
+        }catch (Exception e){
+            ClientWindow.showErrorWindow("Error loading data" , e.getMessage());
+        }
+        if (body.getException() == null){
+            return body.getClient();
+        }
+        else {
+            TruckWindow.showErrorWindow("Error loading data" , body.getException().getMessage());
+            return clientDTOS;
+        }
     }
 
     public Optional<ClientDTO> findById(Long id) {
@@ -54,5 +71,6 @@ public class ClientsService {
     @NoArgsConstructor
     public static class Clients{
         private List<ClientDTO> client;
+        private Exception exception;
     }
 }

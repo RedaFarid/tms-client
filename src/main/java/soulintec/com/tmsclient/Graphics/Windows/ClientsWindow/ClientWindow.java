@@ -405,14 +405,14 @@ public class ClientWindow implements ApplicationListener<ApplicationContext.Appl
         });
     }
 
-    protected static void showInformationWindow(String header, String content, Stage stage) {
+    protected static void showInformationWindow(String header, String content) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Notification");
             alert.setHeaderText(header);
             alert.setContentText(content);
             alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(stage);
+            alert.initOwner(initialStage.getInitialStage());
             alert.initModality(Modality.NONE);
             alert.show();
         });

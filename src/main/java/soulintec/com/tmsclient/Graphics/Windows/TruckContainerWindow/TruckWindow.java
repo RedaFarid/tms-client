@@ -579,7 +579,6 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
     @Async
     private void onDeleteTrailer(MouseEvent action) {
         try {
-
                 truckTrailerService.deleteById(Long.parseLong(trailerNumberField.getText()));
                 update();
 

@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.ClientDTO;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsWindow;
+import soulintec.com.tmsclient.Graphics.Windows.TruckContainerWindow.TruckWindow;
 import soulintec.com.tmsclient.Services.ClientsService;
 
 import java.util.List;
@@ -94,11 +95,13 @@ public class ClientsController {
             clientDTO.setMainOfficeAddress(mainOffice);
 
             String save = clientsService.save(clientDTO);
+            if (save.equals("saved")) {
+                ClientWindow.showInformationWindow("Info", save);
+                updateDataList();
 
-            if (save == null) {
-                MaterialsWindow.showErrorWindow("Error", "Error saving new client");
+            } else {
+                ClientWindow.showErrorWindow("Error inserting data", save);
             }
-            updateDataList();
             resetModel();
         }
         else {
@@ -151,21 +154,28 @@ public class ClientsController {
 
         String save = clientsService.save(clientDTO);
 
-        if (save == null) {
-            MaterialsWindow.showErrorWindow("Error", "Error updating client");
+        if (save.equals("saved")) {
+            ClientWindow.showInformationWindow("Info", save);
+            updateDataList();
+
+        } else {
+            ClientWindow.showErrorWindow("Error updating data", save);
         }
-        updateDataList();
         resetModel();
     }
 
     @Async
     public void onDelete(MouseEvent mouseEvent) {
+
         long id = model.getClientId();
         String deletedById = clientsService.deleteById(id);
-        if (deletedById == null) {
-            MaterialsWindow.showErrorWindow("Error", "Error deleting selected client");
+        if (deletedById.equals("deleted")) {
+            ClientWindow.showInformationWindow("Info", deletedById);
+            updateDataList();
+
+        } else {
+            ClientWindow.showErrorWindow("Error deleting record", deletedById);
         }
-        updateDataList();
         resetModel();
     }
 

@@ -157,11 +157,13 @@ public class TruckController {
             truckContainerDTO.setId(truckContainerModel.getTruckContainerId());
 
             String save = truckContainerService.save(truckContainerDTO);
+            if (save.equals("saved")) {
+                TruckWindow.showInformationWindow("Info", save);
+                updateDataList();
 
-            if (save == null || save == "") {
-                TruckWindow.showErrorWindow("Error", "Error saving new truck container");
+            } else {
+                TruckWindow.showErrorWindow("Error updating data", save);
             }
-            updateDataList();
             resetModel();
         } else {
             TruckWindow.showErrorWindow("Error updating data", "Truck container doesn't  exist ");
