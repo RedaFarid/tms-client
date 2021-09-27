@@ -84,7 +84,6 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
     private TableColumn<TruckContainerModel.TableObject, ObjectProperty<LocalDateTime>> containerCreationDateColumn;
     private TableColumn<TruckContainerModel.TableObject, ObjectProperty<LocalDateTime>> containerModifyDateColumn;
 
-
     private EnhancedButton insertTrailer;
     private EnhancedButton deleteTrailer;
     private EnhancedButton updateTrailer;
@@ -412,7 +411,6 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
         containerModificationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         containerCreationDateLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
-
         containerIdField.setPrefWidth(250);
         containerNumberField.setPrefWidth(250);
         containerLicenceNumberField.setPrefWidth(250);
@@ -524,8 +522,6 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
         containerOnTerminalField.textProperty().bindBidirectional(containerModel.onTerminalProperty());
         containerModificationDateField.textProperty().bindBidirectional(containerModel.modifyDateProperty());
         containerCreationDateField.textProperty().bindBidirectional(containerModel.creationDateProperty());
-
-
     }
 
     private  void actionHandling() {
@@ -565,19 +561,19 @@ public class TruckWindow implements ApplicationListener<ApplicationContext.Appli
 
     @Async
     private void onCreateTrailer(MouseEvent action) {
-        if ((trailerNumberField.getText().length() > 0) && (trailerLicenceNumberField.getText().length() > 0)) {
-            if ((truckTrailerService.findByLicence(Long.parseLong(trailerLicenceNumberField.getText())).isEmpty())) {
-                TruckTrailerDTO trailer = new TruckTrailerDTO(trailerNumberField.getText(), trailerLicenceNumberField.getText(),
-                      trailerLicenceExpirationDateField.getValue(), trailerPermissionField.getSelectionModel().getSelectedItem().toString(),
-                        trailerCommentField.getText());
-                truckTrailerService.save(trailer);
-                update();
-            } else {
-                showErrorWindow("Error Inserting data", "Truck Trailer already exist , please check entered data ...");
-            }
-        } else {
-            showErrorWindow("Error inserting data", "Please check entered data .. No possible empty fields");
-        }
+//        if ((trailerNumberField.getText().length() > 0) && (trailerLicenceNumberField.getText().length() > 0)) {
+//            if ((truckTrailerService.findByLicence(Long.parseLong(trailerLicenceNumberField.getText())).isEmpty())) {
+//                TruckTrailerDTO trailer = new TruckTrailerDTO(trailerNumberField.getText(), trailerLicenceNumberField.getText(),
+//                      trailerLicenceExpirationDateField.getValue(), trailerPermissionField.getSelectionModel().getSelectedItem().toString(),
+//                        trailerCommentField.getText());
+//                truckTrailerService.save(trailer);
+//                update();
+//            } else {
+//                showErrorWindow("Error Inserting data", "Truck Trailer already exist , please check entered data ...");
+//            }
+//        } else {
+//            showErrorWindow("Error inserting data", "Please check entered data .. No possible empty fields");
+//        }
     }
 
     @Async

@@ -98,14 +98,15 @@ public class TruckController {
         truckContainerDTO.setComment(truckContainerModel.getComment());
 
         //TODO-- add this to all and on server side
-        //TODO-- think of it in selecting
         String save = truckContainerService.save(truckContainerDTO);
         if (save.equals("saved")) {
             TruckWindow.showInformationWindow("Info", save);
+            updateDataList();
+
         } else {
             TruckWindow.showErrorWindow("Error inserting data", save);
         }
-        updateDataList();
+
         resetModel();
             } else {
                 TruckWindow.showErrorWindow("Error inserting data", "Truck container already exist , please check entered data");
@@ -132,7 +133,7 @@ public class TruckController {
             return;
         }
         if (maximumWeightConstrain <= 0.0) {
-            TruckWindow.showWarningWindow("Missing Data", "Please enter mobile number");
+            TruckWindow.showWarningWindow("Missing Data", "Please enter maximum weight");
             return;
         }
         if (licenceExpirationDate == null) {
@@ -171,10 +172,13 @@ public class TruckController {
     public void onDelete(MouseEvent mouseEvent) {
         long materialId = truckContainerModel.getTruckContainerId();
         String deletedById = truckContainerService.deleteById(materialId);
-        if (deletedById == null) {
-            MaterialsWindow.showErrorWindow("Error", "Error deleting selected truck container");
+        if (deletedById.equals("deleted")) {
+            TruckWindow.showInformationWindow("Info", deletedById);
+            updateDataList();
+
+        } else {
+            TruckWindow.showErrorWindow("Error deleting record", deletedById);
         }
-        updateDataList();
         resetModel();
     }
 

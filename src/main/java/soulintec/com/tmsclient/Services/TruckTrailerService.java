@@ -2,7 +2,6 @@ package soulintec.com.tmsclient.Services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import soulintec.com.tmsclient.Entities.TruckContainerDTO;
 import soulintec.com.tmsclient.Entities.TruckTrailerDTO;
 
 import java.util.ArrayList;
