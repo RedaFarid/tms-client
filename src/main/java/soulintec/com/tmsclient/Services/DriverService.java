@@ -28,7 +28,7 @@ public class DriverService {
 
     public List<DriverDTO> findAll() {
 
-        Drivers body= null;
+        Drivers body= new Drivers();
         List<DriverDTO> driverDTOS = FXCollections.observableArrayList();
         try{
             ResponseEntity<Drivers> forEntity = restTemplate.getForEntity(Utilities.iP +"/drivers", Drivers.class);

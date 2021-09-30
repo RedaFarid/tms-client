@@ -129,13 +129,15 @@ public class MaterialController {
     @Async
     public void updateDataList() {
         List<MaterialDTO> list = materialService.findAll();
-        getDataList().removeAll(list.stream().map(MaterialsModel.TableObject::createFromMaterialDTO)
-                .filter(item -> !tableList.contains(item))
-                .collect(this::getDataList, ObservableList::add, ObservableList::addAll)
-                .stream()
-                .filter(tableListItem -> list.stream().map(MaterialsModel.TableObject::createFromMaterialDTO)
-                        .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
-                .collect(Collectors.toList()));
+        if (list != null) {
+            getDataList().removeAll(list.stream().map(MaterialsModel.TableObject::createFromMaterialDTO)
+                    .filter(item -> !tableList.contains(item))
+                    .collect(this::getDataList, ObservableList::add, ObservableList::addAll)
+                    .stream()
+                    .filter(tableListItem -> list.stream().map(MaterialsModel.TableObject::createFromMaterialDTO)
+                            .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
+                    .collect(Collectors.toList()));
+        }
 
     }
 

@@ -27,7 +27,7 @@ public class MaterialService {
     }
 
     public List<MaterialDTO> findAll() {
-        Materials body= null;
+        Materials body= new Materials();
         List<MaterialDTO> materials = FXCollections.observableArrayList();
         try{
             ResponseEntity<Materials> forEntity = restTemplate.getForEntity(Utilities.iP +"/material", Materials.class);

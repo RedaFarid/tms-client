@@ -165,7 +165,6 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
     }
 
     private void graphicsBuilder() {
-
         root.setTop(headerLabel);
         root.setCenter(clientstab);
         root.setPadding(new Insets(10));

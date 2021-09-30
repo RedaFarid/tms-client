@@ -29,7 +29,7 @@ public class TruckContainerService {
     }
 
     public List<TruckContainerDTO> findAll() {
-        TruckContainers body= null;
+        TruckContainers body= new TruckContainers();
         List<TruckContainerDTO> truckContainerDTOS = FXCollections.observableArrayList();
         try{
         ResponseEntity<TruckContainers> forEntity = restTemplate.getForEntity(Utilities.iP +"/truckContainers", TruckContainers.class);

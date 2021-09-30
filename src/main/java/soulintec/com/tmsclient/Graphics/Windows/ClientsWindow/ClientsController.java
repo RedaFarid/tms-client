@@ -101,10 +101,9 @@ public class ClientsController {
                 ClientView.showErrorWindow("Error inserting data", save);
             }
             resetModel();
+        } else {
+            ClientView.showErrorWindow("Error inserting data", "Client already exist , please check entered data");
         }
-        else {
-                    ClientView.showErrorWindow("Error inserting data", "Client already exist , please check entered data");
-                }
     }
 
     @Async
@@ -180,13 +179,15 @@ public class ClientsController {
     @Async
     public void updateDataList() {
         List<ClientDTO> list = clientsService.findAll();
-        getDataList().removeAll(list.stream().map(ClientsModel.TableObject::createFromClientDTO)
-                .filter(item -> !tableList.contains(item))
-                .collect(this::getDataList, ObservableList::add, ObservableList::addAll)
-                .stream()
-                .filter(tableListItem -> list.stream().map(ClientsModel.TableObject::createFromClientDTO)
-                        .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
-                .collect(Collectors.toList()));
+        if (list != null) {
+            getDataList().removeAll(list.stream().map(ClientsModel.TableObject::createFromClientDTO)
+                    .filter(item -> !tableList.contains(item))
+                    .collect(this::getDataList, ObservableList::add, ObservableList::addAll)
+                    .stream()
+                    .filter(tableListItem -> list.stream().map(ClientsModel.TableObject::createFromClientDTO)
+                            .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
+                    .collect(Collectors.toList()));
+        }
     }
 
     public void resetModel() {

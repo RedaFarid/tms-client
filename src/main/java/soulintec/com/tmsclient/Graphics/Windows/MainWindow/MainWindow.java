@@ -36,7 +36,7 @@ import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.Ic
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.WindowInterfaceMessages;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.windowReferenceNode;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsView;
-import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.MainTanksWindow;
+import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.TanksView;
 import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 
 @Log4j2
@@ -106,7 +106,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     DriversView driversView;
 
     @Autowired
-    MainTanksWindow mainTanksWindow;
+    TanksView tanksView;
 
     @Autowired
     TruckView truckView;
@@ -244,8 +244,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         });
 
         tanks.setOnIconClicked((String param) -> {
-            root.setCenter(mainTanksWindow.getTabContainer());
-            mainTanksWindow.update();
+            root.setCenter(tanksView.getTabContainer());
+            tanksView.update();
         });
         clients.setOnIconClicked((String param) -> {
             clientView.update();
@@ -315,4 +315,18 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
         });
     }
+
+    public static void showInformationWindow(String header, String content) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Notification");
+            alert.setHeaderText(header);
+            alert.setContentText(content);
+            alert.getDialogPane().setMaxWidth(500);
+            alert.initOwner(window);
+            alert.initModality(Modality.NONE);
+            alert.show();
+        });
+    }
+
 }

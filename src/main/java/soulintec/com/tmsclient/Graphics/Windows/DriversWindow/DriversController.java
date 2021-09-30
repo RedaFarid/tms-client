@@ -181,13 +181,15 @@ public class DriversController {
     @Async
     public void updateDataList() {
         List<DriverDTO> list = driverService.findAll();
-        getDataList().removeAll(list.stream().map(DriversModel.TableObject::createFromDriverDTO)
-                .filter(item -> !tableList.contains(item))
-                .collect(this::getDataList, ObservableList::add, ObservableList::addAll)
-                .stream()
-                .filter(tableListItem -> list.stream().map(DriversModel.TableObject::createFromDriverDTO)
-                        .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
-                .collect(Collectors.toList()));
+        if (list != null) {
+            getDataList().removeAll(list.stream().map(DriversModel.TableObject::createFromDriverDTO)
+                    .filter(item -> !tableList.contains(item))
+                    .collect(this::getDataList, ObservableList::add, ObservableList::addAll)
+                    .stream()
+                    .filter(tableListItem -> list.stream().map(DriversModel.TableObject::createFromDriverDTO)
+                            .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
+                    .collect(Collectors.toList()));
+        }
     }
 
     public void resetModel() {

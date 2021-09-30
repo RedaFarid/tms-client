@@ -1,6 +1,7 @@
 package soulintec.com.tmsclient.Services;
 
 import javafx.collections.FXCollections;
+import jfxtras.scene.layout.HBox;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,7 +31,7 @@ public class ClientsService {
     }
 
     public List<ClientDTO> findAll() {
-        Clients body= null;
+        Clients body= new Clients();
         List<ClientDTO> clientDTOS = FXCollections.observableArrayList();
         try{
             ResponseEntity<Clients> forEntity = restTemplate.getForEntity(Utilities.iP +"/clients", Clients.class);

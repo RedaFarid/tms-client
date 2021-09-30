@@ -199,13 +199,15 @@ public class TruckController {
     @Async
     public void updateContainerDataList() {
         List<TruckContainerDTO> list = truckContainerService.findAll();
-        getTruckContainerDataList().removeAll(list.stream().map(TruckContainerModel.TableObject::createFromTruckContainerDTO)
-                .filter(item -> !truckContainerTableList.contains(item))
-                .collect(this::getTruckContainerDataList, ObservableList::add, ObservableList::addAll)
-                .stream()
-                .filter(tableListItem -> list.stream().map(TruckContainerModel.TableObject::createFromTruckContainerDTO)
-                        .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
-                .collect(Collectors.toList()));
+        if(list!=null) {
+            getTruckContainerDataList().removeAll(list.stream().map(TruckContainerModel.TableObject::createFromTruckContainerDTO)
+                    .filter(item -> !truckContainerTableList.contains(item))
+                    .collect(this::getTruckContainerDataList, ObservableList::add, ObservableList::addAll)
+                    .stream()
+                    .filter(tableListItem -> list.stream().map(TruckContainerModel.TableObject::createFromTruckContainerDTO)
+                            .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
+                    .collect(Collectors.toList()));
+        }
 
     }
 
@@ -375,6 +377,7 @@ public class TruckController {
     @Async
     public void updateTrailerDataList() {
         List<TruckTrailerDTO> list = truckTrailerService.findAll();
+        if(list != null){
         getTruckTrailerDataList().removeAll(list.stream().map(TruckTrailerModel.TableObject::createFromTruckTrailerDTO)
                 .filter(item -> !truckTrailerTableList.contains(item))
                 .collect(this::getTruckTrailerDataList, ObservableList::add, ObservableList::addAll)
@@ -382,6 +385,7 @@ public class TruckController {
                 .filter(tableListItem -> list.stream().map(TruckTrailerModel.TableObject::createFromTruckTrailerDTO)
                         .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
                 .collect(Collectors.toList()));
+        }
 
     }
 
