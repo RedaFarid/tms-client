@@ -7,12 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Data
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class TankDTO{
+public class TankDTO {
     private Long id;
     private String name;
     private Long station;
@@ -26,4 +27,11 @@ public class TankDTO{
     private String createdBy;
     private String onTerminal;
     private double calculatedQty;
+
+    public Long getMaterialID() {
+        if (Objects.isNull(materialID))
+            return 0L;
+        else
+            return materialID;
+    }
 }

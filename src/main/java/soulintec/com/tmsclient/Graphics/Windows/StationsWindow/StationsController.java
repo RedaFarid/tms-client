@@ -19,6 +19,7 @@ import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.StationService;
+import soulintec.com.tmsclient.Services.TanksService;
 
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,8 @@ public class StationsController {
 
     @Autowired
     private StationService stationService;
+    @Autowired
+    private TanksService tanksService;
     @Autowired
     private LogsService logsService;
 
@@ -105,7 +108,7 @@ public class StationsController {
 
                 String save = stationService.save(stationDTO);
                 if (save.equals("saved")) {
-                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting station data"));
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new station : " + name));
                     MainWindow.showInformationWindow("Info", save);
                     update();
 
@@ -160,7 +163,7 @@ public class StationsController {
 
                 String save = stationService.save(stationDTO);
                 if (save.equals("saved")) {
-                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating station data"));
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for station : " + name));
                     MainWindow.showInformationWindow("Info", save);
                     update();
 
@@ -184,17 +187,23 @@ public class StationsController {
     public void onDelete(MouseEvent mouseEvent) {
 
         long id = model.getStationId();
-        String deletedById = stationService.deleteById(id);
-        if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting station data"));
-            MainWindow.showInformationWindow("Info", deletedById);
-            update();
 
+        if (tanksService.findByNameAndStation("%", id).isPresent()) {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Station :  "+ model.getName() +" can't be deleted because there are tanks relate to it "));
+            MainWindow.showErrorWindow("Error deleting record", "Station can't be deleted because there are tanks relate to it \n please delete related tanks first");
         } else {
-            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
-            MainWindow.showErrorWindow("Error deleting record", deletedById);
+            String deletedById = stationService.deleteById(id);
+            if (deletedById.equals("deleted")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting station : " + model.getName()));
+                MainWindow.showInformationWindow("Info", deletedById);
+                update();
+
+            } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
+                MainWindow.showErrorWindow("Error deleting record", deletedById);
+            }
+            resetModel();
         }
-        resetModel();
     }
 
     public synchronized Task<String> updateTask() {

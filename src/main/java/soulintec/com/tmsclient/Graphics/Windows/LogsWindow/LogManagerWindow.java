@@ -1,112 +1,123 @@
 package soulintec.com.tmsclient.Graphics.Windows.LogsWindow;
 
 
-import com.google.common.collect.Lists;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.controlsfx.control.table.TableFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
 import soulintec.com.tmsclient.Entities.LogDTO;
-import soulintec.com.tmsclient.Services.LogsService;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.TanksController;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Executor;
+import java.time.LocalDateTime;
 
 @Component
 public class LogManagerWindow implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
-    private Stage mainWindow = null;
-    private final VBox root = new VBox();
-    private final ToolBar toolbar = new ToolBar();
+    private LogController controller;
+    private LogsModel model;
 
-    private TableFilter<LogDTO> tableFilter;
-    private final ObservableList<LogDTO> list = FXCollections.observableArrayList();
-    private final TableView<LogDTO> table = new TableView<>();
-    private final TableColumn<LogDTO, String> SourceColumn = new TableColumn<>("Source");
-    private final TableColumn<LogDTO, String> EventColumn = new TableColumn<>("Event");
-    private final TableColumn<LogDTO, LogIdentifier> IdentifierColumn = new TableColumn<>("Identifier");
-    private final TableColumn<LogDTO, String> UsernameColumn = new TableColumn<>("Username");
-    private final TableColumn<LogDTO, String> GroupColumn = new TableColumn<>("Group");
-    private final TableColumn<LogDTO, String> TimeColumn = new TableColumn<>("Time");
+    protected static MainWindow initialStage;
 
-    private final Button export_to_txt_file = new Button("Export to csv file");
+    private Stage mainWindow;
 
-    private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
-    private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
+    private VBox root;
+    private ToolBar toolbar;
 
-    @Autowired
-    private LogsService loggingService;
+    private TableFilter<LogsModel.TableObject> tableFilter;
+    private TableView<LogsModel.TableObject> table;
+    private TableColumn<LogsModel.TableObject, StringProperty> sourceColumn;
+    private TableColumn<LogsModel.TableObject, StringProperty> eventColumn;
+    private TableColumn<LogsModel.TableObject, ObjectProperty<LogIdentifier>> identifierColumn;
+    private TableColumn<LogsModel.TableObject, StringProperty> usernameColumn;
+    private TableColumn<LogsModel.TableObject, StringProperty> onTerminalColumn;
+    private TableColumn<LogsModel.TableObject, ObjectProperty<LocalDateTime>> timeColumn;
 
-    @Autowired(required = false)
-    private Executor executor;
+    private Button export_to_txt_file;
+
+    private ObjectProperty<Cursor> CURSOR_DEFAULT;
+    private ObjectProperty<Cursor> CURSOR_WAIT;
 
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
         mainWindow = event.getStage();
 
+        init();
         graphicsBuilder();
         actionHandling();
     }
 
+    private void init() {
+        initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
+        controller = ApplicationContext.applicationContext.getBean(LogController.class);
+        model = controller.getModel();
+
+        root = new VBox();
+        toolbar = new ToolBar();
+
+        table = new TableView<>();
+        sourceColumn = new TableColumn<>("Source");
+        eventColumn = new TableColumn<>("Event");
+        identifierColumn = new TableColumn<>("Identifier");
+        usernameColumn = new TableColumn<>("User name");
+        onTerminalColumn = new TableColumn<>("On terminal");
+        timeColumn = new TableColumn<>("Time");
+
+        export_to_txt_file = new Button("Export to csv file");
+
+        CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
+        CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
+    }
+
     private void graphicsBuilder() {
         //table configuration
-        SourceColumn.setCellValueFactory(new PropertyValueFactory<>("source"));
-        EventColumn.setCellValueFactory(new PropertyValueFactory<>("event"));
-        IdentifierColumn.setCellValueFactory(new PropertyValueFactory<>("logIdentifier"));
-        UsernameColumn.setCellValueFactory(new PropertyValueFactory<>("userName"));
-        GroupColumn.setCellValueFactory(new PropertyValueFactory<>("groupName"));
-        TimeColumn.setCellValueFactory(new PropertyValueFactory<>("dateTime"));
+        sourceColumn.setCellValueFactory(new PropertyValueFactory<>("sourceColumn"));
+        eventColumn.setCellValueFactory(new PropertyValueFactory<>("eventColumn"));
+        identifierColumn.setCellValueFactory(new PropertyValueFactory<>("logIdentifierColumn"));
+        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("userNameColumn"));
+        onTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
+        timeColumn.setCellValueFactory(new PropertyValueFactory<>("dateTimeColumn"));
 
-        table.getColumns().addAll(SourceColumn, EventColumn, IdentifierColumn, UsernameColumn, GroupColumn, TimeColumn);
+        table.getColumns().addAll(sourceColumn, eventColumn, identifierColumn, usernameColumn, onTerminalColumn, timeColumn);
         table.prefHeightProperty().bind(root.heightProperty().subtract(toolbar.heightProperty()));
-        table.setItems(list);
+        table.setItems(controller.getDataList());
         tableFilter = TableFilter.forTableView(table).apply();
 
-        SourceColumn.prefWidthProperty().bind(table.widthProperty().divide(10));
-        EventColumn.prefWidthProperty().bind(table.widthProperty().divide(2).subtract(5));
-        IdentifierColumn.prefWidthProperty().bind(table.widthProperty().divide(10));
-        UsernameColumn.prefWidthProperty().bind(table.widthProperty().divide(10));
-        GroupColumn.prefWidthProperty().bind(table.widthProperty().divide(10));
-        TimeColumn.prefWidthProperty().bind(table.widthProperty().divide(10));
+        sourceColumn.prefWidthProperty().bind(table.widthProperty().divide(10));
+        eventColumn.prefWidthProperty().bind(table.widthProperty().divide(2).subtract(5));
+        identifierColumn.prefWidthProperty().bind(table.widthProperty().divide(10));
+        usernameColumn.prefWidthProperty().bind(table.widthProperty().divide(10));
+        onTerminalColumn.prefWidthProperty().bind(table.widthProperty().divide(10));
+        timeColumn.prefWidthProperty().bind(table.widthProperty().divide(10));
 
-        table.setRowFactory((TableView<LogDTO> param) -> new TableRow<LogDTO>() {
+        table.setRowFactory((TableView<LogsModel.TableObject> param) -> new TableRow<LogsModel.TableObject>() {
             String style;
 
             @Override
-            protected void updateItem(LogDTO item, boolean empty) {
+            protected void updateItem(LogsModel.TableObject item, boolean empty) {
                 super.updateItem(item, empty);
 
-                if (item == null || item.getSource() == null) {
+                if (item == null || item.getSourceColumn() == null) {
                     style = ("");
-                } else if (item.getLogIdentifier().equals(LogIdentifier.System)) {
+                } else if (item.getLogIdentifierColumn().equals(LogIdentifier.System)) {
                     style = ("-fx-background-color: black; -fx-dark-text-color: white;-fx-mid-text-color: white;-fx-light-text-color: white;");
-                } else if (item.getLogIdentifier().equals(LogIdentifier.Error)) {
+                } else if (item.getLogIdentifierColumn().equals(LogIdentifier.Error)) {
                     style = ("-fx-background-color: Red; -fx-dark-text-color: white;-fx-mid-text-color: white;-fx-light-text-color: white;");
-                } else if (item.getLogIdentifier().equals(LogIdentifier.Warning)) {
+                } else if (item.getLogIdentifierColumn().equals(LogIdentifier.Warning)) {
                     style = ("-fx-background-color: DarkOrange; -fx-dark-text-color: white;-fx-mid-text-color: white;-fx-light-text-color: white;");
-                } else if (item.getLogIdentifier().equals(LogIdentifier.Info)) {
+                } else if (item.getLogIdentifierColumn().equals(LogIdentifier.Info)) {
                     style = ("-fx-background-color: blue; -fx-dark-text-color: white;-fx-mid-text-color: white;");
                 } else {
                     style = ("");
@@ -131,97 +142,23 @@ public class LogManagerWindow implements ApplicationListener<ApplicationContext.
     }
 
     private void actionHandling() {
-        export_to_txt_file.setOnMouseClicked(this::onExportToTXT);
+        export_to_txt_file.setOnMouseClicked(a -> this.export());
     }
 
-    private void onExportToTXT(MouseEvent mouseEvent) {
-        FileChooser chooser = new FileChooser();
-        chooser.setTitle("Export log to csv");
-        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("csv format", "*.csv"));
-        chooser.setInitialFileName("log.csv");
-        File file = chooser.showSaveDialog(mainWindow);
-        this.onExportCSV(file, tableFilter.getFilteredList());
+    public synchronized void update() {
+        ReadOnlyBooleanProperty update = controller.update();
+        table.cursorProperty().bind(Bindings.when(update).then(CURSOR_WAIT).otherwise(CURSOR_DEFAULT));
     }
 
-    public void onExportCSV(File file, List<LogDTO> list) {
-        Task<Boolean> updateTask = exportTask(file, list);
-        table.cursorProperty().bind(Bindings.when(updateTask.runningProperty()).then(CURSOR_WAIT).otherwise(CURSOR_DEFAULT));
-        executor.execute(updateTask);
+    public synchronized void export() {
+        ReadOnlyBooleanProperty update = controller.onExportToTXT(tableFilter.getFilteredList(), initialStage.getInitialStage());
+        table.cursorProperty().bind(Bindings.when(update).then(CURSOR_WAIT).otherwise(CURSOR_DEFAULT));
     }
 
-    public Task<Boolean> exportTask(File file, List<LogDTO> list) {
-        return new Task<Boolean>() {
-            @Override
-            protected Boolean call() throws Exception {
-                try (FileWriter fW = new FileWriter(file)) {
-                    try (BufferedWriter bR = new BufferedWriter(fW)) {
-                        //Fill header
-                        StringBuilder headerLine = new StringBuilder();
-                        for (int i = 0; i < 6; i++) {
-                            headerLine.append(InHeader.values()[i]).append(",");
-                        }
-                        headerLine.append("\n");
-                        bR.append(headerLine.toString());
-
-                        //Fill data
-                        list.forEach(logDTO -> {
-
-                                    String line = "";
-                                    line += logDTO.getId() + ",";
-                                    line += logDTO.getLogIdentifier() + ",";
-                                    line += logDTO.getSource() + ",";
-                                    line += logDTO.getEvent() + ",";
-                                    line += logDTO.getUserName() + ",";
-                                    line += logDTO.getDateTime();
-
-                                    line += "\n";
-
-                                    try {
-                                        bR.append(line);
-                                    } catch (IOException ignored) {
-                                    }
-                                }
-                        );
-                    }
-                } catch (Exception ignored) {
-                }
-                return null;
-            }
-        };
-    }
-
-
-    public void update() {
-        Task<Boolean> updateTask = updateTask();
-        table.cursorProperty().bind(Bindings.when(updateTask.runningProperty()).then(CURSOR_WAIT).otherwise(CURSOR_DEFAULT));
-        executor.execute(updateTask);
-    }
-
-    private synchronized Task<Boolean> updateTask() {
-        return new Task<Boolean>() {
-            @Override
-            protected Boolean call() throws Exception {
-                final ArrayList<LogDTO> logDTOS = Lists.newArrayList(loggingService.findAll());
-                Platform.runLater(() -> {
-                    list.clear();
-                    list.addAll(logDTOS);
-                });
-                return false;
-            }
-        };
-    }
 
     public Node getRoot() {
         return root;
     }
 
 
-    private enum InHeader {
-        LogId,
-        LogIdentifier,
-        Source,
-        Event,
-        Username,
-        Date
-    }
 }

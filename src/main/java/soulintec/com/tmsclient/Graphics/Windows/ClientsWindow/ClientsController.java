@@ -161,7 +161,7 @@ public class ClientsController {
 
             String save = clientsService.save(clientDTO);
             if (save.equals("saved")) {
-                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating client data"));
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for client : " + name));
                 ClientView.showInformationWindow("Info", save);
                 updateDataList();
 
@@ -181,7 +181,7 @@ public class ClientsController {
         long id = model.getClientId();
         String deletedById = clientsService.deleteById(id);
         if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting client data"));
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting client : " + model.getName()));
             ClientView.showInformationWindow("Info", deletedById);
             updateDataList();
 

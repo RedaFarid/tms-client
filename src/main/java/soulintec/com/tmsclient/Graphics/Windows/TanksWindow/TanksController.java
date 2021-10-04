@@ -121,6 +121,7 @@ public class TanksController {
         String name = model.getName();
         Long station = model.getStation();
         Double capacity = model.getCapacity();
+        long materialID = model.getMaterialID();
 
         if (StringUtils.isBlank(name)) {
             TanksView.showWarningWindow("Missing Data", "Please enter name");
@@ -146,12 +147,17 @@ public class TanksController {
 //                tank.setQty(model.getQty());
 //                tank.setDateOfQtySet(LocalDateTime.now());
 //                tank.setUserOfQtySet(model.getUserOfQtySet());
-                tank.setMaterialID(model.getMaterialID());
+                if (materialID == 0) {
+                    tank.setMaterialID(null);
+                } else {
+                    tank.setMaterialID(materialID);
+
+                }
 
                 String save = tanksService.save(tank);
 
                 if (save.equals("saved")) {
-                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting tank data"));
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new tank : " + name + " in station : " + stationModel.getName()));
                     TanksView.showInformationWindow("Info", save);
                     update();
 
@@ -177,6 +183,7 @@ public class TanksController {
         Long station = model.getStation();
         Double capacity = model.getCapacity();
         long tankId = model.getTankId();
+        long materialID = model.getMaterialID();
 
         if (tankId == 0) {
             TanksView.showWarningWindow("Missing Data", "Please select tank");
@@ -208,12 +215,18 @@ public class TanksController {
 //                tank.setQty(model.getQty());
 //                tank.setDateOfQtySet(LocalDateTime.now());
 //                tank.setUserOfQtySet(model.getUserOfQtySet());
-                tank.setMaterialID(model.getMaterialID());
+
+                if (materialID == 0) {
+                    tank.setMaterialID(null);
+                } else {
+                    tank.setMaterialID(materialID);
+
+                }
 
                 String save = tanksService.save(tank);
 
                 if (save.equals("saved")) {
-                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating tank data"));
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for tank : " + model.getName() + " in station : " + stationModel.getName()));
                     TanksView.showInformationWindow("Info", save);
                     update();
 
@@ -238,7 +251,7 @@ public class TanksController {
         long id = model.getTankId();
         String deletedById = tanksService.deleteById(id);
         if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting tank data"));
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting tank : " + model.getName() + " in station : " + stationModel.getName()));
             TanksView.showInformationWindow("Info", deletedById);
             update();
 

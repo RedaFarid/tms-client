@@ -69,7 +69,7 @@ public class TruckController {
                 truckContainerModel.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 truckContainerModel.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
-                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting truck container data"));
+//                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting truck container data"));
                 MaterialsView.showErrorWindow("Data doesn't exist", "Error getting data for selected truck container");
             });
         }
@@ -117,7 +117,7 @@ public class TruckController {
 
                 String save = truckContainerService.save(truckContainerDTO);
                 if (save.equals("saved")) {
-                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting truck container data"));
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new truck container : " + containerNumber));
                     TruckView.showInformationWindow("Info", save);
                     updateContainerDataList();
 
@@ -177,7 +177,7 @@ public class TruckController {
 
             String save = truckContainerService.save(truckContainerDTO);
             if (save.equals("saved")) {
-                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating truck container data"));
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for truck container : " + containerNumber));
                 TruckView.showInformationWindow("Info", save);
                 updateContainerDataList();
 
@@ -196,7 +196,7 @@ public class TruckController {
         long materialId = truckContainerModel.getTruckContainerId();
         String deletedById = truckContainerService.deleteById(materialId);
         if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting truck container data"));
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting truck container : " + truckContainerModel.getContainerNumber()));
             TruckView.showInformationWindow("Info", deletedById);
             updateContainerDataList();
 
@@ -266,7 +266,7 @@ public class TruckController {
                 truckTrailerModel.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 truckTrailerModel.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
-                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting truck trailer data "));
+//                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting truck trailer data "));
                 TruckView.showErrorWindow("Data doesn't exist", "Error getting data for selected truck trailer");
             });
         }
@@ -308,7 +308,7 @@ public class TruckController {
 
                 String save = truckTrailerService.save(truckTrailerDTO);
                 if (save.equals("saved")) {
-                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting truck trailer data"));
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new truck trailer : " + trailerNumber));
                     TruckView.showInformationWindow("Info", save);
                     updateTrailerDataList();
 
@@ -362,7 +362,7 @@ public class TruckController {
 
             String save = truckTrailerService.save(truckTrailerDTO);
             if (save.equals("saved")) {
-                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating truck trailer data"));
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for truck trailer : " + trailerNumber));
                 TruckView.showInformationWindow("Info", save);
                 updateTrailerDataList();
 
@@ -381,7 +381,7 @@ public class TruckController {
         long materialId = truckTrailerModel.getTruckTrailerId();
         String deletedById = truckTrailerService.deleteById(materialId);
         if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting truck trailer data"));
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting truck trailer : " + truckTrailerModel.getTrailerNumber()));
             TruckView.showInformationWindow("Info", deletedById);
             updateTrailerDataList();
 

@@ -208,7 +208,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         qtyLabel = new Label("Quantity :");
         calcQtyLabel = new Label("Calculated quantity :");
         stationLabel = new Label("Station :");
-        tankProductIDLabel = new Label("Product ID :");
+        tankProductIDLabel = new Label("Material :");
         dateOfQtySetLabel = new Label("Date of quantity set :");
         userOfQtySetLabel = new Label("User of quantity set :");
         creationDateLabel = new Label("Creation Date :");

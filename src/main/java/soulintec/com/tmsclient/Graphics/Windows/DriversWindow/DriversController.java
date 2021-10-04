@@ -107,7 +107,7 @@ public class DriversController {
             String save = driverService.save(driverDTO);
 
             if (save.equals("saved")) {
-                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting driver data"));
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new driver : " + name));
                 DriversView.showInformationWindow("Info", save);
                 updateDataList();
 
@@ -171,7 +171,7 @@ public class DriversController {
             String save = driverService.save(driverDTO);
 
             if (save.equals("saved")) {
-                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating driver data"));
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for driver : "+ name));
                 DriversView.showInformationWindow("Info", save);
                 updateDataList();
 
@@ -191,7 +191,7 @@ public class DriversController {
         long id = model.getDriverId();
         String deletedById = driverService.deleteById(id);
         if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting driver data"));
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting driver : " + model.getName()));
             DriversView.showInformationWindow("Info", deletedById);
             updateDataList();
 

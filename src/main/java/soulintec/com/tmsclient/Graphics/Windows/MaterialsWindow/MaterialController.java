@@ -74,7 +74,7 @@ public class MaterialController {
             String save = materialService.save(materialDTO);
 
             if (save.equals("saved")) {
-                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting material data"));
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new material : " + name));
                 MaterialsView.showInformationWindow("Info", save);
                 updateDataList();
 
@@ -112,7 +112,7 @@ public class MaterialController {
             String save = materialService.save(materialDTO);
 
             if (save.equals("saved")) {
-                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating material data"));
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for material :  " + name));
                 MaterialsView.showInformationWindow("Info", save);
                 updateDataList();
 
@@ -131,7 +131,7 @@ public class MaterialController {
         long materialId = model.getMaterialId();
         String deletedById = materialService.deleteById(materialId);
         if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting material data"));
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting material : " + model.getName()));
             MaterialsView.showInformationWindow("Info", deletedById);
             updateDataList();
 

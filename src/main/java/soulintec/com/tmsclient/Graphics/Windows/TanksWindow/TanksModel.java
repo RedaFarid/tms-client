@@ -15,7 +15,7 @@ public class TanksModel {
     private final DoubleProperty qty = new SimpleDoubleProperty(0.0);
     private final StringProperty dateOfQtySet = new SimpleStringProperty();
     private final StringProperty userOfQtySet = new SimpleStringProperty();
-    private final LongProperty materialID = new SimpleLongProperty(0);
+    private final LongProperty materialID = new SimpleLongProperty();
     private final StringProperty modifyDate = new SimpleStringProperty();
     private final StringProperty creationDate = new SimpleStringProperty();
     private final StringProperty createdBy = new SimpleStringProperty();

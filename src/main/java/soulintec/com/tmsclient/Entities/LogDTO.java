@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @ToString
 public class LogDTO  {
 
-    private Long id;
+    private Long logId;
     private LogIdentifier logIdentifier ;
     private String source;
     private String event;
