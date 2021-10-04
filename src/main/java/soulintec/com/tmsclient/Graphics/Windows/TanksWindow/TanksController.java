@@ -80,8 +80,8 @@ public class TanksController {
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
 
                 materialService.findById(tankDTO.getMaterialID()).ifPresentOrElse(materialDTO -> {
-                materialsModel.setName(materialDTO.getName());
-                materialsModel.setDescription(materialDTO.getDescription());
+                    materialsModel.setName(materialDTO.getName());
+                    materialsModel.setDescription(materialDTO.getDescription());
                 }, () -> {
                     materialsModel.setName("");
                     materialsModel.setDescription("");
@@ -127,7 +127,7 @@ public class TanksController {
                 tank.setMaterialID(model.getMaterialID());
 
                 String save = tanksService.save(tank);
-                System.err.println(save);
+
                 if (save.equals("saved")) {
                     TanksView.showInformationWindow("Info", save);
                     update();
@@ -137,7 +137,7 @@ public class TanksController {
                 }
                 resetModel();
             } else {
-                TanksView.showErrorWindow("Error inserting data", "Client already exist , please check entered data");
+                TanksView.showErrorWindow("Error inserting data", "Tank already exist , please check entered data");
             }
 
 
@@ -152,6 +152,12 @@ public class TanksController {
         String name = model.getName();
         String station = model.getStation();
         Double capacity = model.getCapacity();
+        long tankId = model.getTankId();
+
+        if (tankId == 0) {
+            TanksView.showWarningWindow("Missing Data", "Please select tank");
+            return;
+        }
 
         if (StringUtils.isBlank(name)) {
             TanksView.showWarningWindow("Missing Data", "Please enter name");
@@ -167,26 +173,36 @@ public class TanksController {
         }
 
         try {
-            TankDTO tank = new TankDTO();
-            tank.setId(model.getTankId());
-            tank.setName(name);
-            tank.setStation(station);
-            tank.setCapacity(capacity);
-//            tank.setQty(model.getQty());
-//            tank.setUserOfQtySet(model.getUserOfQtySet());
-            tank.setMaterialID(model.getMaterialID());
 
-            String save = tanksService.save(tank);
-            if (save.equals("saved")) {
-                TanksView.showInformationWindow("Info", save);
-                update();
+            if (tanksService.findById(tankId).isPresent()) {
+                TankDTO tank = new TankDTO();
+                tank.setId(tankId);
+                tank.setName(name);
+                tank.setStation(station);
+                tank.setCapacity(capacity);
+                tank.setDateOfQtySet(LocalDateTime.now());
+//                tank.setQty(model.getQty());
+//                tank.setDateOfQtySet(LocalDateTime.now());
+//                tank.setUserOfQtySet(model.getUserOfQtySet());
+                tank.setMaterialID(model.getMaterialID());
 
+                String save = tanksService.save(tank);
+
+                if (save.equals("saved")) {
+                    TanksView.showInformationWindow("Info", save);
+                    update();
+
+                } else {
+                    TanksView.showErrorWindow("Error updating data", save);
+                }
+                resetModel();
             } else {
-                TanksView.showErrorWindow("Error updating data", save);
+                TanksView.showErrorWindow("Error inserting data", "tank doesn't exist , please check entered data");
             }
-            resetModel();
+
+
         } catch (Exception e) {
-            TanksView.showErrorWindowForException("Error inserting data", e);
+            TanksView.showErrorWindowForException("Error updating data", e);
         }
     }
 
@@ -267,7 +283,7 @@ public class TanksController {
         });
     }
 
-//    @Scheduled(fixedDelay = 20000)
+    //    @Scheduled(fixedDelay = 20000)
     public void detailedUpdates(List<TankDTO> dataBaseList) {
         if (getDataList() != null) {
 

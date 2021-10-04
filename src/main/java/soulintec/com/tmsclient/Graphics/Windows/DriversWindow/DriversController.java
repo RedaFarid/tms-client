@@ -104,7 +104,7 @@ public class DriversController {
                 updateDataList();
 
             } else {
-                DriversView.showErrorWindow("Error updating data", save);
+                DriversView.showErrorWindow("Error inserting data", save);
             }
 
             resetModel();
@@ -116,12 +116,17 @@ public class DriversController {
     @Async
     public void onUpdate(MouseEvent mouseEvent) {
 
+        long id = model.getDriverId();
         String name = model.getName();
         String licenceNumber = model.getLicenseNumber();
         LocalDate licenceExpirationDate = model.getLicenceExpirationDate();
         String mobileNumber = model.getMobileNumber();
         Permissions permissions = model.getPermissions();
 
+        if (id == 0) {
+            DriversView.showWarningWindow("Missing Data", "Please select driver");
+            return;
+        }
 
         if (StringUtils.isBlank(name)) {
             DriversView.showWarningWindow("Missing Data", "Please enter name");
@@ -143,25 +148,31 @@ public class DriversController {
             DriversView.showWarningWindow("Missing Data", "Please select permission");
             return;
         }
-        DriverDTO driverDTO = new DriverDTO();
-        driverDTO.setId(model.getDriverId());
-        driverDTO.setName(name);
-        driverDTO.setLicenseNumber(licenceNumber);
-        driverDTO.setLicenceExpirationDate(licenceExpirationDate);
-        driverDTO.setMobileNumber(mobileNumber);
-        driverDTO.setPermissions(model.getPermissions());
-        driverDTO.setComment(model.getComment());
 
-        String save = driverService.save(driverDTO);
+        if (driverService.findById(id).isPresent()) {
+            DriverDTO driverDTO = new DriverDTO();
+            driverDTO.setId(id);
+            driverDTO.setName(name);
+            driverDTO.setLicenseNumber(licenceNumber);
+            driverDTO.setLicenceExpirationDate(licenceExpirationDate);
+            driverDTO.setMobileNumber(mobileNumber);
+            driverDTO.setPermissions(model.getPermissions());
+            driverDTO.setComment(model.getComment());
 
-        if (save.equals("saved")) {
-            DriversView.showInformationWindow("Info", save);
-            updateDataList();
+            String save = driverService.save(driverDTO);
 
+            if (save.equals("saved")) {
+                DriversView.showInformationWindow("Info", save);
+                updateDataList();
+
+            } else {
+                DriversView.showErrorWindow("Error updating data", save);
+            }
+
+            resetModel();
         } else {
-            DriversView.showErrorWindow("Error updating data", save);
+            DriversView.showErrorWindow("Error updating data", "Driver doesn't exist , please check selected data");
         }
-        resetModel();
     }
 
     @Async

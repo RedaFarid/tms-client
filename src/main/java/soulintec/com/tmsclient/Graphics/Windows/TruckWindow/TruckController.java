@@ -109,7 +109,6 @@ public class TruckController {
         truckContainerDTO.setPermissions(permissions);
         truckContainerDTO.setComment(truckContainerModel.getComment());
 
-        //TODO-- add this to all and on server side
         String save = truckContainerService.save(truckContainerDTO);
         if (save.equals("saved")) {
             TruckView.showInformationWindow("Info", save);

@@ -36,6 +36,7 @@ import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.Ic
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.WindowInterfaceMessages;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.windowReferenceNode;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsView;
+import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationView;
 import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.TanksView;
 import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 
@@ -67,6 +68,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private windowReferenceNode drivers = new windowReferenceNode(Resources.getResource("Icons/drivers.png").toString(), "Drivers", tempStringProperty);
     private windowReferenceNode tanks = new windowReferenceNode(Resources.getResource("Icons/tanks.png").toString(), "Tanks", tempStringProperty);
     private windowReferenceNode trucks = new windowReferenceNode(Resources.getResource("Icons/trucks.png").toString(), "Trucks", tempStringProperty);
+    private windowReferenceNode stations = new windowReferenceNode(Resources.getResource("Icons/stations.png").toString(), "Stations", tempStringProperty);
 
     private Image loginImage = new Image(Resources.getResource("Icons/login.png").toString());
     private Image logoutimage = new Image(Resources.getResource("Icons/logout.png").toString());
@@ -100,8 +102,6 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     @Autowired
     ClientView clientView;
 
-
-
     @Autowired
     DriversView driversView;
 
@@ -110,6 +110,9 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
     @Autowired
     TruckView truckView;
+
+    @Autowired
+    StationView stationView;
 
     private Notifications notifications;
 
@@ -154,6 +157,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         buttonsview.getChildren().add(new Separator());
         buttonsview.getChildren().add(logger);
         buttonsview.getChildren().add(new Separator());
+        buttonsview.getChildren().add(stations);
         buttonsview.getChildren().add(products);
         buttonsview.getChildren().add(clients);
         buttonsview.getChildren().add(drivers);
@@ -227,6 +231,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
                 drivers.setIconic(IconicStatus);
                 tanks.setIconic(IconicStatus);
                 trucks.setIconic(IconicStatus);
+                stations.setIconic(IconicStatus);
             } else {
                 KeyValue widthValue = new KeyValue(buttonsview.prefWidthProperty(), SIDE_BAR_EXPANDED_HEIGHT);
                 KeyFrame frame = new KeyFrame(Duration.seconds(0.4), widthValue);
@@ -239,6 +244,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
                     drivers.setIconic(IconicStatus);
                     tanks.setIconic(IconicStatus);
                     trucks.setIconic(IconicStatus);
+                    stations.setIconic(IconicStatus);
                 });
             }
         });
@@ -263,6 +269,10 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             truckView.update();
             root.setCenter(truckView.getTabContainer());
         });
+        stations.setOnIconClicked((String param) -> {
+            stationView.update();
+            root.setCenter(stationView.getTabContainer());
+        });
     }
 
     private void onLogIn(MouseEvent mouseEvent) {
@@ -285,6 +295,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         drivers.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         clients.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         products.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
+        stations.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
 
     }
 
@@ -325,6 +336,19 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             alert.getDialogPane().setMaxWidth(500);
             alert.initOwner(window);
             alert.initModality(Modality.NONE);
+            alert.show();
+        });
+    }
+
+    public static void showWarningWindow(String header, String content) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Warning");
+            alert.setHeaderText(header);
+            alert.setContentText(content);
+            alert.getDialogPane().setMaxWidth(500);
+            alert.initOwner(window);
+            alert.initModality(Modality.WINDOW_MODAL);
             alert.show();
         });
     }

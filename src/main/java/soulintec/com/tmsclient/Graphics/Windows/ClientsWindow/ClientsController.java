@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.ClientDTO;
+import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
 import soulintec.com.tmsclient.Services.ClientsService;
 
 import java.util.List;
@@ -116,7 +117,7 @@ public class ClientsController {
         String contactName = model.getContactName();
 
         if (id == 0) {
-            ClientView.showWarningWindow("Missing Data", "Please select client");
+            DriversView.showWarningWindow("Missing Data", "Please select client");
             return;
         }
 
@@ -141,24 +142,27 @@ public class ClientsController {
             return;
         }
 
-        ClientDTO clientDTO = new ClientDTO();
-        clientDTO.setId(id);
-        clientDTO.setName(name);
-        clientDTO.setContactName(contactName);
-        clientDTO.setContactTelNumber(contactTel);
-        clientDTO.setContactEmail(contactEmail);
-        clientDTO.setMainOfficeAddress(mainOffice);
+        if (clientsService.findById(id).isPresent()) {
+            ClientDTO clientDTO = new ClientDTO();
+            clientDTO.setId(id);
+            clientDTO.setName(name);
+            clientDTO.setContactName(contactName);
+            clientDTO.setContactTelNumber(contactTel);
+            clientDTO.setContactEmail(contactEmail);
+            clientDTO.setMainOfficeAddress(mainOffice);
 
-        String save = clientsService.save(clientDTO);
+            String save = clientsService.save(clientDTO);
+            if (save.equals("saved")) {
+                ClientView.showInformationWindow("Info", save);
+                updateDataList();
 
-        if (save.equals("saved")) {
-            ClientView.showInformationWindow("Info", save);
-            updateDataList();
-
+            } else {
+                ClientView.showErrorWindow("Error updating data", save);
+            }
+            resetModel();
         } else {
-            ClientView.showErrorWindow("Error updating data", save);
+            ClientView.showErrorWindow("Error updating data", "Client doesn't exist , please check entered data");
         }
-        resetModel();
     }
 
     @Async

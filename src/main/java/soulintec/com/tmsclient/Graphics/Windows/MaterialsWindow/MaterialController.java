@@ -81,9 +81,9 @@ public class MaterialController {
 
     @Async
     public void onUpdate(MouseEvent mouseEvent) {
+        Long id = model.getMaterialId();
         String name = model.getName();
         String desc = model.getDescription();
-        Long id = model.getMaterialId();
 
         if (id == 0) {
             MaterialsView.showWarningWindow("Missing Data", "Please select material");
@@ -94,22 +94,25 @@ public class MaterialController {
             MaterialsView.showWarningWindow("Missing Data", "Please enter material");
             return;
         }
+        if (materialService.findById(id).isPresent()) {
+            MaterialDTO materialDTO = new MaterialDTO();
+            materialDTO.setId(id);
+            materialDTO.setName(name);
+            materialDTO.setDescription(desc);
 
-        MaterialDTO materialDTO = new MaterialDTO();
-        materialDTO.setId(id);
-        materialDTO.setName(name);
-        materialDTO.setDescription(desc);
+            String save = materialService.save(materialDTO);
 
-        String save = materialService.save(materialDTO);
+            if (save.equals("saved")) {
+                MaterialsView.showInformationWindow("Info", save);
+                updateDataList();
 
-        if (save.equals("saved")) {
-            MaterialsView.showInformationWindow("Info", save);
-            updateDataList();
-
+            } else {
+                MaterialsView.showErrorWindow("Error updating data", save);
+            }
+            resetModel();
         } else {
-            MaterialsView.showErrorWindow("Error updating data", save);
+            MaterialsView.showErrorWindow("Error updating data", "Material doesn't exist , please check entered data");
         }
-        resetModel();
     }
 
     @Async

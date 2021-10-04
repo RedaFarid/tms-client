@@ -13,16 +13,13 @@ import java.time.LocalDateTime;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class DriverDTO {
+public class StationDTO {
 
     private Long id;
-    private String licenseNumber;
-    private String name;
-    private LocalDate licenceExpirationDate;
-
-    private String mobileNumber;
-    private Permissions permissions;
+    private String stationName;
+    private String location;
     private String comment;
+    private String computerName;
     private LocalDateTime creationDate;
     private LocalDateTime modifyDate;
     private String createdBy;

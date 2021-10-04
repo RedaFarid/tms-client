@@ -22,8 +22,8 @@ public class DriverService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String save(DriverDTO driverDTO) {
-        ResponseEntity<String> deleteResponseEntity = restTemplate.postForEntity(Utilities.iP +"/saveDriver",driverDTO, String.class);
-        return deleteResponseEntity.getBody();
+        ResponseEntity<String> saveResponseEntity = restTemplate.postForEntity(Utilities.iP +"/saveDriver",driverDTO, String.class);
+        return saveResponseEntity.getBody();
     }
 
     public List<DriverDTO> findAll() {
