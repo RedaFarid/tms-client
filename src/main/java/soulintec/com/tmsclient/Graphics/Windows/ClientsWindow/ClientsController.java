@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.ClientDTO;
+import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Services.ClientsService;
+import soulintec.com.tmsclient.Services.LogsService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +28,8 @@ public class ClientsController {
 
     @Autowired
     private ClientsService clientsService;
+    @Autowired
+    private LogsService logsService;
 
     public ClientsModel getModel() {
         return model;
@@ -50,6 +55,7 @@ public class ClientsController {
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
+//                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Error getting client data"));
                 ClientView.showErrorWindow("Data doesn't exist", "Error getting data for selected client");
             });
         }
@@ -95,10 +101,12 @@ public class ClientsController {
 
             String save = clientsService.save(clientDTO);
             if (save.equals("saved")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new client :  " + name));
                 ClientView.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                 ClientView.showErrorWindow("Error inserting data", save);
             }
             resetModel();
@@ -153,10 +161,12 @@ public class ClientsController {
 
             String save = clientsService.save(clientDTO);
             if (save.equals("saved")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating client data"));
                 ClientView.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                 ClientView.showErrorWindow("Error updating data", save);
             }
             resetModel();
@@ -171,10 +181,12 @@ public class ClientsController {
         long id = model.getClientId();
         String deletedById = clientsService.deleteById(id);
         if (deletedById.equals("deleted")) {
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting client data"));
             ClientView.showInformationWindow("Info", deletedById);
             updateDataList();
 
         } else {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
             ClientView.showErrorWindow("Error deleting record", deletedById);
         }
         resetModel();
@@ -211,5 +223,10 @@ public class ClientsController {
                 log.fatal(e);
             }
         });
+    }
+
+    @Override
+    public String toString() {
+        return "Clients";
     }
 }

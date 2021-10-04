@@ -6,12 +6,16 @@ import javafx.collections.ObservableList;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.DriverDTO;
+import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.Permissions;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Services.DriverService;
+import soulintec.com.tmsclient.Services.LogsService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,6 +31,8 @@ public class DriversController {
 
     @Autowired
     private DriverService driverService;
+    @Autowired
+    private LogsService logsService;
 
     public DriversModel getModel() {
         return model;
@@ -53,6 +59,7 @@ public class DriversController {
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
+//                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting driver data"));
                 DriversView.showErrorWindow("Data doesn't exist", "Error getting data for selected driver");
             });
         }
@@ -100,10 +107,12 @@ public class DriversController {
             String save = driverService.save(driverDTO);
 
             if (save.equals("saved")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting driver data"));
                 DriversView.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                 DriversView.showErrorWindow("Error inserting data", save);
             }
 
@@ -162,10 +171,12 @@ public class DriversController {
             String save = driverService.save(driverDTO);
 
             if (save.equals("saved")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating driver data"));
                 DriversView.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                 DriversView.showErrorWindow("Error updating data", save);
             }
 
@@ -180,10 +191,12 @@ public class DriversController {
         long id = model.getDriverId();
         String deletedById = driverService.deleteById(id);
         if (deletedById.equals("deleted")) {
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting driver data"));
             DriversView.showInformationWindow("Info", deletedById);
             updateDataList();
 
         } else {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
             DriversView.showErrorWindow("Error deleting record", deletedById);
         }
         resetModel();
@@ -221,5 +234,10 @@ public class DriversController {
                 log.fatal(e);
             }
         });
+    }
+
+    @Override
+    public String toString() {
+        return "Drivers";
     }
 }

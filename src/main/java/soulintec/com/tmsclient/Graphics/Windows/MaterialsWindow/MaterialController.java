@@ -9,7 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
+import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.MaterialDTO;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
+import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.MaterialService;
 
 import java.util.List;
@@ -23,6 +26,9 @@ public class MaterialController {
 
     @Autowired
     private MaterialService materialService;
+
+    @Autowired
+    private LogsService logsService;
 
     public MaterialsModel getModel() {
         return model;
@@ -44,6 +50,7 @@ public class MaterialController {
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
+//                logsService.save(new LogDTO(LogIdentifier.Error, toString(), " Error getting material data"));
                 MaterialsView.showErrorWindow("Data doesn't exist", "Error getting data for selected material");
             });
         }
@@ -67,10 +74,12 @@ public class MaterialController {
             String save = materialService.save(materialDTO);
 
             if (save.equals("saved")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting material data"));
                 MaterialsView.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                 MaterialsView.showErrorWindow("Error inserting data", save);
             }
             resetModel();
@@ -103,10 +112,12 @@ public class MaterialController {
             String save = materialService.save(materialDTO);
 
             if (save.equals("saved")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating material data"));
                 MaterialsView.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                 MaterialsView.showErrorWindow("Error updating data", save);
             }
             resetModel();
@@ -120,10 +131,12 @@ public class MaterialController {
         long materialId = model.getMaterialId();
         String deletedById = materialService.deleteById(materialId);
         if (deletedById.equals("deleted")) {
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting material data"));
             MaterialsView.showInformationWindow("Info", deletedById);
             updateDataList();
 
         } else {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
             MaterialsView.showErrorWindow("Error deleting record", deletedById);
         }
         resetModel();
@@ -160,5 +173,9 @@ public class MaterialController {
         });
     }
 
+    @Override
+    public String toString() {
+        return "Materials";
+    }
 }
 

@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogManagerWindow;
 import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientView;
 import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.IconicButton;
@@ -113,6 +114,9 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
     @Autowired
     StationView stationView;
+
+    @Autowired
+    LogManagerWindow logView;
 
     private Notifications notifications;
 
@@ -273,6 +277,13 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             stationView.update();
             root.setCenter(stationView.getTabContainer());
         });
+
+
+
+        logger.setOnIconClicked((String param) -> {
+            logView.update();
+            root.setCenter(logView.getRoot());
+        });
     }
 
     private void onLogIn(MouseEvent mouseEvent) {
@@ -290,6 +301,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     }
 
     public void init() {
+        logger.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         trucks.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         tanks.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         drivers.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());

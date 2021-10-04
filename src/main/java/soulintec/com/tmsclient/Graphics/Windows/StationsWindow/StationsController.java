@@ -13,8 +13,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
+import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.StationDTO;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.StationService;
 
 import java.util.List;
@@ -37,6 +40,8 @@ public class StationsController {
 
     @Autowired
     private StationService stationService;
+    @Autowired
+    private LogsService logsService;
 
     public StationsModel getModel() {
         return model;
@@ -63,6 +68,7 @@ public class StationsController {
 
 
             }, () -> {
+//                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting station data"));
                 MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected station");
             });
         }
@@ -99,10 +105,12 @@ public class StationsController {
 
                 String save = stationService.save(stationDTO);
                 if (save.equals("saved")) {
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting station data"));
                     MainWindow.showInformationWindow("Info", save);
                     update();
 
                 } else {
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                     MainWindow.showErrorWindow("Error inserting data", save);
                 }
                 resetModel();
@@ -152,14 +160,17 @@ public class StationsController {
 
                 String save = stationService.save(stationDTO);
                 if (save.equals("saved")) {
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating station data"));
                     MainWindow.showInformationWindow("Info", save);
                     update();
 
                 } else {
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                     MainWindow.showErrorWindow("Error updating data", save);
                 }
                 resetModel();
             } else {
+
                 MainWindow.showErrorWindow("Error updating data", "Station doesn't exist , please check selected data");
             }
 
@@ -175,10 +186,12 @@ public class StationsController {
         long id = model.getStationId();
         String deletedById = stationService.deleteById(id);
         if (deletedById.equals("deleted")) {
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting station data"));
             MainWindow.showInformationWindow("Info", deletedById);
             update();
 
         } else {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
             MainWindow.showErrorWindow("Error deleting record", deletedById);
         }
         resetModel();
@@ -259,4 +272,8 @@ public class StationsController {
         }
     }
 
+    @Override
+    public String toString() {
+        return "Stations";
+    }
 }

@@ -9,10 +9,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
+import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.Permissions;
 import soulintec.com.tmsclient.Entities.TruckContainerDTO;
 import soulintec.com.tmsclient.Entities.TruckTrailerDTO;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsView;
+import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.TruckContainerService;
 import soulintec.com.tmsclient.Services.TruckTrailerService;
 
@@ -38,6 +41,8 @@ public class TruckController {
 
     @Autowired
     private TruckTrailerService truckTrailerService;
+    @Autowired
+    private LogsService logsService;
 
     //Truck Container
     public TruckContainerModel getTruckContainerModel() {
@@ -64,6 +69,7 @@ public class TruckController {
                 truckContainerModel.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 truckContainerModel.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting truck container data"));
                 MaterialsView.showErrorWindow("Data doesn't exist", "Error getting data for selected truck container");
             });
         }
@@ -101,24 +107,26 @@ public class TruckController {
 
         if (!truckContainerService.findByLicenceNo(licenceNumber).isPresent()) {
             if (!truckContainerService.findByContainerNo(containerNumber).isPresent()) {
-        TruckContainerDTO truckContainerDTO = new TruckContainerDTO();
-        truckContainerDTO.setContainerNumber(containerNumber);
-        truckContainerDTO.setLicenceNumber(licenceNumber);
-        truckContainerDTO.setLicenceExpirationDate(licenceExpirationDate);
-        truckContainerDTO.setMaximumWeightConstrain(maximumWeightConstrain);
-        truckContainerDTO.setPermissions(permissions);
-        truckContainerDTO.setComment(truckContainerModel.getComment());
+                TruckContainerDTO truckContainerDTO = new TruckContainerDTO();
+                truckContainerDTO.setContainerNumber(containerNumber);
+                truckContainerDTO.setLicenceNumber(licenceNumber);
+                truckContainerDTO.setLicenceExpirationDate(licenceExpirationDate);
+                truckContainerDTO.setMaximumWeightConstrain(maximumWeightConstrain);
+                truckContainerDTO.setPermissions(permissions);
+                truckContainerDTO.setComment(truckContainerModel.getComment());
 
-        String save = truckContainerService.save(truckContainerDTO);
-        if (save.equals("saved")) {
-            TruckView.showInformationWindow("Info", save);
-            updateContainerDataList();
+                String save = truckContainerService.save(truckContainerDTO);
+                if (save.equals("saved")) {
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting truck container data"));
+                    TruckView.showInformationWindow("Info", save);
+                    updateContainerDataList();
 
-        } else {
-            TruckView.showErrorWindow("Error inserting data", save);
-        }
+                } else {
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
+                    TruckView.showErrorWindow("Error inserting data", save);
+                }
 
-        resetContainerModel();
+                resetContainerModel();
             } else {
                 TruckView.showErrorWindow("Error inserting data", "Truck container already exist , please check entered data");
             }
@@ -169,10 +177,12 @@ public class TruckController {
 
             String save = truckContainerService.save(truckContainerDTO);
             if (save.equals("saved")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating truck container data"));
                 TruckView.showInformationWindow("Info", save);
                 updateContainerDataList();
 
             } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                 TruckView.showErrorWindow("Error updating data", save);
             }
             resetContainerModel();
@@ -186,10 +196,12 @@ public class TruckController {
         long materialId = truckContainerModel.getTruckContainerId();
         String deletedById = truckContainerService.deleteById(materialId);
         if (deletedById.equals("deleted")) {
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting truck container data"));
             TruckView.showInformationWindow("Info", deletedById);
             updateContainerDataList();
 
         } else {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
             TruckView.showErrorWindow("Error deleting record", deletedById);
         }
         resetContainerModel();
@@ -198,7 +210,7 @@ public class TruckController {
     @Async
     public void updateContainerDataList() {
         List<TruckContainerDTO> list = truckContainerService.findAll();
-        if(list!=null) {
+        if (list != null) {
             getTruckContainerDataList().removeAll(list.stream().map(TruckContainerModel.TableObject::createFromTruckContainerDTO)
                     .filter(item -> !truckContainerTableList.contains(item))
                     .collect(this::getTruckContainerDataList, ObservableList::add, ObservableList::addAll)
@@ -254,6 +266,7 @@ public class TruckController {
                 truckTrailerModel.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 truckTrailerModel.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting truck trailer data "));
                 TruckView.showErrorWindow("Data doesn't exist", "Error getting data for selected truck trailer");
             });
         }
@@ -295,10 +308,12 @@ public class TruckController {
 
                 String save = truckTrailerService.save(truckTrailerDTO);
                 if (save.equals("saved")) {
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting truck trailer data"));
                     TruckView.showInformationWindow("Info", save);
                     updateTrailerDataList();
 
                 } else {
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                     TruckView.showErrorWindow("Error inserting data", save);
                 }
 
@@ -347,10 +362,12 @@ public class TruckController {
 
             String save = truckTrailerService.save(truckTrailerDTO);
             if (save.equals("saved")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating truck trailer data"));
                 TruckView.showInformationWindow("Info", save);
                 updateTrailerDataList();
 
             } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                 TruckView.showErrorWindow("Error updating data", save);
             }
             resetTrailerModel();
@@ -364,10 +381,12 @@ public class TruckController {
         long materialId = truckTrailerModel.getTruckTrailerId();
         String deletedById = truckTrailerService.deleteById(materialId);
         if (deletedById.equals("deleted")) {
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting truck trailer data"));
             TruckView.showInformationWindow("Info", deletedById);
             updateTrailerDataList();
 
         } else {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
             TruckView.showErrorWindow("Error deleting record", deletedById);
         }
         resetTrailerModel();
@@ -376,14 +395,14 @@ public class TruckController {
     @Async
     public void updateTrailerDataList() {
         List<TruckTrailerDTO> list = truckTrailerService.findAll();
-        if(list != null){
-        getTruckTrailerDataList().removeAll(list.stream().map(TruckTrailerModel.TableObject::createFromTruckTrailerDTO)
-                .filter(item -> !truckTrailerTableList.contains(item))
-                .collect(this::getTruckTrailerDataList, ObservableList::add, ObservableList::addAll)
-                .stream()
-                .filter(tableListItem -> list.stream().map(TruckTrailerModel.TableObject::createFromTruckTrailerDTO)
-                        .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
-                .collect(Collectors.toList()));
+        if (list != null) {
+            getTruckTrailerDataList().removeAll(list.stream().map(TruckTrailerModel.TableObject::createFromTruckTrailerDTO)
+                    .filter(item -> !truckTrailerTableList.contains(item))
+                    .collect(this::getTruckTrailerDataList, ObservableList::add, ObservableList::addAll)
+                    .stream()
+                    .filter(tableListItem -> list.stream().map(TruckTrailerModel.TableObject::createFromTruckTrailerDTO)
+                            .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
+                    .collect(Collectors.toList()));
         }
 
     }
@@ -407,4 +426,8 @@ public class TruckController {
         });
     }
 
+    @Override
+    public String toString() {
+        return "Trucks";
+    }
 }

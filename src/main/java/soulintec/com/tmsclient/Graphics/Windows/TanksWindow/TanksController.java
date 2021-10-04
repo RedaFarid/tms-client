@@ -13,9 +13,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
+import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.TankDTO;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsModel;
 import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
+import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.MaterialService;
 import soulintec.com.tmsclient.Services.StationService;
 import soulintec.com.tmsclient.Services.TanksService;
@@ -49,6 +52,8 @@ public class TanksController {
 
     @Autowired
     private StationService stationService;
+    @Autowired
+    private LogsService logsService;
 
     public TanksModel getModel() {
         return model;
@@ -104,6 +109,7 @@ public class TanksController {
                 });
 
             }, () -> {
+//                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting tanks data"));
                 TanksView.showErrorWindow("Data doesn't exist", "Error getting data for selected tank");
             });
         }
@@ -145,10 +151,12 @@ public class TanksController {
                 String save = tanksService.save(tank);
 
                 if (save.equals("saved")) {
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting tank data"));
                     TanksView.showInformationWindow("Info", save);
                     update();
 
                 } else {
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                     TanksView.showErrorWindow("Error inserting data", save);
                 }
                 resetModel();
@@ -205,10 +213,12 @@ public class TanksController {
                 String save = tanksService.save(tank);
 
                 if (save.equals("saved")) {
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating tank data"));
                     TanksView.showInformationWindow("Info", save);
                     update();
 
                 } else {
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                     TanksView.showErrorWindow("Error updating data", save);
                 }
                 resetModel();
@@ -228,10 +238,12 @@ public class TanksController {
         long id = model.getTankId();
         String deletedById = tanksService.deleteById(id);
         if (deletedById.equals("deleted")) {
+            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting tank data"));
             TanksView.showInformationWindow("Info", deletedById);
             update();
 
         } else {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
             TanksView.showErrorWindow("Error deleting record", deletedById);
         }
         resetModel();
@@ -310,6 +322,7 @@ public class TanksController {
     }
 
     //    @Scheduled(fixedDelay = 20000)
+    //TODO -- do to others
     public void detailedUpdates(List<TankDTO> dataBaseList) {
         if (getDataList() != null) {
 
@@ -354,5 +367,10 @@ public class TanksController {
         stationModel.setComputerName(selected.getComputerNameColumn());
         stationModel.setStationId(selected.getStationIdColumn());
 
+    }
+
+    @Override
+    public String toString() {
+        return "Tanks";
     }
 }

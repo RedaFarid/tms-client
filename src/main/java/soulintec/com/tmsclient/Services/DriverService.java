@@ -70,4 +70,9 @@ public class DriverService {
         private List<DriverDTO> drivers;
         private Exception exception;
     }
+
+    @Override
+    public String toString() {
+        return "Driver Service";
+    }
 }
