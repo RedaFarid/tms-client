@@ -49,7 +49,7 @@ public class TanksService {
         return Optional.ofNullable(forEntity.getBody());
     }
 
-    public Optional<TankDTO> findByNameAndStation(String name, String station) {
+    public Optional<TankDTO> findByNameAndStation(String name, Long station) {
         ResponseEntity<TankDTO> forEntity = restTemplate.getForEntity(Utilities.iP + "/tankByNameAndStation/" + name + "/" + station, TankDTO.class);
 
         return Optional.ofNullable(forEntity.getBody());

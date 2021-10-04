@@ -11,7 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class StationsModel {
-    private final LongProperty stationId = new SimpleLongProperty();
+    private final LongProperty stationId = new SimpleLongProperty(0);
     private final StringProperty name = new SimpleStringProperty("");
     private final StringProperty location = new SimpleStringProperty("");
     private final StringProperty comment = new SimpleStringProperty("");

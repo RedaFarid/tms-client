@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class TankDTO{
     private Long id;
     private String name;
-    private String station;
+    private Long station;
     private double capacity;
     private double qty;
     private LocalDateTime dateOfQtySet;

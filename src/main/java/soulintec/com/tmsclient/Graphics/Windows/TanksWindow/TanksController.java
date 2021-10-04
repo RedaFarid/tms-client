@@ -8,22 +8,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.input.MouseEvent;
-import lombok.Data;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.TankDTO;
-import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientView;
-import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsModel;
+import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
 import soulintec.com.tmsclient.Services.MaterialService;
+import soulintec.com.tmsclient.Services.StationService;
 import soulintec.com.tmsclient.Services.TanksService;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -35,9 +32,11 @@ import java.util.stream.Collectors;
 public class TanksController {
     private final TanksModel model = new TanksModel();
     private final MaterialsModel materialsModel = new MaterialsModel();
+    private final StationsModel stationModel = new StationsModel();
 
     private final ObservableList<TanksModel.TableObject> tableList = FXCollections.observableArrayList();
     private final ObservableList<MaterialsModel.TableObject> productContextList = FXCollections.observableArrayList();
+    private final ObservableList<StationsModel.TableObject> stationContextList = FXCollections.observableArrayList();
 
     @Autowired(required = false)
     private Executor executor;
@@ -48,12 +47,19 @@ public class TanksController {
     @Autowired
     private MaterialService materialService;
 
+    @Autowired
+    private StationService stationService;
+
     public TanksModel getModel() {
         return model;
     }
 
     public MaterialsModel getMaterialsModel() {
         return materialsModel;
+    }
+
+    public StationsModel getStationsModel() {
+        return stationModel;
     }
 
     public ObservableList<TanksModel.TableObject> getDataList() {
@@ -87,6 +93,16 @@ public class TanksController {
                     materialsModel.setDescription("");
                 });
 
+                stationService.findById(tankDTO.getStation()).ifPresentOrElse(stationDTO -> {
+                    stationModel.setName(stationDTO.getStationName());
+                    stationModel.setLocation(stationDTO.getLocation());
+                    stationModel.setComputerName(stationDTO.getComputerName());
+                }, () -> {
+                    stationModel.setName("");
+                    stationModel.setLocation("");
+                    stationModel.setComputerName("");
+                });
+
             }, () -> {
                 TanksView.showErrorWindow("Data doesn't exist", "Error getting data for selected tank");
             });
@@ -97,14 +113,14 @@ public class TanksController {
     public void onInsert(MouseEvent mouseEvent) {
 
         String name = model.getName();
-        String station = model.getStation();
+        Long station = model.getStation();
         Double capacity = model.getCapacity();
 
         if (StringUtils.isBlank(name)) {
             TanksView.showWarningWindow("Missing Data", "Please enter name");
             return;
         }
-        if (StringUtils.isBlank(station)) {
+        if (station == 0) {
             TanksView.showWarningWindow("Missing Data", "Please enter station");
             return;
         }
@@ -150,7 +166,7 @@ public class TanksController {
     public void onUpdate(MouseEvent mouseEvent) {
 
         String name = model.getName();
-        String station = model.getStation();
+        Long station = model.getStation();
         Double capacity = model.getCapacity();
         long tankId = model.getTankId();
 
@@ -163,7 +179,7 @@ public class TanksController {
             TanksView.showWarningWindow("Missing Data", "Please enter name");
             return;
         }
-        if (StringUtils.isBlank(station)) {
+        if (station == 0) {
             TanksView.showWarningWindow("Missing Data", "Please enter station");
             return;
         }
@@ -258,12 +274,18 @@ public class TanksController {
         return productContextList;
     }
 
+    public ObservableList<StationsModel.TableObject> getStationContextList() {
+        stationContextList.clear();
+        stationContextList.addAll(stationService.findAll().stream().map(StationsModel.TableObject::createFromStationDTO).collect(Collectors.toList()));
+        return stationContextList;
+    }
+
     public void resetModel() {
         Platform.runLater(() -> {
             try {
                 model.setTankId(0);
                 model.setName("");
-                model.setStation("");
+                model.setStation(0);
                 model.setCapacity(0.0);
                 model.setMaterialID(0);
                 model.setQty(0.0);
@@ -276,6 +298,10 @@ public class TanksController {
 
                 materialsModel.setName("");
                 materialsModel.setDescription("");
+
+                stationModel.setName("");
+                stationModel.setLocation("");
+                stationModel.setComputerName("");
 
             } catch (Exception e) {
                 log.fatal(e);
@@ -317,6 +343,16 @@ public class TanksController {
         materialsModel.setMaterialId(selected.getMaterialIdColumn());
         materialsModel.setName(selected.getNameColumn());
         materialsModel.setDescription(selected.getDescriptionColumn());
+
+    }
+
+
+    public void setStationData(StationsModel.TableObject selected) {
+
+        stationModel.setName(selected.getNameColumn());
+        stationModel.setLocation(selected.getLocationColumn());
+        stationModel.setComputerName(selected.getComputerNameColumn());
+        stationModel.setStationId(selected.getStationIdColumn());
 
     }
 }

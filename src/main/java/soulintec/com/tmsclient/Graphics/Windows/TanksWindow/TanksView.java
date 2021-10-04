@@ -25,6 +25,7 @@ import soulintec.com.tmsclient.ApplicationContext;
 import soulintec.com.tmsclient.Graphics.Controls.*;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsModel;
+import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
 
 import java.time.LocalDateTime;
 
@@ -35,11 +36,13 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     private TanksController controller;
     private TanksModel model;
     private MaterialsModel materialsModel;
+    private StationsModel stationsModel;
 
     protected static MainWindow initialStage;
 
     private DataEntryPartitionTitled tanksDataEntry;
     private DataEntryPartitionTitled contextProductsDataEntry;
+    private DataEntryPartitionTitled contextStationDataEntry;
 
     private Tab tanksTab;
     private VBox tanksPane;
@@ -53,6 +56,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
 
     private Stage mainWindow;
     private Stage contextProductStage;
+    private Stage contextStationStage;
 
     private TableView<TanksModel.TableObject> tanksTableView;
     private TableColumn<TanksModel.TableObject, LongProperty> tankIdColumn;
@@ -72,6 +76,11 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     private TableView<MaterialsModel.TableObject> contextProductTableView;
     private TableColumn<MaterialsModel.TableObject, StringProperty> contextProductNameColumn;
     private TableColumn<MaterialsModel.TableObject, StringProperty> contextProductDescriptionColumn;
+
+    private TableView<StationsModel.TableObject> contextStationsTableView;
+    private TableColumn<StationsModel.TableObject, StringProperty> contextStationNameColumn;
+    private TableColumn<StationsModel.TableObject, StringProperty> contextStationLocationColumn;
+    private TableColumn<StationsModel.TableObject, ObjectProperty<String>> contextStationComputerColumn;
 
     private EnhancedButton insertTank;
     private EnhancedButton deleteTank;
@@ -93,13 +102,17 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     private Label onTerminalLabel;
     private Label createdByLabel;
 
-    private Label ContextProductNameLabel;
-    private Label ContextProductDescriptionLabel;
+    private Label contextProductNameLabel;
+    private Label contextProductDescriptionLabel;
+
+    private Label contextStationNameLabel;
+    private Label contextStationLocationLabel;
+    private Label contextStationComputerLabel;
 
     private EnhancedLongField tankIdField;
     private EnhancedTextField nameField;
     private EnhancedDoubleField capacityField;
-    private EnhancedTextField stationField;
+    private EnhancedLongField stationIdField;
     private EnhancedLongField materialIdField;
     private EnhancedDoubleField qtyField;
     private EnhancedDoubleField calcQtyField;
@@ -110,8 +123,12 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     private EnhancedTextField createdByField;
     private EnhancedTextField onTerminalField;
 
-    private Label ContextProductNameFieldField;
-    private Label ContextProductDescriptionField;
+    private Label contextProductNameFieldField;
+    private Label contextProductDescriptionField;
+
+    private Label contextStationNameField;
+    private Label contextStationLocationField;
+    private Label contextStationComputerField;
 
     private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
     private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
@@ -121,6 +138,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
         mainWindow = event.getStage();
         contextProductStage = new Stage();
+        contextStationStage = new Stage();
         userAuthorities();
         init();
         graphicsBuilder();
@@ -136,9 +154,11 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         controller = ApplicationContext.applicationContext.getBean(TanksController.class);
         model = controller.getModel();
         materialsModel = controller.getMaterialsModel();
+        stationsModel = controller.getStationsModel();
 
         tanksDataEntry = new DataEntryPartitionTitled("Tank");
-        contextProductsDataEntry = new DataEntryPartitionTitled("Selected product");
+        contextProductsDataEntry = new DataEntryPartitionTitled("Selected material");
+        contextStationDataEntry = new DataEntryPartitionTitled("Selected station");
 
         tanksTab = new Tab("Tanks Management");
         tanksPane = new VBox();
@@ -170,6 +190,12 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         contextProductNameColumn = new TableColumn<>("Name");
         contextProductDescriptionColumn = new TableColumn<>("Description");
 
+        contextStationsTableView = new TableView<>();
+
+        contextStationNameColumn = new TableColumn<>("Name");
+        contextStationComputerColumn = new TableColumn<>("Computer");
+        contextStationLocationColumn = new TableColumn<>("Location");
+
         insertTank = new EnhancedButton("Insert new tank");
         deleteTank = new EnhancedButton("Delete selected tank");
         updateTank = new EnhancedButton("Update selected tank");
@@ -190,13 +216,17 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         onTerminalLabel = new Label("On Terminal :");
         createdByLabel = new Label("Created By :");
 
-        ContextProductNameLabel = new Label("Name :");
-        ContextProductDescriptionLabel = new Label("Description :");
+        contextProductNameLabel = new Label("Name :");
+        contextProductDescriptionLabel = new Label("Description :");
+
+        contextStationNameLabel = new Label("Name :");
+        contextStationComputerLabel = new Label("Computer :");
+        contextStationLocationLabel = new Label("Location :");
 
         tankIdField = new EnhancedLongField();
         nameField = new EnhancedTextField();
         capacityField = new EnhancedDoubleField();
-        stationField = new EnhancedTextField();
+        stationIdField = new EnhancedLongField();
         materialIdField = new EnhancedLongField();
         qtyField = new EnhancedDoubleField();
         calcQtyField = new EnhancedDoubleField();
@@ -207,14 +237,19 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         createdByField = new EnhancedTextField();
         onTerminalField = new EnhancedTextField();
 
-        ContextProductNameFieldField = new Label();
-        ContextProductDescriptionField = new Label();
+        contextProductNameFieldField = new Label();
+        contextProductDescriptionField = new Label();
+
+        contextStationNameField = new Label();
+        contextStationLocationField = new Label();
+        contextStationComputerField = new Label();
     }
 
     private void graphicsBuilder() {
 
         tanksGraphicsBuilder();
         productsContextGraphicsBuilder();
+        stationsContextGraphicsBuilder();
 
         tabContainer.getTabs().addAll(tanksTab);
 
@@ -305,7 +340,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         tankIdField.setPrefWidth(250);
         nameField.setPrefWidth(250);
         capacityField.setPrefWidth(250);
-        stationField.setPrefWidth(250);
+        stationIdField.setPrefWidth(250);
         materialIdField.setPrefWidth(250);
         qtyField.setPrefWidth(250);
         calcQtyField.setPrefWidth(250);
@@ -334,7 +369,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         tanksDataEntry.add(nameField, 4, 1);
 
         tanksDataEntry.add(stationLabel, 5, 1);
-        tanksDataEntry.add(stationField, 6, 1);
+        tanksDataEntry.add(stationIdField, 6, 1);
 
         tanksDataEntry.add(capacityLabel, 7, 1);
         tanksDataEntry.add(capacityField, 8, 1);
@@ -405,7 +440,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         tanksHbox.getItems().addAll(insertTank, updateTank, deleteTank/*, new Separator(), refreshTank*/);
         tanksHbox.setPadding(new Insets(10, 10, 10, 10));
 
-        tanksVbox.getChildren().addAll(contextProductsDataEntry, tanksDataEntry, tanksHbox);
+        tanksVbox.getChildren().addAll(contextProductsDataEntry,contextStationDataEntry, tanksDataEntry, tanksHbox);
         tanksVbox.setSpacing(5);
         tanksVbox.setAlignment(Pos.CENTER);
 
@@ -418,7 +453,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         tankIdField.longValueProperty().bindBidirectional(model.tankIdProperty());
         nameField.textProperty().bindBidirectional(model.nameProperty());
         capacityField.doubleValueProperty().bindBidirectional(model.capacityProperty());
-        stationField.textProperty().bindBidirectional(model.stationProperty());
+        stationIdField.longValueProperty().bindBidirectional(model.stationProperty());
         materialIdField.longValueProperty().bindBidirectional(model.materialIDProperty());
         qtyField.doubleValueProperty().bindBidirectional(model.qtyProperty());
         calcQtyField.doubleValueProperty().bindBidirectional(model.calculatedQtyProperty());
@@ -433,27 +468,27 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
 
     private void productsContextGraphicsBuilder() {
         //dataentery region configuration
-        ContextProductNameLabel.setPrefWidth(150);
-        ContextProductDescriptionLabel.setPrefWidth(150);
+        contextProductNameLabel.setPrefWidth(150);
+        contextProductDescriptionLabel.setPrefWidth(150);
 
-        ContextProductNameLabel.setTextAlignment(TextAlignment.RIGHT);
-        ContextProductDescriptionLabel.setTextAlignment(TextAlignment.RIGHT);
+        contextProductNameLabel.setTextAlignment(TextAlignment.RIGHT);
+        contextProductDescriptionLabel.setTextAlignment(TextAlignment.RIGHT);
 
-        ContextProductNameLabel.setAlignment(Pos.BASELINE_RIGHT);
-        ContextProductDescriptionLabel.setAlignment(Pos.BASELINE_RIGHT);
+        contextProductNameLabel.setAlignment(Pos.BASELINE_RIGHT);
+        contextProductDescriptionLabel.setAlignment(Pos.BASELINE_RIGHT);
 
-        ContextProductNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        ContextProductDescriptionLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        contextProductNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        contextProductDescriptionLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
-        ContextProductNameFieldField.setPrefWidth(250);
-        ContextProductDescriptionField.setPrefWidth(250);
+        contextProductNameFieldField.setPrefWidth(250);
+        contextProductDescriptionField.setPrefWidth(250);
 
-        contextProductsDataEntry.add(ContextProductNameLabel, 1, 2);
-        contextProductsDataEntry.add(ContextProductDescriptionLabel, 3, 2);
+        contextProductsDataEntry.add(contextProductNameLabel, 1, 2);
+        contextProductsDataEntry.add(contextProductDescriptionLabel, 3, 2);
 
 //        dataentery.add(IDLabel, 1, 1);
-        contextProductsDataEntry.add(ContextProductNameFieldField, 2, 2);
-        contextProductsDataEntry.add(ContextProductDescriptionField, 4, 2);
+        contextProductsDataEntry.add(contextProductNameFieldField, 2, 2);
+        contextProductsDataEntry.add(contextProductDescriptionField, 4, 2);
 
         contextProductNameColumn.setCellValueFactory(new PropertyValueFactory<>("nameColumn"));
         contextProductDescriptionColumn.setCellValueFactory(new PropertyValueFactory<>("descriptionColumn"));
@@ -474,15 +509,79 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         contextProductTableView.prefHeightProperty().bind(contextProductStage.heightProperty());
 
         materialIdField.longValueProperty().bindBidirectional(materialsModel.materialIdProperty());
-        ContextProductNameFieldField.textProperty().bindBidirectional(materialsModel.nameProperty());
-        ContextProductDescriptionField.textProperty().bindBidirectional(materialsModel.descriptionProperty());
+        contextProductNameFieldField.textProperty().bindBidirectional(materialsModel.nameProperty());
+        contextProductDescriptionField.textProperty().bindBidirectional(materialsModel.descriptionProperty());
     }
+
+
+    private void stationsContextGraphicsBuilder() {
+
+        //dataentery region configuration
+        contextStationNameLabel.setPrefWidth(150);
+        contextStationLocationLabel.setPrefWidth(150);
+        contextStationLocationLabel.setPrefWidth(150);
+
+        contextStationNameLabel.setTextAlignment(TextAlignment.RIGHT);
+        contextStationLocationLabel.setTextAlignment(TextAlignment.RIGHT);
+        contextStationComputerLabel.setTextAlignment(TextAlignment.RIGHT);
+
+        contextStationNameLabel.setAlignment(Pos.BASELINE_RIGHT);
+        contextStationLocationLabel.setAlignment(Pos.BASELINE_RIGHT);
+        contextStationComputerLabel.setAlignment(Pos.BASELINE_RIGHT);
+
+        contextStationNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");;
+        contextStationLocationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");;
+        contextStationComputerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");;
+
+        contextStationNameField.setPrefWidth(250);
+        contextStationLocationField.setPrefWidth(250);
+        contextStationComputerField.setPrefWidth(250);
+
+        contextStationDataEntry.add(contextStationNameLabel, 1, 2);
+        contextStationDataEntry.add(contextStationLocationLabel, 3, 2);
+        contextStationDataEntry.add(contextStationComputerLabel, 5, 2);
+
+        contextStationDataEntry.add(contextStationNameField, 2, 2);
+        contextStationDataEntry.add(contextStationLocationField, 4, 2);
+        contextStationDataEntry.add(contextStationComputerField, 6, 2);
+
+        contextStationNameColumn.setCellValueFactory(new PropertyValueFactory<>("nameColumn"));
+        contextStationLocationColumn.setCellValueFactory(new PropertyValueFactory<>("locationColumn"));
+        contextStationComputerColumn.setCellValueFactory(new PropertyValueFactory<>("computerNameColumn"));
+
+        contextStationsTableView.getColumns().addAll(contextStationNameColumn, contextStationLocationColumn,contextStationComputerColumn);
+        contextStationsTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        //stage configuration
+
+        Pane pane = new Pane(contextStationsTableView);
+        pane.setBorder(new Border(new BorderStroke(Color.valueOf("#0099cc"), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+        pane.setPadding(new Insets(2, 2, 2, 2));
+        contextStationStage.setScene(new Scene(pane));
+        contextStationStage.initStyle(StageStyle.UNDECORATED);
+        contextStationStage.initOwner(mainWindow);
+
+        contextStationsTableView.prefWidthProperty().bind(contextStationStage.widthProperty());
+        contextStationsTableView.prefHeightProperty().bind(contextStationStage.heightProperty());
+
+        stationIdField.longValueProperty().bindBidirectional(stationsModel.stationIdProperty());
+        contextStationNameField.textProperty().bindBidirectional(stationsModel.nameProperty());
+        contextStationLocationField.textProperty().bindBidirectional(stationsModel.locationProperty());
+        contextStationComputerField.textProperty().bindBidirectional(stationsModel.commentProperty());
+    }
+
 
     private void actionHandling() {
         tanksActionHandling();
         mainWindow.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
             if (contextProductStage.isShowing()) {
                 contextProductStage.close();
+            }
+        });
+
+        mainWindow.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+            if (contextStationStage.isShowing()) {
+                contextStationStage.close();
             }
         });
     }
@@ -510,6 +609,18 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         });
 
 
+        stationIdField.setOnMouseClicked(this::onRunStationContextWidow);
+        contextStationsTableView.setOnMouseClicked(action -> {
+
+            if (action.getClickCount() == 2) {
+                StationsModel.TableObject selected = contextStationsTableView.getSelectionModel().getSelectedItem();
+                controller.setStationData(selected);
+
+                contextStationStage.close();
+            }
+        });
+
+
 
     }
 
@@ -523,6 +634,20 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
             contextProductStage.setX(action.getScreenX());
             contextProductStage.setY(action.getScreenY());
             contextProductStage.show();
+        });
+    }
+
+
+    private void onRunStationContextWidow(MouseEvent action) {
+        Platform.runLater(() -> {
+            contextStationsTableView.getItems().clear();
+            contextStationsTableView.setItems(controller.getStationContextList());
+            contextStationStage.setWidth(600);
+            contextStationStage.setHeight(500);
+            contextStationStage.setResizable(false);
+            contextStationStage.setX(action.getScreenX());
+            contextStationStage.setY(action.getScreenY());
+            contextStationStage.show();
         });
     }
 

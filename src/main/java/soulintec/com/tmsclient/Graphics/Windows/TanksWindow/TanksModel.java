@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class TanksModel {
     private final LongProperty tankId = new SimpleLongProperty();
     private final StringProperty name = new SimpleStringProperty();
-    private final StringProperty station = new SimpleStringProperty();
+    private final LongProperty station = new SimpleLongProperty(0);
     private final DoubleProperty capacity = new SimpleDoubleProperty(0.0);
     private final DoubleProperty qty = new SimpleDoubleProperty(0.0);
     private final StringProperty dateOfQtySet = new SimpleStringProperty();
@@ -46,15 +46,15 @@ public class TanksModel {
         this.name.set(name);
     }
 
-    public String getStation() {
+    public long getStation() {
         return station.get();
     }
 
-    public StringProperty stationProperty() {
+    public LongProperty stationProperty() {
         return station;
     }
 
-    public void setStation(String station) {
+    public void setStation(long station) {
         this.station.set(station);
     }
 
@@ -181,7 +181,7 @@ public class TanksModel {
     public static class TableObject implements Comparable<TanksModel.TableObject>{
         private final LongProperty tankIdColumn;
         private final StringProperty nameColumn;
-        private final StringProperty stationColumn;
+        private final LongProperty stationColumn;
         private final DoubleProperty capacityColumn;
         private final DoubleProperty qtyColumn;
         private final ObjectProperty<LocalDateTime> dateOfQtySetColumn;
@@ -193,7 +193,7 @@ public class TanksModel {
         private final StringProperty onTerminalColumn;
         private final DoubleProperty calculatedQtyColumn;
 
-        public TableObject(LongProperty tankIdColumn, StringProperty nameColumn, StringProperty stationColumn, DoubleProperty capacityColumn, DoubleProperty qtyColumn, ObjectProperty<LocalDateTime> dateOfQtySetColumn, StringProperty userOfQtySetColumn, LongProperty materialIDColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn,  DoubleProperty calculatedQtyColumn) {
+        public TableObject(LongProperty tankIdColumn, StringProperty nameColumn, LongProperty stationColumn, DoubleProperty capacityColumn, DoubleProperty qtyColumn, ObjectProperty<LocalDateTime> dateOfQtySetColumn, StringProperty userOfQtySetColumn, LongProperty materialIDColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn,  DoubleProperty calculatedQtyColumn) {
             this.tankIdColumn = tankIdColumn;
             this.nameColumn = nameColumn;
             this.stationColumn = stationColumn;
@@ -233,15 +233,15 @@ public class TanksModel {
             this.nameColumn.set(nameColumn);
         }
 
-        public String getStationColumn() {
+        public long getStationColumn() {
             return stationColumn.get();
         }
 
-        public StringProperty stationColumnProperty() {
+        public LongProperty stationColumnProperty() {
             return stationColumn;
         }
 
-        public void setStationColumn(String stationColumn) {
+        public void setStationColumn(long stationColumn) {
             this.stationColumn.set(stationColumn);
         }
 
@@ -369,7 +369,7 @@ public class TanksModel {
             return new TanksModel.TableObject(
                     new SimpleLongProperty(tankDTO.getId()),
                     new SimpleStringProperty(tankDTO.getName()),
-                    new SimpleStringProperty(tankDTO.getStation()),
+                    new SimpleLongProperty(tankDTO.getStation()),
                     new SimpleDoubleProperty(tankDTO.getCapacity()),
                     new SimpleDoubleProperty(tankDTO.getQty()),
                     new SimpleObjectProperty<LocalDateTime>(tankDTO.getDateOfQtySet()),
