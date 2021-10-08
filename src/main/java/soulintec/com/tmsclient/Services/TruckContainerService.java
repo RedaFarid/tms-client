@@ -6,13 +6,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.TruckContainerDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,9 +26,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TruckContainerService {
 
+    @Autowired
+    private LogsService logsService;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String save(TruckContainerDTO truckContainerDTO) {
+        try {
+            truckContainerDTO.setOnTerminal(InetAddress.getLocalHost().getHostName());
+        } catch (UnknownHostException e) {
+            truckContainerDTO.setOnTerminal("Unknown computer");
+            logsService.save(new LogDTO(LogIdentifier.Error, "Computer name",e.getMessage() ));
+            log.error("Can't get computer name");
+        }
         ResponseEntity<String> saveResponseEntity = restTemplate.postForEntity(Utilities.iP +"/saveTruckContainers",truckContainerDTO, String.class);
         return saveResponseEntity.getBody();
     }

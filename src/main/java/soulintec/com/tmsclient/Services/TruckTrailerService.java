@@ -6,14 +6,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.poi.ss.formula.functions.T;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.TruckTrailerDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,9 +25,20 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class TruckTrailerService {
+
+    @Autowired
+    private LogsService logsService;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String save(TruckTrailerDTO truckTrailerDTO) {
+        try {
+            truckTrailerDTO.setOnTerminal(InetAddress.getLocalHost().getHostName());
+        } catch (UnknownHostException e) {
+            truckTrailerDTO.setOnTerminal("Unknown computer");
+            logsService.save(new LogDTO(LogIdentifier.Error, "Computer name", e.getMessage()));
+            log.error("Can't get computer name");
+        }
         ResponseEntity<String> saveResponseEntity = restTemplate.postForEntity(Utilities.iP + "/saveTruckTrailers", truckTrailerDTO, String.class);
         return saveResponseEntity.getBody();
     }
@@ -39,13 +54,13 @@ public class TruckTrailerService {
             TruckView.showErrorWindow("Error loading data", e.getMessage());
         }
 
-            if (body.getException() == null) {
-                return body.getTruckTrailers();
+        if (body.getException() == null) {
+            return body.getTruckTrailers();
 
-            } else {
-                TruckView.showErrorWindow("Error loading data", body.getException().getMessage());
-                return truckTrailerDTOS;
-            }
+        } else {
+            TruckView.showErrorWindow("Error loading data", body.getException().getMessage());
+            return truckTrailerDTOS;
+        }
 
 
     }

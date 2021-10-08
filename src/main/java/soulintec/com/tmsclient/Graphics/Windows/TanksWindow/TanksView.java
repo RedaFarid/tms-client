@@ -177,8 +177,8 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         productColumn = new TableColumn<>("Material");
         stationColumn = new TableColumn<>("Station");
         qtyColumn = new TableColumn<>("Quantity");
-        dateOfQtySetColumn = new TableColumn<>("Date od quantity set");
-        userOfQtySetColumn = new TableColumn<>("User od quantity set");
+        dateOfQtySetColumn = new TableColumn<>("Date of quantity set");
+        userOfQtySetColumn = new TableColumn<>("User of quantity set");
         calcQtyColumn = new TableColumn<>("Calculated quantity");
         createdByColumn = new TableColumn<>("Created By");
         onTerminalColumn = new TableColumn<>("On Terminal");

@@ -4,23 +4,42 @@ import javafx.collections.FXCollections;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.TankDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+@Log4j2
 @Service
+@RequiredArgsConstructor
 public class TanksService {
+
+    @Autowired
+    private LogsService logsService;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String save(TankDTO tankDTO) {
+        try {
+            tankDTO.setOnTerminal(InetAddress.getLocalHost().getHostName());
+        } catch (UnknownHostException e) {
+            tankDTO.setOnTerminal("Unknown computer");
+            logsService.save(new LogDTO(LogIdentifier.Error, "Computer name", e.getMessage()));
+            log.error("Can't get computer name");
+        }
         ResponseEntity<String> deleteResponseEntity = restTemplate.postForEntity(Utilities.iP + "/saveTank", tankDTO, String.class);
         return deleteResponseEntity.getBody();
     }
