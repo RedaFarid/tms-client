@@ -536,8 +536,8 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         transactionsDataEntry.add(createdByLabel, 5, 3);
         transactionsDataEntry.add(createdByField, 6, 3);
 
-        transactionsDataEntry.add(onTerminalLabel, 7,3);
-        transactionsDataEntry.add(onTerminalField, 8,3);
+        transactionsDataEntry.add(onTerminalLabel, 7, 3);
+        transactionsDataEntry.add(onTerminalField, 8, 3);
 
         //table configuration
         transactionIdColumn.setCellValueFactory(new PropertyValueFactory<>("transactionIdColumn"));
@@ -1010,6 +1010,27 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
                 contextTanksStage.close();
             }
         });
+
+        mainWindow.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+            if (contextProductStage.isShowing()) {
+                contextProductStage.close();
+            }
+            if (contextStationStage.isShowing()) {
+                contextStationStage.close();
+            }
+            if (contextDriversStage.isShowing()) {
+                contextDriversStage.close();
+            }
+            if (contextTanksStage.isShowing()) {
+                contextTanksStage.close();
+            }
+            if (contextTruckContainersStage.isShowing()) {
+                contextTruckContainersStage.close();
+            }
+            if (contextTruckTrailersStage.isShowing()) {
+                contextTruckTrailersStage.close();
+            }
+        });
     }
 
     private void onRunDriverContextWidow(MouseEvent action) {
@@ -1058,7 +1079,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
             contextTanksStage.setWidth(600);
             contextTanksStage.setHeight(500);
             contextTanksStage.setResizable(false);
-            contextTanksStage.setX(action.getScreenX()-75);
+            contextTanksStage.setX(action.getScreenX() - 75);
             contextTanksStage.setY(action.getScreenY());
             contextTanksStage.show();
         });

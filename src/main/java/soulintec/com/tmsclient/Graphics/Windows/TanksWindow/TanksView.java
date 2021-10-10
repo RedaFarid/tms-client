@@ -58,6 +58,8 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     private Stage contextProductStage;
     private Stage contextStationStage;
 
+    private Stage qtyStage;
+
     private TableView<TanksModel.TableObject> tanksTableView;
     private TableColumn<TanksModel.TableObject, LongProperty> tankIdColumn;
     private TableColumn<TanksModel.TableObject, StringProperty> nameColumn;
@@ -86,6 +88,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     private EnhancedButton deleteTank;
     private EnhancedButton updateTank;
     private EnhancedButton refreshTank;
+    private EnhancedButton setQty;
     private EnhancedButton report;
 
     private Label idLabel;
@@ -130,6 +133,11 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     private Label contextStationLocationField;
     private Label contextStationComputerField;
 
+    //qty stage
+    private Label qtyStageLabel;
+    private EnhancedDoubleField qtyStageField;
+    private EnhancedButton qtyStageButton;
+
     private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
     private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
 
@@ -139,6 +147,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         mainWindow = event.getStage();
         contextProductStage = new Stage();
         contextStationStage = new Stage();
+        qtyStage = new Stage();
         userAuthorities();
         init();
         graphicsBuilder();
@@ -200,6 +209,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         deleteTank = new EnhancedButton("Delete selected tank");
         updateTank = new EnhancedButton("Update selected tank");
         refreshTank = new EnhancedButton("Refresh data");
+        setQty = new EnhancedButton("Set quantity");
         report = new EnhancedButton("Show Report");
 
         idLabel = new Label("Tank ID :");
@@ -243,6 +253,12 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         contextStationNameField = new Label();
         contextStationLocationField = new Label();
         contextStationComputerField = new Label();
+
+        //qty stage
+        qtyStageLabel = new Label("Quantity :");
+        qtyStageField = new EnhancedDoubleField();
+        qtyStageButton = new EnhancedButton("Set quantity");
+
     }
 
     private void graphicsBuilder() {
@@ -269,6 +285,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         insertTank.setPrefWidth(150);
         deleteTank.setPrefWidth(150);
         updateTank.setPrefWidth(150);
+        setQty.setPrefWidth(150);
         refreshTank.setPrefWidth(150);
         report.setPrefWidth(150);
 
@@ -416,8 +433,8 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         createdByColumn.setCellValueFactory(new PropertyValueFactory<>("createdByColumn"));
         onTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
 
-        tanksTableView.getColumns().addAll(tankIdColumn, nameColumn,stationColumn,productColumn, capacityColumn,qtyColumn,calcQtyColumn,dateOfQtySetColumn,
-                userOfQtySetColumn,creationDateColumn,modifyDateColumn,createdByColumn,onTerminalColumn);
+        tanksTableView.getColumns().addAll(tankIdColumn, nameColumn, stationColumn, productColumn, capacityColumn, qtyColumn, calcQtyColumn, dateOfQtySetColumn,
+                userOfQtySetColumn, creationDateColumn, modifyDateColumn, createdByColumn, onTerminalColumn);
         tanksTableView.prefHeightProperty().bind(root.heightProperty().subtract(tanksVbox.heightProperty()));
         tanksTableView.setItems(controller.getDataList());
 //        TanksTableView.setRowFactory((TableView<TanksModel.TableObject> param) -> new EnhancedTableRow());
@@ -437,10 +454,10 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         onTerminalColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(3));
 
         //stage configuration
-        tanksHbox.getItems().addAll(insertTank, updateTank, deleteTank/*, new Separator(), refreshTank*/);
+        tanksHbox.getItems().addAll(insertTank, updateTank, deleteTank, new Separator(), setQty);
         tanksHbox.setPadding(new Insets(10, 10, 10, 10));
 
-        tanksVbox.getChildren().addAll(contextProductsDataEntry,contextStationDataEntry, tanksDataEntry, tanksHbox);
+        tanksVbox.getChildren().addAll(contextProductsDataEntry, contextStationDataEntry, tanksDataEntry, tanksHbox);
         tanksVbox.setSpacing(5);
         tanksVbox.setAlignment(Pos.CENTER);
 
@@ -449,6 +466,29 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
 
         tanksTab.setContent(tanksPane);
         tanksTab.setClosable(false);
+
+        //Qty Stage
+        qtyStageLabel.setPrefWidth(90);
+        qtyStageField.setPrefWidth(200);
+        qtyStageButton.setPrefWidth(100);
+
+        qtyStageLabel.setAlignment(Pos.BASELINE_RIGHT);
+        qtyStageLabel.setTextAlignment(TextAlignment.RIGHT);
+        qtyStageLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+
+        GridPane gridPane = new GridPane();
+
+        gridPane.add(qtyStageLabel, 1, 1);
+        gridPane.add(qtyStageField, 2, 1);
+        gridPane.add(qtyStageButton, 2, 2);
+
+        gridPane.setPadding(new Insets(2, 2, 2, 2));
+        gridPane.setHgap(5);
+        gridPane.setVgap(20);
+
+        qtyStage.setScene(new Scene(gridPane));
+        qtyStage.setTitle("Set Quantity");
+        qtyStage.initOwner(mainWindow);
 
         tankIdField.longValueProperty().bindBidirectional(model.tankIdProperty());
         nameField.textProperty().bindBidirectional(model.nameProperty());
@@ -529,9 +569,9 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         contextStationLocationLabel.setAlignment(Pos.BASELINE_RIGHT);
         contextStationComputerLabel.setAlignment(Pos.BASELINE_RIGHT);
 
-        contextStationNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");;
-        contextStationLocationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");;
-        contextStationComputerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");;
+        contextStationNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        contextStationLocationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        contextStationComputerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
         contextStationNameField.setPrefWidth(250);
         contextStationLocationField.setPrefWidth(250);
@@ -549,7 +589,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         contextStationLocationColumn.setCellValueFactory(new PropertyValueFactory<>("locationColumn"));
         contextStationComputerColumn.setCellValueFactory(new PropertyValueFactory<>("computerNameColumn"));
 
-        contextStationsTableView.getColumns().addAll(contextStationNameColumn, contextStationLocationColumn,contextStationComputerColumn);
+        contextStationsTableView.getColumns().addAll(contextStationNameColumn, contextStationLocationColumn, contextStationComputerColumn);
         contextStationsTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         //stage configuration
@@ -570,7 +610,6 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         contextStationComputerField.textProperty().bindBidirectional(stationsModel.commentProperty());
     }
 
-
     private void actionHandling() {
         tanksActionHandling();
         mainWindow.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
@@ -588,6 +627,12 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         deleteTank.setOnMouseClicked(controller::onDelete);
         updateTank.setOnMouseClicked(controller::onUpdate);
         refreshTank.setOnMouseClicked(action -> update());
+        setQty.setOnMouseClicked(this::onRunQtyStage);
+
+        qtyStageButton.setOnMouseClicked(action -> {
+                controller.setQty(qtyStageField.getDoubleValue());
+                contextStationStage.close();
+        });
 
         tanksTableView.setOnMouseClicked((a) -> {
             controller.onTableSelection(tanksTableView.getSelectionModel().getSelectedItems());
@@ -596,11 +641,9 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         //managing context
         materialIdField.setOnMouseClicked(this::onRunProductContextWidow);
         contextProductTableView.setOnMouseClicked(action -> {
-
             if (action.getClickCount() == 2) {
                 MaterialsModel.TableObject selected = contextProductTableView.getSelectionModel().getSelectedItem();
                 controller.setProductData(selected);
-
                 contextProductStage.close();
             }
         });
@@ -612,11 +655,9 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
             if (action.getClickCount() == 2) {
                 StationsModel.TableObject selected = contextStationsTableView.getSelectionModel().getSelectedItem();
                 controller.setStationData(selected);
-
                 contextStationStage.close();
             }
         });
-
 
 
     }
@@ -634,7 +675,6 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         });
     }
 
-
     private void onRunStationContextWidow(MouseEvent action) {
         Platform.runLater(() -> {
             contextStationsTableView.getItems().clear();
@@ -645,6 +685,17 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
             contextStationStage.setX(action.getScreenX());
             contextStationStage.setY(action.getScreenY());
             contextStationStage.show();
+        });
+    }
+
+    private void onRunQtyStage(MouseEvent action) {
+        Platform.runLater(() -> {
+            qtyStage.setWidth(350);
+            qtyStage.setHeight(150);
+            qtyStage.setResizable(false);
+            qtyStage.setX(750);
+            qtyStage.setY(root.getHeight() / 2);
+            qtyStage.show();
         });
     }
 

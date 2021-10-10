@@ -387,4 +387,35 @@ public class TanksController {
     public String toString() {
         return "Tanks";
     }
+
+    public void setQty(double qty) {
+        long tankId = model.getTankId();
+
+        if (tankId == 0) {
+            TanksView.showWarningWindow("Missing Data", "Please select tank");
+            return;
+        }
+        try {
+            tanksService.findById(tankId).ifPresentOrElse((item -> {
+                item.setQty(qty);
+                item.setDateOfQtySet(LocalDateTime.now());
+                String save = tanksService.save(item);
+                if (save.equals("saved")) {
+                    logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating quantity for tank : " + model.getName() + " in station : " + stationModel.getName()));
+                    TanksView.showInformationWindow("Info", save);
+                    update();
+
+                } else {
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
+                    TanksView.showErrorWindow("Error updating data", save);
+                }
+                resetModel();
+            }), () -> {
+                TanksView.showWarningWindow("No selected tank", "Please select tank");
+            });
+
+        } catch (Exception e) {
+            TanksView.showErrorWindowForException("Error updating data", e);
+        }
+    }
 }
