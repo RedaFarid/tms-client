@@ -14,6 +14,7 @@ import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.TankDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 
 import java.net.InetAddress;
@@ -77,6 +78,24 @@ public class TanksService {
     public String deleteById(Long id) {
         ResponseEntity<String> deleteResponseEntity = restTemplate.postForEntity(Utilities.iP + "/deleteTankById", id, String.class);
         return deleteResponseEntity.getBody();
+    }
+
+    public List<TankDTO> findByMaterialAndStation(long materialId, long stationId) {
+        Tanks body = new Tanks();
+        List<TankDTO> tankDTOS = FXCollections.observableArrayList();
+        try {
+            ResponseEntity<Tanks> forEntity = restTemplate.getForEntity(Utilities.iP + "/tanksByMaterialAndStation/" + materialId + "/" + stationId, Tanks.class);
+            body = forEntity.getBody();
+
+        } catch (Exception e) {
+            MainWindow.showErrorWindow("Error loading data", e.getMessage());
+        }
+        if (body.getException() == null) {
+            return body.getTank();
+        } else {
+            MainWindow.showErrorWindow("Error loading data", body.getException().getMessage());
+            return tankDTOS;
+        }
     }
 
     @Data

@@ -372,7 +372,7 @@ public class TanksModel {
                     new SimpleLongProperty(tankDTO.getStation()),
                     new SimpleDoubleProperty(tankDTO.getCapacity()),
                     new SimpleDoubleProperty(tankDTO.getQty()),
-                    new SimpleObjectProperty<LocalDateTime>(tankDTO.getDateOfQtySet()),
+                    new SimpleObjectProperty<>(tankDTO.getDateOfQtySet()),
                     new SimpleStringProperty(tankDTO.getUserOfQtySet()),
                     new SimpleLongProperty(tankDTO.getMaterialID()),
                     new SimpleObjectProperty<>(tankDTO.getCreationDate()),
@@ -400,7 +400,8 @@ public class TanksModel {
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(tankIdColumn.getValue(), nameColumn.getValue()
+            return Objects.hashCode(tankIdColumn.getValue()
+//                    , nameColumn.getValue()
 //                    , capacityColumn.getValue(), qtyColumn.getValue(), dateOfQtySetColumn.getValue(), userOfQtySetColumn.getValue(),
 //                    materialIDColumn.getValue(), creationDateColumn.getValue(), modifyDateColumn.getValue(), createdByColumn.getValue(), onTerminalColumn.getValue(), materialNameColumn.getValue(),
 //                    calculatedQtyColumn.getValue()

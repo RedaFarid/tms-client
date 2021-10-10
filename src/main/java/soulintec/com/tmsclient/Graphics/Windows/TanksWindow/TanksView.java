@@ -577,9 +577,6 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
             if (contextProductStage.isShowing()) {
                 contextProductStage.close();
             }
-        });
-
-        mainWindow.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
             if (contextStationStage.isShowing()) {
                 contextStationStage.close();
             }

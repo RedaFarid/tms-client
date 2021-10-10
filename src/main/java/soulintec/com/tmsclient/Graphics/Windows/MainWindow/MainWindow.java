@@ -39,6 +39,7 @@ import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.wi
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsView;
 import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationView;
 import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.TanksView;
+import soulintec.com.tmsclient.Graphics.Windows.TransactionsWindow.TransactionView;
 import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 
 @Log4j2
@@ -64,7 +65,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private IconicButton Iconic = new IconicButton(Resources.getResource("Icons/maxminbuttons.png").toString());
 
     private windowReferenceNode logger = new windowReferenceNode(Resources.getResource("Icons/log.png").toString(), "Log", tempStringProperty);
-    private windowReferenceNode products = new windowReferenceNode(Resources.getResource("Icons/stocks.png").toString(), "Products", tempStringProperty);
+    private windowReferenceNode products = new windowReferenceNode(Resources.getResource("Icons/stocks.png").toString(), "Materials", tempStringProperty);
     private windowReferenceNode clients = new windowReferenceNode(Resources.getResource("Icons/clients.png").toString(), "Clients", tempStringProperty);
     private windowReferenceNode drivers = new windowReferenceNode(Resources.getResource("Icons/drivers.png").toString(), "Drivers", tempStringProperty);
     private windowReferenceNode tanks = new windowReferenceNode(Resources.getResource("Icons/tanks.png").toString(), "Tanks", tempStringProperty);
@@ -86,7 +87,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
     private Button logIn = new Button("Log in", loginview);
     private Button logOut = new Button("Log out", logoutview);
-    private Button DashBoardButton = new Button("Dashboard", dashboardview);
+    private Button dashBoardButton = new Button("Dashboard", dashboardview);
     private Button exit = new Button("Exit", exitview);
     private boolean IconicStatus = true;
 
@@ -114,6 +115,9 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
     @Autowired
     StationView stationView;
+
+    @Autowired
+    TransactionView transactionView;
 
     @Autowired
     LogManagerWindow logView;
@@ -174,12 +178,12 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         logIn.setPrefWidth(120);
         logOut.setPrefWidth(120);
         exit.setPrefWidth(120);
-        DashBoardButton.setPrefWidth(200);
+        dashBoardButton.setPrefWidth(200);
 
         logIn.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:black;-fx-font-size:18;");
         logOut.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:black;-fx-font-size:18;");
         exit.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:black;-fx-font-size:18;");
-        DashBoardButton.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:black;-fx-font-size:18;");
+        dashBoardButton.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:black;-fx-font-size:18;");
 
         currentUserLabel.setStyle("-fx-font-weight:normal;-fx-font-style:normal;-fx-text-fill:black;-fx-font-size:30;");
         currentUserLabel.setPrefWidth(1035);
@@ -189,7 +193,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         clock.setPrefHeight(40);
         clock.setRunning(true);
 
-        fastActionsBar.getItems().addAll(logIn, logOut, new Separator(), DashBoardButton, new Separator(), exit, currentUserLabel, clock /*, clock */);
+        fastActionsBar.getItems().addAll(logIn, logOut, new Separator(), dashBoardButton, new Separator(), exit, currentUserLabel, clock /*, clock */);
         fastActionsBar.setBackground(new Background(new BackgroundFill(Color.CADETBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
         fastActionsBar.setBorder(new Border(new BorderStroke(Color.CADETBLUE.darker(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 0, 1, 0))));
 
@@ -211,8 +215,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         window.setAlwaysOnTop(true);
 
         try {
-        window.show();
-        }catch (Exception e){
+            window.show();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -278,8 +282,11 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             root.setCenter(stationView.getTabContainer());
         });
 
-
-
+        dashBoardButton.setOnMouseClicked(action -> {
+            transactionView.update();
+            root.setCenter(transactionView.getTabContainer());
+            root.getStylesheets().add(Resources.getResource("Styles/MainWindowStyle.css").toString());
+        });
         logger.setOnIconClicked((String param) -> {
             logView.update();
             root.setCenter(logView.getRoot());
@@ -289,6 +296,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private void onLogIn(MouseEvent mouseEvent) {
 
     }
+
     private void onLogOut(MouseEvent mouseEvent) {
 
     }
@@ -296,6 +304,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     public Stage getInitialStage() {
         return window;
     }
+
     public StatusBar getStatusBar() {
         return statusbar;
     }
@@ -312,7 +321,6 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     }
 
 
-
     public static void showErrorWindow(String header, String content) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -326,6 +334,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             alert.show();
         });
     }
+
     public static void showErrorWindowForException(String header, Throwable e) {
         Platform.runLater(() -> {
             ExceptionDialog exceptionDialog = new ExceptionDialog(e);

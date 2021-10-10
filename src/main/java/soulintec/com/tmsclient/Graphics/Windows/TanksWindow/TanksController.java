@@ -81,6 +81,7 @@ public class TanksController {
                 model.setStation(tankDTO.getStation());
                 model.setCapacity(tankDTO.getCapacity());
                 model.setQty(tankDTO.getQty());
+                model.setCalculatedQty(tankDTO.getCalculatedQty());
                 model.setDateOfQtySet(String.valueOf(tankDTO.getDateOfQtySet()));
                 model.setUserOfQtySet(tankDTO.getUserOfQtySet());
                 model.setMaterialID(tankDTO.getMaterialID());
