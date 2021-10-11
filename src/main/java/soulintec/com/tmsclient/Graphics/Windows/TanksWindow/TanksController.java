@@ -331,8 +331,6 @@ public class TanksController {
         });
     }
 
-    //    @Scheduled(fixedDelay = 20000)
-    //TODO -- do to others
     public void detailedUpdates(List<TankDTO> dataBaseList) {
         if (getDataList() != null) {
 
