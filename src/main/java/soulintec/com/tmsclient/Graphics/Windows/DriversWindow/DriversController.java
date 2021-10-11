@@ -1,8 +1,11 @@
 package soulintec.com.tmsclient.Graphics.Windows.DriversWindow;
 
+import com.google.common.collect.Lists;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -12,15 +15,20 @@ import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.DriverDTO;
 import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.Permissions;
+import soulintec.com.tmsclient.Entities.StationDTO;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
 import soulintec.com.tmsclient.Services.DriverService;
 import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.TransactionService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Executor;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -36,6 +44,9 @@ public class DriversController {
     private TransactionService transactionService;
     @Autowired
     private LogsService logsService;
+
+    @Autowired(required = false)
+    private Executor executor;
 
     public DriversModel getModel() {
         return model;
@@ -112,7 +123,7 @@ public class DriversController {
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new driver : " + name));
                 MainWindow.showInformationWindow("Info", save);
-                updateDataList();
+                update();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
@@ -176,7 +187,7 @@ public class DriversController {
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for driver : " + name));
                 MainWindow.showInformationWindow("Info", save);
-                updateDataList();
+                update();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
@@ -201,7 +212,7 @@ public class DriversController {
             if (deletedById.equals("deleted")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting driver : " + model.getName()));
                 MainWindow.showInformationWindow("Info", deletedById);
-                updateDataList();
+                update();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
@@ -212,18 +223,63 @@ public class DriversController {
         }
 
     }
+    public synchronized Task<String> updateTask() {
+        return new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                List<DriverDTO> dataBaseList = Lists.newArrayList(driverService.findAll());
 
-    @Async
-    public void updateDataList() {
-        List<DriverDTO> list = driverService.findAll();
-        if (list != null) {
-            getDataList().removeAll(list.stream().map(DriversModel.TableObject::createFromDriverDTO)
-                    .filter(item -> !tableList.contains(item))
-                    .collect(this::getDataList, ObservableList::add, ObservableList::addAll)
-                    .stream()
-                    .filter(tableListItem -> list.stream().map(DriversModel.TableObject::createFromDriverDTO)
-                            .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
-                    .collect(Collectors.toList()));
+                Platform.runLater(() -> {
+                    getDataList().removeAll(
+                            dataBaseList
+                                    .stream()
+                                    .map(DriversModel.TableObject::createFromDriverDTO)
+                                    .filter(item -> !getDataList().contains(item))
+                                    .collect(() -> getDataList(), ObservableList::add, ObservableList::addAll)
+                                    .stream()
+                                    .filter(tableListItem -> dataBaseList.stream().map(DriversModel.TableObject::createFromDriverDTO).noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem)))
+                                    .collect(Collectors.toList()));
+                });
+                detailedUpdates(dataBaseList);
+                return null;
+            }
+        };
+
+
+    }
+
+    public ReadOnlyBooleanProperty update() {
+        final Task<String> updateTask = updateTask();
+        ReadOnlyBooleanProperty readOnlyBooleanProperty = updateTask.runningProperty();
+        executor.execute(updateTask);
+        return readOnlyBooleanProperty;
+    }
+
+    public void detailedUpdates(List<DriverDTO> dataBaseList) {
+        if (getDataList() != null) {
+
+            final Map<Long, DriverDTO> driverDTOMap = dataBaseList.stream().collect(Collectors.toMap(DriverDTO::getId, Function.identity()));
+            for (DriversModel.TableObject item : getDataList()) {
+                try {
+                    final DriverDTO driverDTO = driverDTOMap.get(item.getDriverIdColumn());
+                    if (driverDTO != null) {
+                        item.setNameColumn(driverDTO.getName());
+                        item.setLicenseNumberColumn(driverDTO.getLicenseNumber());
+                        item.setCommentColumn(driverDTO.getComment());
+                        item.setLicenceExpirationDateColumn(driverDTO.getLicenceExpirationDate());
+                        item.setMobileNumberColumn(driverDTO.getMobileNumber());
+                        item.setPermissionsColumn(driverDTO.getPermissions());
+                        item.setCreationDateColumn(driverDTO.getCreationDate());
+                        item.setModifyDateColumn(driverDTO.getModifyDate());
+                        item.setCreatedByColumn(driverDTO.getCreatedBy());
+                        item.setOnTerminalColumn(driverDTO.getOnTerminal());
+                    }
+
+                } catch (Exception e) {
+                    logsService.save(new LogDTO(LogIdentifier.Error , toString() , e.getMessage()));
+                    log.fatal(e);
+                }
+            }
         }
     }
 

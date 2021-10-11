@@ -315,6 +315,11 @@ public class TransactionsController {
         OperationType operationType = model.getOperationType();
         Double qty = model.getQty();
 
+        if (qty > tanksModel.getCalculatedQty() && operationType.equals(OperationType.Out)) {
+            MainWindow.showWarningWindow("Wrong Data", "Please check tank quantity");
+            return;
+        }
+
         if (id == 0) {
             MainWindow.showWarningWindow("Missing Data", "Please select transaction");
             return;

@@ -142,9 +142,7 @@ public class TanksController {
                 tank.setStation(station);
                 tank.setCapacity(capacity);
                 tank.setDateOfQtySet(LocalDateTime.now());
-//                tank.setQty(model.getQty());
-//                tank.setDateOfQtySet(LocalDateTime.now());
-//                tank.setUserOfQtySet(model.getUserOfQtySet());
+
                 if (materialID == 0) {
                     tank.setMaterialID(null);
                 } else {
@@ -202,23 +200,18 @@ public class TanksController {
         }
 
         try {
-
             if (tanksService.findById(tankId).isPresent()) {
                 TankDTO tank = new TankDTO();
                 tank.setId(tankId);
                 tank.setName(name);
                 tank.setStation(station);
                 tank.setCapacity(capacity);
-                tank.setDateOfQtySet(LocalDateTime.now());
-//                tank.setQty(model.getQty());
-//                tank.setDateOfQtySet(LocalDateTime.now());
-//                tank.setUserOfQtySet(model.getUserOfQtySet());
+                tank.setDateOfQtySet((LocalDateTime.parse(model.getDateOfQtySet())));
 
                 if (materialID == 0) {
                     tank.setMaterialID(null);
                 } else {
                     tank.setMaterialID(materialID);
-
                 }
 
                 String save = tanksService.save(tank);

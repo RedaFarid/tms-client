@@ -1,8 +1,11 @@
 package soulintec.com.tmsclient.Graphics.Windows.ClientsWindow;
 
+import com.google.common.collect.Lists;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -11,14 +14,19 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.ClientDTO;
 import soulintec.com.tmsclient.Entities.LogDTO;
+import soulintec.com.tmsclient.Entities.StationDTO;
 import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
 import soulintec.com.tmsclient.Services.ClientsService;
 import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.TransactionService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -34,6 +42,9 @@ public class ClientsController {
     private TransactionService transactionService;
     @Autowired
     private LogsService logsService;
+
+    @Autowired(required = false)
+    private Executor executor;
 
     public ClientsModel getModel() {
         return model;
@@ -107,7 +118,7 @@ public class ClientsController {
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new client :  " + name));
                 MainWindow.showInformationWindow("Info", save);
-                updateDataList();
+                update();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
@@ -167,7 +178,7 @@ public class ClientsController {
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for client : " + name));
                 MainWindow.showInformationWindow("Info", save);
-                updateDataList();
+                update();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
@@ -191,27 +202,13 @@ public class ClientsController {
             if (deletedById.equals("deleted")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting client : " + model.getName()));
                 MainWindow.showInformationWindow("Info", deletedById);
-                updateDataList();
+                update();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
                 MainWindow.showErrorWindow("Error deleting record", deletedById);
             }
             resetModel();
-        }
-    }
-
-    @Async
-    public void updateDataList() {
-        List<ClientDTO> list = clientsService.findAll();
-        if (list != null) {
-            getDataList().removeAll(list.stream().map(ClientsModel.TableObject::createFromClientDTO)
-                    .filter(item -> !tableList.contains(item))
-                    .collect(this::getDataList, ObservableList::add, ObservableList::addAll)
-                    .stream()
-                    .filter(tableListItem -> list.stream().map(ClientsModel.TableObject::createFromClientDTO)
-                            .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
-                    .collect(Collectors.toList()));
         }
     }
 
@@ -232,6 +229,66 @@ public class ClientsController {
                 log.fatal(e);
             }
         });
+    }
+
+    public synchronized Task<String> updateTask() {
+        return new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                List<ClientDTO> dataBaseList = Lists.newArrayList(clientsService.findAll());
+
+                Platform.runLater(() -> {
+                    getDataList().removeAll(
+                            dataBaseList
+                                    .stream()
+                                    .map(ClientsModel.TableObject::createFromClientDTO)
+                                    .filter(item -> !getDataList().contains(item))
+                                    .collect(() -> getDataList(), ObservableList::add, ObservableList::addAll)
+                                    .stream()
+                                    .filter(tableListItem -> dataBaseList.stream().map(ClientsModel.TableObject::createFromClientDTO).noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem)))
+                                    .collect(Collectors.toList()));
+                });
+                detailedUpdates(dataBaseList);
+                return null;
+            }
+        };
+
+
+    }
+
+    public ReadOnlyBooleanProperty update() {
+        final Task<String> updateTask = updateTask();
+        ReadOnlyBooleanProperty readOnlyBooleanProperty = updateTask.runningProperty();
+        executor.execute(updateTask);
+        return readOnlyBooleanProperty;
+    }
+
+
+    public void detailedUpdates(List<ClientDTO> dataBaseList) {
+        if (getDataList() != null) {
+
+            final Map<Long, ClientDTO> clientDTOMap = dataBaseList.stream().collect(Collectors.toMap(ClientDTO::getId, Function.identity()));
+            for (ClientsModel.TableObject item : getDataList()) {
+                try {
+                    final ClientDTO clientDTO = clientDTOMap.get(item.getClientIdColumn());
+                    if (clientDTO != null) {
+                        item.setNameColumn(clientDTO.getName());
+                        item.setMainOfficeAddressColumn(clientDTO.getMainOfficeAddress());
+                        item.setContactNameColumn(clientDTO.getContactName());
+                        item.setContactTelNumberColumn(clientDTO.getContactTelNumber());
+                        item.setContactEmailColumn(clientDTO.getContactEmail());
+                        item.setCreationDateColumn(clientDTO.getCreationDate());
+                        item.setModifyDateColumn(clientDTO.getModifyDate());
+                        item.setCreatedByColumn(clientDTO.getCreatedBy());
+                        item.setOnTerminalColumn(clientDTO.getOnTerminal());
+                    }
+
+                } catch (Exception e) {
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), e.getMessage()));
+                    log.fatal(e);
+                }
+            }
+        }
     }
 
     @Override

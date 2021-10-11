@@ -1,11 +1,11 @@
 package soulintec.com.tmsclient.Graphics.Windows.ClientsWindow;
 
 import javafx.application.Platform;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -94,6 +94,10 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
 
     @Autowired
     ClientsService clientService;
+
+    private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
+    private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
+
 
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
@@ -348,6 +352,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
     }
 
     public void update() {
-        controller.updateDataList();
+        ReadOnlyBooleanProperty update = controller.update();
+        table.cursorProperty().bind(Bindings.when(update).then(CURSOR_WAIT).otherwise(CURSOR_DEFAULT));
     }
 }
