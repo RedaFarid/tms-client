@@ -13,10 +13,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
+import soulintec.com.tmsclient.Entities.ComputerDTO;
 import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.StationDTO;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Services.ComputersService;
 import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.StationService;
 import soulintec.com.tmsclient.Services.TanksService;
@@ -34,7 +36,7 @@ public class StationsController {
     private final StationsModel model = new StationsModel();
 
     private final ObservableList<StationsModel.TableObject> tableList = FXCollections.observableArrayList();
-//    private final ObservableList<MaterialsModel.TableObject> productContextList = FXCollections.observableArrayList();
+    private final ObservableList<String> computers = FXCollections.observableArrayList();
 
     @Autowired(required = false)
     private Executor executor;
@@ -44,6 +46,8 @@ public class StationsController {
     @Autowired
     private TanksService tanksService;
     @Autowired
+    private ComputersService computersService;
+    @Autowired
     private LogsService logsService;
 
     public StationsModel getModel() {
@@ -52,6 +56,18 @@ public class StationsController {
 
     public ObservableList<StationsModel.TableObject> getDataList() {
         return tableList;
+    }
+
+    public ObservableList<String> getComputers() {
+        return computers;
+    }
+
+    public void updateComputers(){
+        List<String> collect = computersService.findAll().stream().map(ComputerDTO::getName).collect(Collectors.toList());
+        Platform.runLater(()-> {
+            computers.clear();
+            computers.addAll(collect);
+        });
     }
 
     public void onTableSelection(ObservableList<? extends StationsModel.TableObject> list) {
@@ -153,7 +169,6 @@ public class StationsController {
 //        }
 
         try {
-
             if (stationService.findById(id).isPresent()) {
                 StationDTO stationDTO = new StationDTO();
                 stationDTO.setId(id);

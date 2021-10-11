@@ -298,7 +298,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         idField.longValueProperty().bindBidirectional(model.stationIdProperty());
         nameField.textProperty().bindBidirectional(model.nameProperty());
         locationField.textProperty().bindBidirectional(model.locationProperty());
-        computerNameField.valueProperty().bindBidirectional(model.commentProperty());
+        computerNameField.valueProperty().bindBidirectional(model.computerNameProperty());
         commentField.textProperty().bindBidirectional(model.commentProperty());
         createdByField.textProperty().bindBidirectional(model.createdByProperty());
         onTerminalField.textProperty().bindBidirectional(model.onTerminalProperty());
@@ -310,7 +310,10 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         insertStation.setOnMouseClicked(controller::onInsert);
         deleteStation.setOnMouseClicked(controller::onDelete);
         updateStation.setOnMouseClicked(controller::onUpdate);
-
+        computerNameField.setOnMouseClicked(i -> {
+            controller.updateComputers();
+            computerNameField.setItems(controller.getComputers());
+        });
         table.setOnMouseClicked((a) -> {
             controller.onTableSelection(table.getSelectionModel().getSelectedItems());
         });
