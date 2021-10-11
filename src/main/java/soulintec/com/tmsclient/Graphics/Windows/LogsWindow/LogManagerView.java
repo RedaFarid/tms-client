@@ -24,7 +24,7 @@ import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.TanksController;
 import java.time.LocalDateTime;
 
 @Component
-public class LogManagerWindow implements ApplicationListener<ApplicationContext.ApplicationListener> {
+public class LogManagerView implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private LogController controller;
     private LogsModel model;

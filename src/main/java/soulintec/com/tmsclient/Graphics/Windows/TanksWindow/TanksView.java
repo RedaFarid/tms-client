@@ -18,6 +18,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.extern.log4j.Log4j2;
+import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -60,6 +61,8 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
 
     private Stage qtyStage;
 
+    private TableFilter<TanksModel.TableObject> tableFilter;
+
     private TableView<TanksModel.TableObject> tanksTableView;
     private TableColumn<TanksModel.TableObject, LongProperty> tankIdColumn;
     private TableColumn<TanksModel.TableObject, StringProperty> nameColumn;
@@ -75,9 +78,13 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     private TableColumn<TanksModel.TableObject, ObjectProperty<LocalDateTime>> creationDateColumn;
     private TableColumn<TanksModel.TableObject, ObjectProperty<LocalDateTime>> modifyDateColumn;
 
+    private TableFilter<MaterialsModel.TableObject> contextProductTableVFilter;
+
     private TableView<MaterialsModel.TableObject> contextProductTableView;
     private TableColumn<MaterialsModel.TableObject, StringProperty> contextProductNameColumn;
     private TableColumn<MaterialsModel.TableObject, StringProperty> contextProductDescriptionColumn;
+
+    private TableFilter<StationsModel.TableObject> contextStationsTableVFilter;
 
     private TableView<StationsModel.TableObject> contextStationsTableView;
     private TableColumn<StationsModel.TableObject, StringProperty> contextStationNameColumn;
@@ -437,6 +444,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
                 userOfQtySetColumn, creationDateColumn, modifyDateColumn, createdByColumn, onTerminalColumn);
         tanksTableView.prefHeightProperty().bind(root.heightProperty().subtract(tanksVbox.heightProperty()));
         tanksTableView.setItems(controller.getDataList());
+        tableFilter = TableFilter.forTableView(tanksTableView).apply();
 //        TanksTableView.setRowFactory((TableView<TanksModel.TableObject> param) -> new EnhancedTableRow());
 
         tankIdColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(1));
@@ -630,8 +638,8 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         setQty.setOnMouseClicked(this::onRunQtyStage);
 
         qtyStageButton.setOnMouseClicked(action -> {
-                controller.setQty(qtyStageField.getDoubleValue());
-                contextStationStage.close();
+            controller.setQty(qtyStageField.getDoubleValue());
+            contextStationStage.close();
         });
 
         tanksTableView.setOnMouseClicked((a) -> {
@@ -664,8 +672,9 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
 
     private void onRunProductContextWidow(MouseEvent action) {
         Platform.runLater(() -> {
-            contextProductTableView.getItems().clear();
+            contextProductTableView.getItems().removeAll();
             contextProductTableView.setItems(controller.getProductContextList());
+            contextProductTableVFilter = TableFilter.forTableView(contextProductTableView).apply();
             contextProductStage.setWidth(600);
             contextProductStage.setHeight(500);
             contextProductStage.setResizable(false);
@@ -677,8 +686,9 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
 
     private void onRunStationContextWidow(MouseEvent action) {
         Platform.runLater(() -> {
-            contextStationsTableView.getItems().clear();
+            contextStationsTableView.getItems().removeAll();
             contextStationsTableView.setItems(controller.getStationContextList());
+            contextStationsTableVFilter = TableFilter.forTableView(contextStationsTableView).apply();
             contextStationStage.setWidth(600);
             contextStationStage.setHeight(500);
             contextStationStage.setResizable(false);
@@ -707,82 +717,6 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
 
     public Node getTabContainer() {
         return root;
-    }
-
-    public static void showErrorWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    public static void showErrorWindowForException(String header, Throwable e) {
-        Platform.runLater(() -> {
-            ExceptionDialog exceptionDialog = new ExceptionDialog(e);
-            exceptionDialog.setHeaderText(header);
-            exceptionDialog.getDialogPane().setMaxWidth(500);
-            exceptionDialog.initOwner(initialStage.getInitialStage());
-            exceptionDialog.initModality(Modality.WINDOW_MODAL);
-            exceptionDialog.show();
-
-        });
-    }
-
-    protected static void showErrorWindowForException(String header, Throwable e, Stage stage) {
-        Platform.runLater(() -> {
-            ExceptionDialog exceptionDialog = new ExceptionDialog(e);
-            exceptionDialog.setHeaderText(header);
-            exceptionDialog.getDialogPane().setMaxWidth(500);
-            exceptionDialog.initOwner(stage);
-            exceptionDialog.initModality(Modality.WINDOW_MODAL);
-            exceptionDialog.show();
-
-        });
-    }
-
-    protected static void showErrorWindowOneTime(String header, String content, Stage stage) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(stage);
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    public static void showWarningWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    protected static void showInformationWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Notification");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.NONE);
-            alert.show();
-        });
     }
 
 }

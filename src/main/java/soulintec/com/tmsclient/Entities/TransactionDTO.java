@@ -20,6 +20,7 @@ public class TransactionDTO {
     private long driver;
     private long truckTrailer;
     private long truckContainer;
+    private long client;
     private OperationType operationType;
     private Double qty;
     private LocalDateTime dateTime;

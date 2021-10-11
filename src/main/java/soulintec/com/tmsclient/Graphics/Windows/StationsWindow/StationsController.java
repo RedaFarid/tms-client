@@ -185,11 +185,10 @@ public class StationsController {
 
     @Async
     public void onDelete(MouseEvent mouseEvent) {
-
         long id = model.getStationId();
 
         if (tanksService.findByNameAndStation("%", id).isPresent()) {
-            logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Station :  "+ model.getName() +" can't be deleted because there are tanks relate to it "));
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Station :  " + model.getName() + " can't be deleted because there are tanks relate to it "));
             MainWindow.showErrorWindow("Error deleting record", "Station can't be deleted because there are tanks relate to it \n please delete related tanks first");
         } else {
             String deletedById = stationService.deleteById(id);
@@ -264,17 +263,19 @@ public class StationsController {
             for (StationsModel.TableObject item : getDataList()) {
                 try {
                     final StationDTO stationDTO = stationDTOMap.get(item.getStationIdColumn());
-
-                    item.setNameColumn(stationDTO.getStationName());
-                    item.setLocationColumn(stationDTO.getLocation());
-                    item.setCommentColumn(stationDTO.getComment());
-                    item.setComputerNameColumn(stationDTO.getComputerName());
-                    item.setCreationDateColumn(stationDTO.getCreationDate());
-                    item.setModifyDateColumn(stationDTO.getModifyDate());
-                    item.setCreatedByColumn(stationDTO.getCreatedBy());
-                    item.setOnTerminalColumn(stationDTO.getOnTerminal());
+                    if (stationDTO != null) {
+                        item.setNameColumn(stationDTO.getStationName());
+                        item.setLocationColumn(stationDTO.getLocation());
+                        item.setCommentColumn(stationDTO.getComment());
+                        item.setComputerNameColumn(stationDTO.getComputerName());
+                        item.setCreationDateColumn(stationDTO.getCreationDate());
+                        item.setModifyDateColumn(stationDTO.getModifyDate());
+                        item.setCreatedByColumn(stationDTO.getCreatedBy());
+                        item.setOnTerminalColumn(stationDTO.getOnTerminal());
+                    }
 
                 } catch (Exception e) {
+                    logsService.save(new LogDTO(LogIdentifier.Error , toString() , e.getMessage()));
                     log.fatal(e);
                 }
             }

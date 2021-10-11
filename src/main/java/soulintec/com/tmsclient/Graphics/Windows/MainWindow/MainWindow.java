@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
-import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogManagerWindow;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogManagerView;
 import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientView;
 import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.IconicButton;
@@ -120,7 +120,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     TransactionView transactionView;
 
     @Autowired
-    LogManagerWindow logView;
+    LogManagerView logView;
 
     private Notifications notifications;
 

@@ -14,8 +14,10 @@ import soulintec.com.tmsclient.Entities.Permissions;
 import soulintec.com.tmsclient.Entities.TruckContainerDTO;
 import soulintec.com.tmsclient.Entities.TruckTrailerDTO;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsView;
 import soulintec.com.tmsclient.Services.LogsService;
+import soulintec.com.tmsclient.Services.TransactionService;
 import soulintec.com.tmsclient.Services.TruckContainerService;
 import soulintec.com.tmsclient.Services.TruckTrailerService;
 
@@ -41,6 +43,9 @@ public class TruckController {
 
     @Autowired
     private TruckTrailerService truckTrailerService;
+    @Autowired
+    private TransactionService transactionService;
+
     @Autowired
     private LogsService logsService;
 
@@ -70,7 +75,7 @@ public class TruckController {
                 truckContainerModel.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting truck container data"));
-                MaterialsView.showErrorWindow("Data doesn't exist", "Error getting data for selected truck container");
+                MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected truck container");
             });
         }
     }
@@ -85,23 +90,23 @@ public class TruckController {
         Permissions permissions = truckContainerModel.getPermissions();
 
         if (StringUtils.isBlank(containerNumber)) {
-            TruckView.showWarningWindow("Missing Data", "Please enter container number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter container number");
             return;
         }
         if (StringUtils.isBlank(licenceNumber)) {
-            TruckView.showWarningWindow("Missing Data", "Please enter licence number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter licence number");
             return;
         }
         if (maximumWeightConstrain <= 0.0) {
-            TruckView.showWarningWindow("Missing Data", "Please enter max weight");
+            MainWindow.showWarningWindow("Missing Data", "Please enter max weight");
             return;
         }
         if (licenceExpirationDate == null) {
-            TruckView.showWarningWindow("Missing Data", "Please enter expiration date");
+            MainWindow.showWarningWindow("Missing Data", "Please enter expiration date");
             return;
         }
         if (Objects.isNull(permissions)) {
-            TruckView.showWarningWindow("Missing Data", "Please select permission");
+            MainWindow.showWarningWindow("Missing Data", "Please select permission");
             return;
         }
 
@@ -118,20 +123,20 @@ public class TruckController {
                 String save = truckContainerService.save(truckContainerDTO);
                 if (save.equals("saved")) {
                     logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new truck container : " + containerNumber));
-                    TruckView.showInformationWindow("Info", save);
+                    MainWindow.showInformationWindow("Info", save);
                     updateContainerDataList();
 
                 } else {
                     logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                    TruckView.showErrorWindow("Error inserting data", save);
+                    MainWindow.showErrorWindow("Error inserting data", save);
                 }
 
                 resetContainerModel();
             } else {
-                TruckView.showErrorWindow("Error inserting data", "Truck container already exist , please check entered data");
+                MainWindow.showErrorWindow("Error inserting data", "Truck container already exist , please check entered data");
             }
         } else {
-            TruckView.showErrorWindow("Error inserting data", "Truck container already exist , please check entered data");
+            MainWindow.showErrorWindow("Error inserting data", "Truck container already exist , please check entered data");
         }
     }
 
@@ -144,23 +149,23 @@ public class TruckController {
         Permissions permissions = truckContainerModel.getPermissions();
 
         if (StringUtils.isBlank(containerNumber)) {
-            TruckView.showWarningWindow("Missing Data", "Please enter container number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter container number");
             return;
         }
         if (StringUtils.isBlank(licenceNumber)) {
-            TruckView.showWarningWindow("Missing Data", "Please enter licence number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter licence number");
             return;
         }
         if (maximumWeightConstrain <= 0.0) {
-            TruckView.showWarningWindow("Missing Data", "Please enter maximum weight");
+            MainWindow.showWarningWindow("Missing Data", "Please enter maximum weight");
             return;
         }
         if (licenceExpirationDate == null) {
-            TruckView.showWarningWindow("Missing Data", "Please enter expiration date");
+            MainWindow.showWarningWindow("Missing Data", "Please enter expiration date");
             return;
         }
         if (Objects.isNull(permissions)) {
-            TruckView.showWarningWindow("Missing Data", "Please select permission");
+            MainWindow.showWarningWindow("Missing Data", "Please select permission");
             return;
         }
 
@@ -178,33 +183,38 @@ public class TruckController {
             String save = truckContainerService.save(truckContainerDTO);
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for truck container : " + containerNumber));
-                TruckView.showInformationWindow("Info", save);
+                MainWindow.showInformationWindow("Info", save);
                 updateContainerDataList();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                TruckView.showErrorWindow("Error updating data", save);
+                MainWindow.showErrorWindow("Error updating data", save);
             }
             resetContainerModel();
         } else {
-            TruckView.showErrorWindow("Error updating data", "Truck container doesn't  exist ");
+            MainWindow.showErrorWindow("Error updating data", "Truck container doesn't  exist ");
         }
     }
 
     @Async
     public void onContainerDelete(MouseEvent mouseEvent) {
-        long materialId = truckContainerModel.getTruckContainerId();
-        String deletedById = truckContainerService.deleteById(materialId);
-        if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting truck container : " + truckContainerModel.getContainerNumber()));
-            TruckView.showInformationWindow("Info", deletedById);
-            updateContainerDataList();
-
+        long truckContainerId = truckContainerModel.getTruckContainerId();
+        if (transactionService.findAll().stream().filter(i -> i.getTruckContainer() == truckContainerId).count() != 0) {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Container :  " + truckContainerModel.getContainerNumber() + " can't be deleted because there are transactions relate to it "));
+            MainWindow.showErrorWindow("Error deleting record", "Container can't be deleted because there are transactions relate to it \n please delete related transactions first");
         } else {
-            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
-            TruckView.showErrorWindow("Error deleting record", deletedById);
+            String deletedById = truckContainerService.deleteById(truckContainerId);
+            if (deletedById.equals("deleted")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting truck container : " + truckContainerModel.getContainerNumber()));
+                MainWindow.showInformationWindow("Info", deletedById);
+                updateContainerDataList();
+
+            } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
+                MainWindow.showErrorWindow("Error deleting record", deletedById);
+            }
+            resetContainerModel();
         }
-        resetContainerModel();
     }
 
     @Async
@@ -267,7 +277,7 @@ public class TruckController {
                 truckTrailerModel.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting truck trailer data "));
-                TruckView.showErrorWindow("Data doesn't exist", "Error getting data for selected truck trailer");
+                MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected truck trailer");
             });
         }
     }
@@ -281,19 +291,19 @@ public class TruckController {
         Permissions permissions = truckTrailerModel.getPermissions();
 
         if (StringUtils.isBlank(trailerNumber)) {
-            TruckView.showWarningWindow("Missing Data", "Please enter trailer number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter trailer number");
             return;
         }
         if (StringUtils.isBlank(licenceNumber)) {
-            TruckView.showWarningWindow("Missing Data", "Please enter licence number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter licence number");
             return;
         }
         if (licenceExpirationDate == null) {
-            TruckView.showWarningWindow("Missing Data", "Please enter expiration date");
+            MainWindow.showWarningWindow("Missing Data", "Please enter expiration date");
             return;
         }
         if (Objects.isNull(permissions)) {
-            TruckView.showWarningWindow("Missing Data", "Please select permission");
+            MainWindow.showWarningWindow("Missing Data", "Please select permission");
             return;
         }
 
@@ -309,20 +319,20 @@ public class TruckController {
                 String save = truckTrailerService.save(truckTrailerDTO);
                 if (save.equals("saved")) {
                     logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new truck trailer : " + trailerNumber));
-                    TruckView.showInformationWindow("Info", save);
+                    MainWindow.showInformationWindow("Info", save);
                     updateTrailerDataList();
 
                 } else {
                     logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                    TruckView.showErrorWindow("Error inserting data", save);
+                    MainWindow.showErrorWindow("Error inserting data", save);
                 }
 
                 resetTrailerModel();
             } else {
-                TruckView.showErrorWindow("Error inserting data", "Truck trailer already exist , please check entered data");
+                MainWindow.showErrorWindow("Error inserting data", "Truck trailer already exist , please check entered data");
             }
         } else {
-            TruckView.showErrorWindow("Error inserting data", "Truck trailer already exist , please check entered data");
+            MainWindow.showErrorWindow("Error inserting data", "Truck trailer already exist , please check entered data");
         }
     }
 
@@ -334,19 +344,19 @@ public class TruckController {
         Permissions permissions = truckTrailerModel.getPermissions();
 
         if (StringUtils.isBlank(trailerNumber)) {
-            TruckView.showWarningWindow("Missing Data", "Please enter trailer number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter trailer number");
             return;
         }
         if (StringUtils.isBlank(licenceNumber)) {
-            TruckView.showWarningWindow("Missing Data", "Please enter licence number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter licence number");
             return;
         }
         if (licenceExpirationDate == null) {
-            TruckView.showWarningWindow("Missing Data", "Please enter expiration date");
+            MainWindow.showWarningWindow("Missing Data", "Please enter expiration date");
             return;
         }
         if (Objects.isNull(permissions)) {
-            TruckView.showWarningWindow("Missing Data", "Please select permission");
+            MainWindow.showWarningWindow("Missing Data", "Please select permission");
             return;
         }
 
@@ -363,33 +373,38 @@ public class TruckController {
             String save = truckTrailerService.save(truckTrailerDTO);
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for truck trailer : " + trailerNumber));
-                TruckView.showInformationWindow("Info", save);
+                MainWindow.showInformationWindow("Info", save);
                 updateTrailerDataList();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                TruckView.showErrorWindow("Error updating data", save);
+                MainWindow.showErrorWindow("Error updating data", save);
             }
             resetTrailerModel();
         } else {
-            TruckView.showErrorWindow("Error updating data", "Truck trailer doesn't  exist ");
+            MainWindow.showErrorWindow("Error updating data", "Truck trailer doesn't  exist ");
         }
     }
 
     @Async
     public void onTrailerDelete(MouseEvent mouseEvent) {
-        long materialId = truckTrailerModel.getTruckTrailerId();
-        String deletedById = truckTrailerService.deleteById(materialId);
-        if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting truck trailer : " + truckTrailerModel.getTrailerNumber()));
-            TruckView.showInformationWindow("Info", deletedById);
-            updateTrailerDataList();
-
+        long truckTrailerId = truckTrailerModel.getTruckTrailerId();
+        if (transactionService.findAll().stream().filter(i -> i.getTruckContainer() == truckTrailerId).count() != 0) {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Trailer :  " + truckTrailerModel.getTrailerNumber() + " can't be deleted because there are transactions relate to it "));
+            MainWindow.showErrorWindow("Error deleting record", "Trailer can't be deleted because there are transactions relate to it \n please delete related transactions first");
         } else {
-            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
-            TruckView.showErrorWindow("Error deleting record", deletedById);
+            String deletedById = truckTrailerService.deleteById(truckTrailerId);
+            if (deletedById.equals("deleted")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting truck trailer : " + truckTrailerModel.getTrailerNumber()));
+                MainWindow.showInformationWindow("Info", deletedById);
+                updateTrailerDataList();
+
+            } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
+                MainWindow.showErrorWindow("Error deleting record", deletedById);
+            }
+            resetTrailerModel();
         }
-        resetTrailerModel();
     }
 
     @Async

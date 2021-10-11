@@ -6,14 +6,17 @@ import javafx.collections.ObservableList;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.MaterialDTO;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.MaterialService;
+import soulintec.com.tmsclient.Services.TransactionService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +29,8 @@ public class MaterialController {
 
     @Autowired
     private MaterialService materialService;
-
+    @Autowired
+    private TransactionService transactionService;
     @Autowired
     private LogsService logsService;
 
@@ -51,7 +55,7 @@ public class MaterialController {
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Error, toString(), " Error getting material data"));
-                MaterialsView.showErrorWindow("Data doesn't exist", "Error getting data for selected material");
+                MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected material");
             });
         }
     }
@@ -63,7 +67,7 @@ public class MaterialController {
         String desc = model.getDescription();
 
         if (StringUtils.isBlank(name)) {
-            MaterialsView.showWarningWindow("Missing Data", "Please enter material");
+            MainWindow.showWarningWindow("Missing Data", "Please enter material");
             return;
         }
         if (!materialService.findByName(name).isPresent()) {
@@ -75,16 +79,16 @@ public class MaterialController {
 
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new material : " + name));
-                MaterialsView.showInformationWindow("Info", save);
+                MainWindow.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                MaterialsView.showErrorWindow("Error inserting data", save);
+                MainWindow.showErrorWindow("Error inserting data", save);
             }
             resetModel();
         } else {
-            MaterialsView.showErrorWindow("Error inserting data", "Material already exist , please check entered data");
+            MainWindow.showErrorWindow("Error inserting data", "Material already exist , please check entered data");
         }
     }
 
@@ -95,12 +99,12 @@ public class MaterialController {
         String desc = model.getDescription();
 
         if (id == 0) {
-            MaterialsView.showWarningWindow("Missing Data", "Please select material");
+            MainWindow.showWarningWindow("Missing Data", "Please select material");
             return;
         }
 
         if (StringUtils.isBlank(name)) {
-            MaterialsView.showWarningWindow("Missing Data", "Please enter material");
+            MainWindow.showWarningWindow("Missing Data", "Please enter material");
             return;
         }
         if (materialService.findById(id).isPresent()) {
@@ -113,33 +117,38 @@ public class MaterialController {
 
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for material :  " + name));
-                MaterialsView.showInformationWindow("Info", save);
+                MainWindow.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                MaterialsView.showErrorWindow("Error updating data", save);
+                MainWindow.showErrorWindow("Error updating data", save);
             }
             resetModel();
         } else {
-            MaterialsView.showErrorWindow("Error updating data", "Material doesn't exist , please check entered data");
+            MainWindow.showErrorWindow("Error updating data", "Material doesn't exist , please check entered data");
         }
     }
 
     @Async
     public void onDelete(MouseEvent mouseEvent) {
         long materialId = model.getMaterialId();
-        String deletedById = materialService.deleteById(materialId);
-        if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting material : " + model.getName()));
-            MaterialsView.showInformationWindow("Info", deletedById);
-            updateDataList();
-
+        if (transactionService.findAll().stream().filter(i -> i.getMaterial() == materialId).count() != 0) {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Material :  " + model.getName() + " can't be deleted because there are transactions relate to it "));
+            MainWindow.showErrorWindow("Error deleting record", "Material can't be deleted because there are transactions relate to it \n please delete related transactions first");
         } else {
-            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
-            MaterialsView.showErrorWindow("Error deleting record", deletedById);
+            String deletedById = materialService.deleteById(materialId);
+            if (deletedById.equals("deleted")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting material : " + model.getName()));
+                MainWindow.showInformationWindow("Info", deletedById);
+                updateDataList();
+
+            } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
+                MainWindow.showErrorWindow("Error deleting record", deletedById);
+            }
+            resetModel();
         }
-        resetModel();
     }
 
     @Async

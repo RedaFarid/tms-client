@@ -39,7 +39,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
 
     private DataEntryPartitionTitled dataEntryPartitionTitled;
 
-    private VBox clientstab;
+    private VBox clientsTab;
     private VBox clientsPane;
 
     private VBox clientsVbox;
@@ -110,7 +110,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         model = controller.getModel();
 
         dataEntryPartitionTitled = new DataEntryPartitionTitled("Client");
-        clientstab = new VBox();
+        clientsTab = new VBox();
         clientsPane = new VBox();
         clientsVbox = new VBox();
         clientsHbox = new ToolBar();
@@ -166,7 +166,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
 
     private void graphicsBuilder() {
         root.setTop(headerLabel);
-        root.setCenter(clientstab);
+        root.setCenter(clientsTab);
         root.setPadding(new Insets(10));
 
         headerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:white;-fx-font-size:25;");
@@ -319,7 +319,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         clientsPane.getChildren().add(clientsVbox);
         clientsPane.getChildren().add(table);
 
-        clientstab.getChildren().add(clientsPane);
+        clientsTab.getChildren().add(clientsPane);
 
         idField.longValueProperty().bindBidirectional(model.clientIdProperty());
         nameField.textProperty().bindBidirectional(model.nameProperty());
@@ -345,82 +345,6 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
 
     public Node getTabContainer() {
         return root;
-    }
-
-    public static void showErrorWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    public static void showErrorWindowForException(String header, Throwable e) {
-        Platform.runLater(() -> {
-            ExceptionDialog exceptionDialog = new ExceptionDialog(e);
-            exceptionDialog.setHeaderText(header);
-            exceptionDialog.getDialogPane().setMaxWidth(500);
-            exceptionDialog.initOwner(initialStage.getInitialStage());
-            exceptionDialog.initModality(Modality.WINDOW_MODAL);
-            exceptionDialog.show();
-
-        });
-    }
-
-    protected static void showErrorWindowForException(String header, Throwable e, Stage stage) {
-        Platform.runLater(() -> {
-            ExceptionDialog exceptionDialog = new ExceptionDialog(e);
-            exceptionDialog.setHeaderText(header);
-            exceptionDialog.getDialogPane().setMaxWidth(500);
-            exceptionDialog.initOwner(stage);
-            exceptionDialog.initModality(Modality.WINDOW_MODAL);
-            exceptionDialog.show();
-
-        });
-    }
-
-    protected static void showErrorWindowOneTime(String header, String content, Stage stage) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(stage);
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    public static void showWarningWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    protected static void showInformationWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Notification");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.NONE);
-            alert.show();
-        });
     }
 
     public void update() {

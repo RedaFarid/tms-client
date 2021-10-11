@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.OperationType;
 import soulintec.com.tmsclient.Entities.TransactionDTO;
+import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientsModel;
 import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversModel;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
@@ -43,11 +44,13 @@ public class TransactionsController {
     private final DriversModel driversModel = new DriversModel();
     private final TruckTrailerModel truckTrailersModel = new TruckTrailerModel();
     private final TruckContainerModel truckContainersModel = new TruckContainerModel();
+    private final  ClientsModel clientsModel = new ClientsModel();
 
     private final ObservableList<TransactionsModel.TableObject> tableList = FXCollections.observableArrayList();
 
     private final ObservableList<MaterialsModel.TableObject> materialContextList = FXCollections.observableArrayList();
     private final ObservableList<TanksModel.TableObject> tanksContextList = FXCollections.observableArrayList();
+    private final ObservableList<ClientsModel.TableObject> clientsContextList = FXCollections.observableArrayList();
     private final ObservableList<StationsModel.TableObject> stationContextList = FXCollections.observableArrayList();
     private final ObservableList<DriversModel.TableObject> driversContextList = FXCollections.observableArrayList();
     private final ObservableList<TruckTrailerModel.TableObject> truckTrailerContextList = FXCollections.observableArrayList();
@@ -71,6 +74,8 @@ public class TransactionsController {
     private TruckTrailerService truckTrailerService;
     @Autowired
     private TruckContainerService truckContainerService;
+    @Autowired
+    private ClientsService clientsService;
 
     @Autowired
     private LogsService logsService;
@@ -101,6 +106,10 @@ public class TransactionsController {
 
     public MaterialsModel getMaterialsModel() {
         return materialsModel;
+    }
+
+    public ClientsModel getClientsModel() {
+        return clientsModel;
     }
 
     public ObservableList<TransactionsModel.TableObject> getDataList() {
@@ -191,6 +200,18 @@ public class TransactionsController {
                     truckContainersModel.setLicenseNumber("");
                 });
 
+                clientsService.findById(transactionDTO.getClient()).ifPresentOrElse(clientDTO -> {
+                    clientsModel.setClientId(clientDTO.getId());
+                    clientsModel.setName(clientDTO.getName());
+                    clientsModel.setContactName(clientDTO.getContactName());
+                    clientsModel.setContactTelNumber(clientDTO.getContactTelNumber());
+                }, () -> {
+                    clientsModel.setClientId(0);
+                    clientsModel.setName("");
+                    clientsModel.setContactName("");
+                    clientsModel.setContactTelNumber("");
+                });
+
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting tanks data"));
                 MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected transaction");
@@ -200,13 +221,13 @@ public class TransactionsController {
 
     @Async
     public void onInsert(MouseEvent mouseEvent) {
-
         long materialID = model.getMaterial();
         long stationId = model.getStation();
         long tankId = model.getTank();
         long driverId = model.getDriver();
         long truckTrailerId = model.getTruckTrailer();
         long truckContainerId = model.getTruckContainer();
+        long clientId = model.getClient();
         OperationType operationType = model.getOperationType();
         Double qty = model.getQty();
 
@@ -234,6 +255,10 @@ public class TransactionsController {
             MainWindow.showWarningWindow("Missing Data", "Please select truck container");
             return;
         }
+        if (clientId == 0) {
+            MainWindow.showWarningWindow("Missing Data", "Please select client");
+            return;
+        }
         if (qty <= 0) {
             MainWindow.showWarningWindow("Missing Data", "Please enter quantity");
             return;
@@ -243,12 +268,17 @@ public class TransactionsController {
             return;
         }
 
+        if (qty > tanksModel.getCalculatedQty() && operationType.equals(OperationType.Out)) {
+            MainWindow.showWarningWindow("Wrong Data", "Please check tank quantity");
+            return;
+        }
         try {
             TransactionDTO transactionDTO = new TransactionDTO();
             transactionDTO.setMaterial(materialID);
             transactionDTO.setStation(stationId);
             transactionDTO.setTank(tankId);
             transactionDTO.setDriver(driverId);
+            transactionDTO.setClient(clientId);
             transactionDTO.setTruckTrailer(truckTrailerId);
             transactionDTO.setTruckContainer(truckContainerId);
             transactionDTO.setQty(qty);
@@ -281,6 +311,7 @@ public class TransactionsController {
         long driverId = model.getDriver();
         long truckTrailerId = model.getTruckTrailer();
         long truckContainerId = model.getTruckContainer();
+        long clientId = model.getClient();
         OperationType operationType = model.getOperationType();
         Double qty = model.getQty();
 
@@ -312,6 +343,10 @@ public class TransactionsController {
             MainWindow.showWarningWindow("Missing Data", "Please select truck container");
             return;
         }
+        if (clientId == 0) {
+            MainWindow.showWarningWindow("Missing Data", "Please select client");
+            return;
+        }
         if (qty <= 0) {
             MainWindow.showWarningWindow("Missing Data", "Please enter quantity");
             return;
@@ -330,6 +365,7 @@ public class TransactionsController {
             transactionDTO.setDriver(driverId);
             transactionDTO.setTruckTrailer(truckTrailerId);
             transactionDTO.setTruckContainer(truckContainerId);
+            transactionDTO.setClient(clientId);
             transactionDTO.setQty(qty);
             transactionDTO.setDateTime(model.getDateTime());
             transactionDTO.setOperationType(operationType);
@@ -406,21 +442,24 @@ public class TransactionsController {
             for (TransactionsModel.TableObject item : getDataList()) {
                 try {
                     final TransactionDTO transactionDTO = transactionToMap.get(item.getTransactionIdColumn());
-
-                    item.setMaterialColumn(transactionDTO.getMaterial());
-                    item.setStationColumn(transactionDTO.getStation());
-                    item.setTankColumn(transactionDTO.getTank());
-                    item.setDriverColumn(transactionDTO.getDriver());
-                    item.setTruckTrailerColumn(transactionDTO.getTruckTrailer());
-                    item.setTruckContainerColumn(transactionDTO.getTruckContainer());
-                    item.setOperationTypeColumn(transactionDTO.getOperationType());
-                    item.setQtyColumn(transactionDTO.getQty());
-                    item.setDateTimeColumn(transactionDTO.getDateTime());
-                    item.setCreationDateColumn(transactionDTO.getCreationDate());
-                    item.setModifyDateColumn(transactionDTO.getModifyDate());
-                    item.setCreatedByColumn(transactionDTO.getCreatedBy());
-                    item.setOnTerminalColumn(transactionDTO.getOnTerminal());
+                    if (transactionDTO != null) {
+                        item.setMaterialColumn(transactionDTO.getMaterial());
+                        item.setStationColumn(transactionDTO.getStation());
+                        item.setTankColumn(transactionDTO.getTank());
+                        item.setDriverColumn(transactionDTO.getDriver());
+                        item.setTruckTrailerColumn(transactionDTO.getTruckTrailer());
+                        item.setTruckContainerColumn(transactionDTO.getTruckContainer());
+                        item.setClientColumn(transactionDTO.getClient());
+                        item.setOperationTypeColumn(transactionDTO.getOperationType());
+                        item.setQtyColumn(transactionDTO.getQty());
+                        item.setDateTimeColumn(transactionDTO.getDateTime());
+                        item.setCreationDateColumn(transactionDTO.getCreationDate());
+                        item.setModifyDateColumn(transactionDTO.getModifyDate());
+                        item.setCreatedByColumn(transactionDTO.getCreatedBy());
+                        item.setOnTerminalColumn(transactionDTO.getOnTerminal());
+                    }
                 } catch (Exception e) {
+                    logsService.save(new LogDTO(LogIdentifier.Error , toString() , e.getMessage()));
                     log.fatal(e);
                 }
             }
@@ -437,6 +476,7 @@ public class TransactionsController {
                 model.setDriver(0);
                 model.setTruckTrailer(0);
                 model.setTruckContainer(0);
+                model.setClient(0);
                 model.setOperationType(null);
                 model.setQty(0.0);
                 model.setDateTime(null);
@@ -470,6 +510,11 @@ public class TransactionsController {
                 truckContainersModel.setTruckContainerId(0);
                 truckContainersModel.setContainerNumber("");
                 truckContainersModel.setLicenseNumber("");
+
+                clientsModel.setClientId(0);
+                clientsModel.setName("");
+                clientsModel.setContactName("");
+                clientsModel.setContactTelNumber("");
 
             } catch (Exception e) {
                 log.fatal(e);
@@ -513,6 +558,12 @@ public class TransactionsController {
         return truckTrailerContextList;
     }
 
+    public ObservableList<ClientsModel.TableObject> getClientsContextList() {
+        clientsContextList.clear();
+        clientsContextList.addAll(clientsService.findAll().stream().map(ClientsModel.TableObject::createFromClientDTO).collect(Collectors.toList()));
+        return clientsContextList;
+    }
+
     public void setProductData(MaterialsModel.TableObject selected) {
         if (selected != null) {
             materialsModel.setMaterialId(selected.getMaterialIdColumn());
@@ -540,7 +591,6 @@ public class TransactionsController {
         }
     }
 
-
     public void setDriverData(DriversModel.TableObject selected) {
         if (selected != null) {
             driversModel.setDriverId(selected.getDriverIdColumn());
@@ -548,7 +598,6 @@ public class TransactionsController {
             driversModel.setLicenseNumber(selected.getLicenseNumberColumn());
         }
     }
-
 
     public void setTruckTrailerData(TruckTrailerModel.TableObject selected) {
         if (selected != null) {
@@ -559,11 +608,19 @@ public class TransactionsController {
     }
 
     public void setTruckContainerData(TruckContainerModel.TableObject selected) {
-        //TODO--In tanks
         if (selected != null) {
             truckContainersModel.setTruckContainerId(selected.getTruckContainerIdColumn());
             truckContainersModel.setContainerNumber(selected.getContainerNumberColumn());
             truckContainersModel.setLicenseNumber(selected.getLicenseNumberColumn());
+        }
+    }
+
+    public void setClientData(ClientsModel.TableObject selected) {
+        if (selected != null) {
+            clientsModel.setClientId(selected.getClientIdColumn());
+            clientsModel.setName(selected.getNameColumn());
+            clientsModel.setContactName(selected.getContactNameColumn());
+            clientsModel.setContactTelNumber(selected.getContactTelNumberColumn());
         }
     }
 

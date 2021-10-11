@@ -10,9 +10,6 @@ import java.time.LocalDateTime;
 
 public class TransactionsModel {
     //TODO--Check on delete for all keys
-    //TODO--Check filtering tool for all
-    //TODO--Make all info windows from main window
-    //TODO--Make all equals and hashes for id only and modify controllers
     private final LongProperty transactionId = new SimpleLongProperty();
     private final LongProperty material = new SimpleLongProperty();
     private final LongProperty station = new SimpleLongProperty();
@@ -20,6 +17,7 @@ public class TransactionsModel {
     private final LongProperty driver = new SimpleLongProperty();
     private final LongProperty truckTrailer = new SimpleLongProperty();
     private final LongProperty truckContainer = new SimpleLongProperty();
+    private final LongProperty client = new SimpleLongProperty();
     private final ObjectProperty<OperationType> operationType = new SimpleObjectProperty<>();
     private final DoubleProperty qty = new SimpleDoubleProperty(0.0);
     private final ObjectProperty<LocalDateTime> dateTime = new SimpleObjectProperty<>(LocalDateTime.now());
@@ -110,6 +108,18 @@ public class TransactionsModel {
 
     public void setTruckContainer(long truckContainer) {
         this.truckContainer.set(truckContainer);
+    }
+
+    public long getClient() {
+        return client.get();
+    }
+
+    public LongProperty clientProperty() {
+        return client;
+    }
+
+    public void setClient(long client) {
+        this.client.set(client);
     }
 
     public OperationType getOperationType() {
@@ -204,6 +214,7 @@ public class TransactionsModel {
         private final LongProperty driverColumn;
         private final LongProperty truckTrailerColumn;
         private final LongProperty truckContainerColumn;
+        private final LongProperty clientColumn;
         private final ObjectProperty<OperationType> operationTypeColumn;
         private final DoubleProperty qtyColumn;
         private final ObjectProperty<LocalDateTime> dateTimeColumn;
@@ -212,7 +223,7 @@ public class TransactionsModel {
         private final StringProperty createdByColumn;
         private final StringProperty onTerminalColumn;
 
-        public TableObject(LongProperty transactionIdColumn, LongProperty materialColumn, LongProperty stationColumn, LongProperty tankColumn, LongProperty driverColumn, LongProperty truckTrailerColumn, LongProperty truckContainerColumn, ObjectProperty<OperationType> operationTypeColumn, DoubleProperty qtyColumn, ObjectProperty<LocalDateTime> dateTimeColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn) {
+        public TableObject(LongProperty transactionIdColumn, LongProperty materialColumn, LongProperty stationColumn, LongProperty tankColumn, LongProperty driverColumn, LongProperty truckTrailerColumn, LongProperty truckContainerColumn, LongProperty clientColumn, ObjectProperty<OperationType> operationTypeColumn, DoubleProperty qtyColumn, ObjectProperty<LocalDateTime> dateTimeColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn) {
             this.transactionIdColumn = transactionIdColumn;
             this.materialColumn = materialColumn;
             this.stationColumn = stationColumn;
@@ -220,6 +231,7 @@ public class TransactionsModel {
             this.driverColumn = driverColumn;
             this.truckTrailerColumn = truckTrailerColumn;
             this.truckContainerColumn = truckContainerColumn;
+            this.clientColumn = clientColumn;
             this.operationTypeColumn = operationTypeColumn;
             this.qtyColumn = qtyColumn;
             this.dateTimeColumn = dateTimeColumn;
@@ -311,6 +323,18 @@ public class TransactionsModel {
 
         public void setTruckContainerColumn(long truckContainerColumn) {
             this.truckContainerColumn.set(truckContainerColumn);
+        }
+
+        public long getClientColumn() {
+            return clientColumn.get();
+        }
+
+        public LongProperty clientColumnProperty() {
+            return clientColumn;
+        }
+
+        public void setClientColumn(long clientColumn) {
+            this.clientColumn.set(clientColumn);
         }
 
         public OperationType getOperationTypeColumn() {
@@ -406,6 +430,7 @@ public class TransactionsModel {
                     new SimpleLongProperty(transactionDTO.getDriver()),
                     new SimpleLongProperty(transactionDTO.getTruckTrailer()),
                     new SimpleLongProperty(transactionDTO.getTruckContainer()),
+                    new SimpleLongProperty(transactionDTO.getClient()),
                     new SimpleObjectProperty<>(transactionDTO.getOperationType()),
                     new SimpleDoubleProperty(transactionDTO.getQty()),
                     new SimpleObjectProperty<>(transactionDTO.getDateTime()),

@@ -16,6 +16,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -28,6 +29,7 @@ import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedLongField;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedTextField;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.TanksModel;
 import soulintec.com.tmsclient.Services.TruckContainerService;
 import soulintec.com.tmsclient.Services.TruckTrailerService;
 
@@ -65,6 +67,8 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
 
     private Stage mainWindow;
 
+    private TableFilter<TruckTrailerModel.TableObject> trailerTableFilter;
+
     private TableView<TruckTrailerModel.TableObject> trailersTableView;
     private TableColumn<TruckTrailerModel.TableObject, LongProperty> trailerIdColumn;
     private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerNumColumn;
@@ -76,6 +80,8 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
     private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerOnTerminalColumn;
     private TableColumn<TruckTrailerModel.TableObject, ObjectProperty<LocalDateTime>> trailerCreationDateColumn;
     private TableColumn<TruckTrailerModel.TableObject, ObjectProperty<LocalDateTime>> trailerModifyDateColumn;
+
+    private TableFilter<TruckContainerModel.TableObject> containerTableFilter;
 
     private TableView<TruckContainerModel.TableObject> containersTableView;
     private TableColumn<TruckContainerModel.TableObject, LongProperty> containerIdColumn;
@@ -420,6 +426,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailersTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         trailersTableView.prefHeightProperty().bind(tabContainer.heightProperty().subtract(trailersVbox.heightProperty()));
         trailersTableView.setItems(controller.getTruckTrailerDataList());
+        trailerTableFilter = TableFilter.forTableView(trailersTableView).apply();
 
         trailersHbox.getItems().addAll(insertTrailer, updateTrailer, deleteTrailer);
         trailersHbox.setPadding(new Insets(10, 10, 10, 10));
@@ -593,6 +600,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containersTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         containersTableView.prefHeightProperty().bind(tabContainer.heightProperty().subtract(containersVvox.heightProperty()));
         containersTableView.setItems(controller.getTruckContainerDataList());
+        containerTableFilter = TableFilter.forTableView(containersTableView).apply();
 
         containersHbox.getItems().addAll(insertContainer, updateContainer, deleteContainer);
         containersHbox.setPadding(new Insets(10, 10, 10, 10));
@@ -656,80 +664,5 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
 
     public Node getTabContainer() {
         return root;
-    }
-    public static void showErrorWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    public static void showErrorWindowForException(String header, Throwable e) {
-        Platform.runLater(() -> {
-            ExceptionDialog exceptionDialog = new ExceptionDialog(e);
-            exceptionDialog.setHeaderText(header);
-            exceptionDialog.getDialogPane().setMaxWidth(500);
-            exceptionDialog.initOwner(initialStage.getInitialStage());
-            exceptionDialog.initModality(Modality.WINDOW_MODAL);
-            exceptionDialog.show();
-
-        });
-    }
-
-    protected static void showErrorWindowForException(String header, Throwable e, Stage stage) {
-        Platform.runLater(() -> {
-            ExceptionDialog exceptionDialog = new ExceptionDialog(e);
-            exceptionDialog.setHeaderText(header);
-            exceptionDialog.getDialogPane().setMaxWidth(500);
-            exceptionDialog.initOwner(stage);
-            exceptionDialog.initModality(Modality.WINDOW_MODAL);
-            exceptionDialog.show();
-
-        });
-    }
-
-    protected static void showErrorWindowOneTime(String header, String content, Stage stage) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(stage);
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    public static void showWarningWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    protected static void showInformationWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Notification");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.NONE);
-            alert.show();
-        });
     }
 }

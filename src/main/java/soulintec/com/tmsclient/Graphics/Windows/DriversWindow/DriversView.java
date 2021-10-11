@@ -18,6 +18,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.controlsfx.control.table.TableFilter;
 import org.controlsfx.dialog.ExceptionDialog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -30,6 +31,7 @@ import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedLongField;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedTextField;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
 import soulintec.com.tmsclient.Services.DriverService;
 
 import java.time.LocalDateTime;
@@ -49,6 +51,8 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
     private Label headerLabel;
 
     private Stage mainWindow;
+
+    private TableFilter<DriversModel.TableObject> tableFilter;
 
     private TableView<DriversModel.TableObject> table;
     private TableColumn<DriversModel.TableObject, LongProperty> idColumn;
@@ -313,6 +317,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.prefHeightProperty().bind(root.heightProperty().subtract(vbox.heightProperty()));
         table.setItems(controller.getDataList());
+        tableFilter = TableFilter.forTableView(table).apply();
 
         hbox.getItems().addAll(insert, update, delete);
         hbox.setPadding(new Insets(10, 10, 10, 10));
@@ -357,82 +362,6 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
 
     public Node getRoot() {
         return root;
-    }
-
-    public static void showErrorWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    public static void showErrorWindowForException(String header, Throwable e) {
-        Platform.runLater(() -> {
-            ExceptionDialog exceptionDialog = new ExceptionDialog(e);
-            exceptionDialog.setHeaderText(header);
-            exceptionDialog.getDialogPane().setMaxWidth(500);
-            exceptionDialog.initOwner(initialStage.getInitialStage());
-            exceptionDialog.initModality(Modality.WINDOW_MODAL);
-            exceptionDialog.show();
-
-        });
-    }
-
-    protected static void showErrorWindowForException(String header, Throwable e, Stage stage) {
-        Platform.runLater(() -> {
-            ExceptionDialog exceptionDialog = new ExceptionDialog(e);
-            exceptionDialog.setHeaderText(header);
-            exceptionDialog.getDialogPane().setMaxWidth(500);
-            exceptionDialog.initOwner(stage);
-            exceptionDialog.initModality(Modality.WINDOW_MODAL);
-            exceptionDialog.show();
-
-        });
-    }
-
-    protected static void showErrorWindowOneTime(String header, String content, Stage stage) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(stage);
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    public static void showWarningWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    protected static void showInformationWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Notification");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.NONE);
-            alert.show();
-        });
     }
 
 }

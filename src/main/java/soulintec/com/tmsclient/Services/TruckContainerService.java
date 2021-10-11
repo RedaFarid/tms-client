@@ -14,7 +14,7 @@ import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.TruckContainerDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
-import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -51,13 +51,13 @@ public class TruckContainerService {
         body = forEntity.getBody();
 
         }catch (Exception e){
-            TruckView.showErrorWindow("Error loading data" , e.getMessage());
+            MainWindow.showErrorWindow("Error loading data" , e.getMessage());
         }
         if (body.getException() == null){
             return body.getTruckContainer();
         }
         else {
-            TruckView.showErrorWindow("Error loading data" , body.getException().getMessage());
+            MainWindow.showErrorWindow("Error loading data" , body.getException().getMessage());
             return truckContainerDTOS;
         }
 

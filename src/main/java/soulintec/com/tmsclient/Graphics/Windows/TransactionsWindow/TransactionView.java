@@ -19,12 +19,14 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import jfxtras.scene.control.LocalDateTimeTextField;
 import lombok.extern.log4j.Log4j2;
+import org.controlsfx.control.table.TableFilter;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
 import soulintec.com.tmsclient.Entities.OperationType;
 import soulintec.com.tmsclient.Entities.Permissions;
 import soulintec.com.tmsclient.Graphics.Controls.*;
+import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientsModel;
 import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversModel;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsModel;
@@ -49,6 +51,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private DriversModel driversModel;
     private TruckContainerModel truckContainerModel;
     private TruckTrailerModel truckTrailerModel;
+    private ClientsModel clientsModel;
 
     protected static MainWindow initialStage;
 
@@ -59,6 +62,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private DataEntryPartitionTitled contextDriversDataEntry;
     private DataEntryPartitionTitled contextTruckContainersDataEntry;
     private DataEntryPartitionTitled contextTruckTrailersDataEntry;
+    private DataEntryPartitionTitled contextClientsDataEntry;
 
     private Tab transactionsTab;
     private VBox transactionsPane;
@@ -77,11 +81,15 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private Stage contextDriversStage;
     private Stage contextTruckContainersStage;
     private Stage contextTruckTrailersStage;
+    private Stage contextClientsStage;
+
+    private TableFilter<TransactionsModel.TableObject> tableFilter;
 
     private TableView<TransactionsModel.TableObject> tableView;
     private TableColumn<TransactionsModel.TableObject, LongProperty> transactionIdColumn;
     private TableColumn<TransactionsModel.TableObject, LongProperty> materialColumn;
     private TableColumn<TransactionsModel.TableObject, LongProperty> stationColumn;
+    private TableColumn<TransactionsModel.TableObject, LongProperty> clientColumn;
     private TableColumn<TransactionsModel.TableObject, LongProperty> tankColumn;
     private TableColumn<TransactionsModel.TableObject, LongProperty> driverColumn;
     private TableColumn<TransactionsModel.TableObject, StringProperty> truckTrailerColumn;
@@ -94,31 +102,50 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private TableColumn<TransactionsModel.TableObject, ObjectProperty<LocalDateTime>> creationDateColumn;
     private TableColumn<TransactionsModel.TableObject, ObjectProperty<LocalDateTime>> modifyDateColumn;
 
+    private TableFilter<MaterialsModel.TableObject> contextProductTableFilter;
+
     private TableView<MaterialsModel.TableObject> contextProductTableView;
     private TableColumn<MaterialsModel.TableObject, StringProperty> contextProductNameColumn;
     private TableColumn<MaterialsModel.TableObject, StringProperty> contextProductDescriptionColumn;
+
+    private TableFilter<StationsModel.TableObject> contextStationsTableFilter;
 
     private TableView<StationsModel.TableObject> contextStationsTableView;
     private TableColumn<StationsModel.TableObject, StringProperty> contextStationNameColumn;
     private TableColumn<StationsModel.TableObject, StringProperty> contextStationLocationColumn;
     private TableColumn<StationsModel.TableObject, ObjectProperty<String>> contextStationComputerColumn;
 
+    private TableFilter<TanksModel.TableObject> contextTanksTableFilter;
+
     private TableView<TanksModel.TableObject> contextTanksTableView;
     private TableColumn<TanksModel.TableObject, StringProperty> contextTankNameColumn;
     private TableColumn<TanksModel.TableObject, DoubleProperty> contextTankQtyColumn;
     private TableColumn<TanksModel.TableObject, DoubleProperty> contextTankCalcQtyColumn;
 
+    private TableFilter<DriversModel.TableObject> contextDriverTableFilter;
+
     private TableView<DriversModel.TableObject> contextDriverTableView;
     private TableColumn<DriversModel.TableObject, StringProperty> contextDriverNameColumn;
     private TableColumn<DriversModel.TableObject, StringProperty> contextDriverLicenceNoColumn;
+
+    private TableFilter<TruckTrailerModel.TableObject> contextTruckTrailerTableFilter;
 
     private TableView<TruckTrailerModel.TableObject> contextTruckTrailerTableView;
     private TableColumn<TruckTrailerModel.TableObject, StringProperty> contextTruckTrailerNoColumn;
     private TableColumn<TruckTrailerModel.TableObject, StringProperty> contextTruckTrailerLicenceNoColumn;
 
+    private TableFilter<TruckContainerModel.TableObject> contextTruckContainerFilter;
+
     private TableView<TruckContainerModel.TableObject> contextTruckContainerTableView;
     private TableColumn<TruckContainerModel.TableObject, StringProperty> contextTruckContainerNoColumn;
     private TableColumn<TruckContainerModel.TableObject, StringProperty> contextTruckContainerLicenceNoColumn;
+
+    private TableFilter<ClientsModel.TableObject> contextClientsFilter;
+
+    private TableView<ClientsModel.TableObject> contextClientsTableView;
+    private TableColumn<ClientsModel.TableObject, StringProperty> contextClientNameColumn;
+    private TableColumn<ClientsModel.TableObject, StringProperty> contextClientContactNameColumn;
+    private TableColumn<ClientsModel.TableObject, StringProperty> contextClientMobileColumn;
 
     private EnhancedButton insert;
     private EnhancedButton delete;
@@ -133,6 +160,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private Label driverLabel;
     private Label truckContainerLabel;
     private Label truckTrailerLabel;
+    private Label clientLabel;
     private Label qtyLabel;
     private Label operationTypeLabel;
     private Label dateTimeLabel;
@@ -161,6 +189,10 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private Label contextTruckContainerNoLabel;
     private Label contextTruckContainerLicenceNoLabel;
 
+    private Label contextClientNameLabel;
+    private Label contextClientContactNameLabel;
+    private Label contextClientMobileLabel;
+
     private EnhancedLongField transactionIdField;
     private EnhancedLongField materialIdField;
     private EnhancedLongField stationIdField;
@@ -168,6 +200,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private EnhancedLongField driverIdField;
     private EnhancedLongField truckTrailerField;
     private EnhancedLongField truckContainerField;
+    private EnhancedLongField clientField;
     private EnhancedDoubleField qtyField;
     private ComboBox<OperationType> operationTypeComboBox;
     private LocalDateTimeTextField dateTimeField;
@@ -184,8 +217,8 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private Label contextStationComputerField;
 
     private Label contextTankNameField;
-    private Label contextTankQtyField;
-    private Label contextTankCalcQtyField;
+    private EnhancedDoubleField contextTankQtyField;
+    private EnhancedDoubleField contextTankCalcQtyField;
 
     private Label contextDriverNameField;
     private Label contextDriverLicenceNoField;
@@ -195,6 +228,10 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
 
     private Label contextTruckContainerNoField;
     private Label contextTruckContainerLicenceNoField;
+
+    private Label contextClientNameField;
+    private Label contextClientContactField;
+    private Label contextClientMobileField;
 
     private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
     private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
@@ -209,6 +246,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         contextDriversStage = new Stage();
         contextTruckContainersStage = new Stage();
         contextTruckTrailersStage = new Stage();
+        contextClientsStage = new Stage();
         userAuthorities();
         init();
         graphicsBuilder();
@@ -222,6 +260,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private void init() {
         initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
         controller = ApplicationContext.applicationContext.getBean(TransactionsController.class);
+
         model = controller.getModel();
         materialsModel = controller.getMaterialsModel();
         stationsModel = controller.getStationModel();
@@ -229,6 +268,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         driversModel = controller.getDriversModel();
         truckContainerModel = controller.getTruckContainersModel();
         truckTrailerModel = controller.getTruckTrailersModel();
+        clientsModel = controller.getClientsModel();
 
         transactionsDataEntry = new DataEntryPartitionTitled("Transaction");
         contextProductsDataEntry = new DataEntryPartitionTitled("Selected material");
@@ -237,6 +277,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         contextDriversDataEntry = new DataEntryPartitionTitled("Selected driver");
         contextTruckTrailersDataEntry = new DataEntryPartitionTitled("Selected truck trailer");
         contextTruckContainersDataEntry = new DataEntryPartitionTitled("Selected truck container");
+        contextClientsDataEntry = new DataEntryPartitionTitled("Selected client");
 
         transactionsTab = new Tab("Transactions Management");
         transactionsPane = new VBox();
@@ -251,6 +292,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         transactionIdColumn = new TableColumn<>("Id");
         materialColumn = new TableColumn<>("Material");
         tankColumn = new TableColumn<>("Tank");
+        clientColumn = new TableColumn<>("Client");
         driverColumn = new TableColumn<>("Driver");
         stationColumn = new TableColumn<>("Station");
         qtyColumn = new TableColumn<>("Quantity");
@@ -283,17 +325,23 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         contextDriverTableView = new TableView<>();
 
         contextDriverNameColumn = new TableColumn<>("Name");
-        contextDriverLicenceNoColumn = new TableColumn<>("Licence Number");
+        contextDriverLicenceNoColumn = new TableColumn<>("Licence number");
 
         contextTruckTrailerTableView = new TableView<>();
 
         contextTruckTrailerNoColumn = new TableColumn<>("Number");
-        contextTruckTrailerLicenceNoColumn = new TableColumn<>("Licence Number");
+        contextTruckTrailerLicenceNoColumn = new TableColumn<>("Licence number");
 
         contextTruckContainerTableView = new TableView<>();
 
         contextTruckContainerNoColumn = new TableColumn<>("Number");
-        contextTruckContainerLicenceNoColumn = new TableColumn<>("Licence Number");
+        contextTruckContainerLicenceNoColumn = new TableColumn<>("Licence number");
+
+        contextClientsTableView = new TableView<>();
+
+        contextClientNameColumn = new TableColumn<>("Name");
+        contextClientContactNameColumn = new TableColumn<>("Contact name");
+        contextClientMobileColumn = new TableColumn<>("Mobile number");
 
         insert = new EnhancedButton("Insert new transaction");
         delete = new EnhancedButton("Delete selected transaction");
@@ -305,6 +353,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         materialLabel = new Label("Material :");
         tankLabel = new Label("Tank :");
         qtyLabel = new Label("Quantity :");
+        clientLabel = new Label("Client :");
         driverLabel = new Label("Driver :");
         stationLabel = new Label("Station :");
         truckTrailerLabel = new Label("Truck trailer :");
@@ -336,11 +385,16 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         contextTruckContainerNoLabel = new Label("Number :");
         contextTruckContainerLicenceNoLabel = new Label("Licence Number :");
 
+        contextClientNameLabel = new Label("Name :");
+        contextClientContactNameLabel = new Label("Contact name :");
+        contextClientMobileLabel = new Label("Mobile number :");
+
         transactionIdField = new EnhancedLongField();
         tankIdField = new EnhancedLongField();
         driverIdField = new EnhancedLongField();
         stationIdField = new EnhancedLongField();
         materialIdField = new EnhancedLongField();
+        clientField = new EnhancedLongField();
         operationTypeComboBox = new ComboBox<>();
         qtyField = new EnhancedDoubleField();
         truckContainerField = new EnhancedLongField();
@@ -359,8 +413,8 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         contextStationComputerField = new Label();
 
         contextTankNameField = new Label();
-        contextTankQtyField = new Label();
-        contextTankCalcQtyField = new Label();
+        contextTankQtyField = new EnhancedDoubleField();
+        contextTankCalcQtyField = new EnhancedDoubleField();
 
         contextDriverNameField = new Label();
         contextDriverLicenceNoField = new Label();
@@ -370,6 +424,10 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
 
         contextTruckContainerNoField = new Label();
         contextTruckContainerLicenceNoField = new Label();
+
+        contextClientNameField = new Label();
+        contextClientContactField = new Label();
+        contextClientMobileField = new Label();
     }
 
     private void graphicsBuilder() {
@@ -381,6 +439,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         driversContextGraphicsBuilder();
         truckTrailersContextGraphicsBuilder();
         truckContainersContextGraphicsBuilder();
+        clientsContextGraphicsBuilder();
 
         tabContainer.getTabs().addAll(transactionsTab);
 
@@ -388,7 +447,6 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         root.setCenter(transactionsPane);
         root.setPadding(new Insets(10));
     }
-
 
     private void mainGrapgicBuilder() {
         headerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:white;-fx-font-size:25;");
@@ -410,6 +468,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         tankLabel.setPrefWidth(150);
         qtyLabel.setPrefWidth(150);
         driverLabel.setPrefWidth(150);
+        clientLabel.setPrefWidth(150);
         stationLabel.setPrefWidth(150);
         truckTrailerLabel.setPrefWidth(150);
         dateTimeLabel.setPrefWidth(150);
@@ -425,6 +484,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         idLabel.setTextAlignment(TextAlignment.LEFT);
         materialLabel.setTextAlignment(TextAlignment.LEFT);
         tankLabel.setTextAlignment(TextAlignment.LEFT);
+        clientLabel.setTextAlignment(TextAlignment.LEFT);
         qtyLabel.setTextAlignment(TextAlignment.LEFT);
         driverLabel.setTextAlignment(TextAlignment.LEFT);
         stationLabel.setTextAlignment(TextAlignment.LEFT);
@@ -442,6 +502,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         idLabel.setAlignment(Pos.BASELINE_LEFT);
         materialLabel.setAlignment(Pos.BASELINE_LEFT);
         tankLabel.setAlignment(Pos.BASELINE_LEFT);
+        clientLabel.setAlignment(Pos.BASELINE_LEFT);
         qtyLabel.setAlignment(Pos.BASELINE_LEFT);
         driverLabel.setAlignment(Pos.BASELINE_LEFT);
         stationLabel.setAlignment(Pos.BASELINE_LEFT);
@@ -460,6 +521,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         materialLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         tankLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         qtyLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        clientLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         driverLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         stationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         truckTrailerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
@@ -476,6 +538,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         transactionIdField.setPrefWidth(250);
         tankIdField.setPrefWidth(250);
         driverIdField.setPrefWidth(250);
+        clientField.setPrefWidth(250);
         stationIdField.setPrefWidth(250);
         materialIdField.setPrefWidth(250);
         operationTypeComboBox.setPrefWidth(250);
@@ -521,23 +584,27 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         transactionsDataEntry.add(truckContainerLabel, 5, 2);
         transactionsDataEntry.add(truckContainerField, 6, 2);
 
-        transactionsDataEntry.add(operationTypeLabel, 7, 2);
-        transactionsDataEntry.add(operationTypeComboBox, 8, 2);
+        transactionsDataEntry.add(clientLabel, 7, 2);
+        transactionsDataEntry.add(clientField, 8, 2);
 
-        transactionsDataEntry.add(dateTimeLabel, 9, 2);
-        transactionsDataEntry.add(dateTimeField, 10, 2);
 
-        transactionsDataEntry.add(creationDateLabel, 1, 3);
-        transactionsDataEntry.add(creationDateField, 2, 3);
+        transactionsDataEntry.add(operationTypeLabel, 1, 3);
+        transactionsDataEntry.add(operationTypeComboBox, 2, 3);
 
-        transactionsDataEntry.add(modificationLabel, 3, 3);
-        transactionsDataEntry.add(modificationDateField, 4, 3);
+        transactionsDataEntry.add(dateTimeLabel, 3, 3);
+        transactionsDataEntry.add(dateTimeField, 4, 3);
 
-        transactionsDataEntry.add(createdByLabel, 5, 3);
-        transactionsDataEntry.add(createdByField, 6, 3);
+        transactionsDataEntry.add(creationDateLabel, 1, 4);
+        transactionsDataEntry.add(creationDateField, 2, 4);
 
-        transactionsDataEntry.add(onTerminalLabel, 7, 3);
-        transactionsDataEntry.add(onTerminalField, 8, 3);
+        transactionsDataEntry.add(modificationLabel, 3, 4);
+        transactionsDataEntry.add(modificationDateField, 4, 4);
+
+        transactionsDataEntry.add(createdByLabel, 5, 4);
+        transactionsDataEntry.add(createdByField, 6, 4);
+
+        transactionsDataEntry.add(onTerminalLabel, 7, 4);
+        transactionsDataEntry.add(onTerminalField, 8, 4);
 
         //table configuration
         transactionIdColumn.setCellValueFactory(new PropertyValueFactory<>("transactionIdColumn"));
@@ -545,6 +612,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         tankColumn.setCellValueFactory(new PropertyValueFactory<>("tankColumn"));
         driverColumn.setCellValueFactory(new PropertyValueFactory<>("driverColumn"));
         stationColumn.setCellValueFactory(new PropertyValueFactory<>("stationColumn"));
+        clientColumn.setCellValueFactory(new PropertyValueFactory<>("clientColumn"));
         qtyColumn.setCellValueFactory(new PropertyValueFactory<>("qtyColumn"));
         dateTimeColumn.setCellValueFactory(new PropertyValueFactory<>("dateTimeColumn"));
         truckTrailerColumn.setCellValueFactory(new PropertyValueFactory<>("truckTrailerColumn"));
@@ -555,26 +623,28 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         createdByColumn.setCellValueFactory(new PropertyValueFactory<>("createdByColumn"));
         onTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
 
-        tableView.getColumns().addAll(transactionIdColumn, materialColumn, stationColumn, tankColumn, driverColumn, truckTrailerColumn, truckContainerColumn, qtyColumn, operationTypeColumn, dateTimeColumn,
+        tableView.getColumns().addAll(transactionIdColumn, materialColumn, stationColumn, tankColumn, clientColumn, driverColumn, truckTrailerColumn, truckContainerColumn, qtyColumn, operationTypeColumn, dateTimeColumn,
                 creationDateColumn, modifyDateColumn, createdByColumn, onTerminalColumn);
         tableView.prefHeightProperty().bind(root.heightProperty().subtract(transactionsVbox.heightProperty()));
         tableView.setItems(controller.getDataList());
         tableView.setRowFactory((TableView<TransactionsModel.TableObject> param) -> new EnhancedTableRow());
+        tableFilter = TableFilter.forTableView(tableView).apply();
 
-        transactionIdColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(1));
-        materialColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(1));
-        tankColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(1));
-        driverColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(1));
-        stationColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(1));
-        operationTypeColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(2));
-        qtyColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(2));
-        truckContainerColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(1));
-        dateTimeColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(3));
-        truckTrailerColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(1));
-        creationDateColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(3));
-        modifyDateColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(3));
-        createdByColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(3));
-        onTerminalColumn.prefWidthProperty().bind(tableView.widthProperty().divide(26).multiply(3));
+        transactionIdColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(1));
+        materialColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(1));
+        tankColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(1));
+        driverColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(1));
+        stationColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(1));
+        clientColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(1));
+        operationTypeColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(2));
+        qtyColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(2));
+        truckContainerColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(2));
+        dateTimeColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(3));
+        truckTrailerColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(2));
+        creationDateColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(3));
+        modifyDateColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(3));
+        createdByColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(3));
+        onTerminalColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(3));
 
         operationTypeComboBox.getItems().addAll(FXCollections.observableArrayList(OperationType.values()));
 
@@ -582,7 +652,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         transactionsHbox.getItems().addAll(insert, update, delete/*, new Separator(), refreshTank*/);
         transactionsHbox.setPadding(new Insets(10, 10, 10, 10));
 
-        transactionsVbox.getChildren().addAll(contextProductsDataEntry, contextStationDataEntry, contextTanksDataEntry, contextDriversDataEntry, contextTruckTrailersDataEntry, contextTruckContainersDataEntry, transactionsDataEntry, transactionsHbox);
+        transactionsVbox.getChildren().addAll(contextProductsDataEntry, contextStationDataEntry, contextTanksDataEntry, contextClientsDataEntry, contextDriversDataEntry, contextTruckTrailersDataEntry, contextTruckContainersDataEntry, transactionsDataEntry, transactionsHbox);
         transactionsVbox.setSpacing(5);
         transactionsVbox.setAlignment(Pos.CENTER);
 
@@ -599,6 +669,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         materialIdField.longValueProperty().bindBidirectional(model.materialProperty());
         operationTypeComboBox.valueProperty().bindBidirectional(model.operationTypeProperty());
         truckContainerField.longValueProperty().bindBidirectional(model.truckContainerProperty());
+        clientField.longValueProperty().bindBidirectional(model.clientProperty());
         qtyField.doubleValueProperty().bindBidirectional(model.qtyProperty());
         dateTimeField.localDateTimeProperty().bindBidirectional(model.dateTimeProperty());
         truckTrailerField.longValueProperty().bindBidirectional(model.truckTrailerProperty());
@@ -629,7 +700,6 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         contextProductsDataEntry.add(contextProductNameLabel, 1, 0);
         contextProductsDataEntry.add(contextProductDescriptionLabel, 3, 0);
 
-//        dataentery.add(IDLabel, 1, 1);
         contextProductsDataEntry.add(contextProductNameFieldField, 2, 0);
         contextProductsDataEntry.add(contextProductDescriptionField, 4, 0);
 
@@ -673,11 +743,8 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         contextStationComputerLabel.setAlignment(Pos.BASELINE_LEFT);
 
         contextStationNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        ;
         contextStationLocationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        ;
         contextStationComputerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
-        ;
 
         contextStationNameField.setPrefWidth(250);
         contextStationLocationField.setPrefWidth(250);
@@ -715,7 +782,6 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         contextStationLocationField.textProperty().bindBidirectional(stationsModel.locationProperty());
         contextStationComputerField.textProperty().bindBidirectional(stationsModel.commentProperty());
     }
-
 
     private void truckContainersContextGraphicsBuilder() {
         //dataentery region configuration
@@ -874,6 +940,9 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         contextTankQtyLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         contextTankCalcQtyLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
+        contextTankQtyField.setStyle("-fx-background-color:transparent;-fx-border-color: transparent;");
+        contextTankCalcQtyField.setStyle("-fx-background-color:transparent;-fx-border-color: transparent;");
+
         contextTankNameField.setPrefWidth(250);
         contextTankQtyField.setPrefWidth(250);
         contextTankCalcQtyField.setPrefWidth(250);
@@ -907,8 +976,63 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
 
         tankIdField.longValueProperty().bindBidirectional(tanksModel.tankIdProperty());
         contextTankNameField.textProperty().bindBidirectional(tanksModel.nameProperty());
-//        contextTankQtyField.textProperty().bindBidirectional(tanksModel.qtyProperty());
-//        contextTankCalcQtyField.textProperty().bindBidirectional(tanksModel.calculatedQtyProperty());
+        contextTankQtyField.doubleValueProperty().bindBidirectional(tanksModel.qtyProperty());
+        contextTankCalcQtyField.doubleValueProperty().bindBidirectional(tanksModel.calculatedQtyProperty());
+
+    }
+
+    private void clientsContextGraphicsBuilder() {
+        //dataentery region configuration
+        contextClientNameLabel.setPrefWidth(150);
+        contextClientContactNameLabel.setPrefWidth(150);
+        contextClientMobileLabel.setPrefWidth(150);
+
+        contextClientNameLabel.setTextAlignment(TextAlignment.LEFT);
+        contextClientMobileLabel.setTextAlignment(TextAlignment.LEFT);
+        contextClientContactNameLabel.setTextAlignment(TextAlignment.LEFT);
+
+        contextClientNameLabel.setAlignment(Pos.BASELINE_LEFT);
+        contextClientContactNameLabel.setAlignment(Pos.BASELINE_LEFT);
+        contextClientMobileLabel.setAlignment(Pos.BASELINE_LEFT);
+
+        contextClientNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        contextClientContactNameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        contextClientMobileLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+
+        contextClientNameField.setPrefWidth(250);
+        contextClientContactField.setPrefWidth(250);
+        contextClientMobileField.setPrefWidth(250);
+
+        contextClientsDataEntry.add(contextClientNameLabel, 1, 0);
+        contextClientsDataEntry.add(contextClientContactNameLabel, 3, 0);
+        contextClientsDataEntry.add(contextClientMobileLabel, 5, 0);
+
+        contextClientsDataEntry.add(contextClientNameField, 2, 0);
+        contextClientsDataEntry.add(contextClientContactField, 4, 0);
+        contextClientsDataEntry.add(contextClientMobileField, 6, 0);
+
+        contextClientNameColumn.setCellValueFactory(new PropertyValueFactory<>("nameColumn"));
+        contextClientContactNameColumn.setCellValueFactory(new PropertyValueFactory<>("contactNameColumn"));
+        contextClientMobileColumn.setCellValueFactory(new PropertyValueFactory<>("contactTelNumberColumn"));
+
+        contextClientsTableView.getColumns().addAll(contextClientNameColumn, contextClientContactNameColumn, contextClientMobileColumn);
+        contextClientsTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        //stage configuration
+        Pane pane = new Pane(contextClientsTableView);
+        pane.setBorder(new Border(new BorderStroke(Color.valueOf("#0099cc"), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1))));
+        pane.setPadding(new Insets(2, 2, 2, 2));
+        contextClientsStage.setScene(new Scene(pane));
+        contextClientsStage.initStyle(StageStyle.UNDECORATED);
+        contextClientsStage.initOwner(mainWindow);
+
+        contextClientsTableView.prefWidthProperty().bind(contextClientsStage.widthProperty());
+        contextClientsTableView.prefHeightProperty().bind(contextClientsStage.heightProperty());
+
+        clientField.longValueProperty().bindBidirectional(clientsModel.clientIdProperty());
+        contextClientNameField.textProperty().bindBidirectional(clientsModel.nameProperty());
+        contextClientContactField.textProperty().bindBidirectional(clientsModel.contactNameProperty());
+        contextClientMobileField.textProperty().bindBidirectional(clientsModel.contactTelNumberProperty());
 
     }
 
@@ -930,6 +1054,9 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
             }
             if (contextTruckContainersStage.isShowing()) {
                 contextTruckContainersStage.close();
+            }
+            if (contextClientsStage.isShowing()) {
+                contextClientsStage.close();
             }
         });
 
@@ -1011,6 +1138,17 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
             }
         });
 
+        clientField.setOnMouseClicked(this::onRunClientContextWidow);
+        contextClientsTableView.setOnMouseClicked(action -> {
+
+            if (action.getClickCount() == 2) {
+                ClientsModel.TableObject selected = contextClientsTableView.getSelectionModel().getSelectedItem();
+                controller.setClientData(selected);
+
+                contextClientsStage.close();
+            }
+        });
+
         mainWindow.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
             if (contextProductStage.isShowing()) {
                 contextProductStage.close();
@@ -1030,13 +1168,17 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
             if (contextTruckTrailersStage.isShowing()) {
                 contextTruckTrailersStage.close();
             }
+            if (contextClientsStage.isShowing()) {
+                contextClientsStage.close();
+            }
         });
     }
 
     private void onRunDriverContextWidow(MouseEvent action) {
         Platform.runLater(() -> {
-            contextDriverTableView.getItems().clear();
+            contextDriverTableView.getItems().removeAll();
             contextDriverTableView.setItems(controller.getDriverContextList());
+            contextDriverTableFilter = TableFilter.forTableView(contextDriverTableView).apply();
             contextDriversStage.setWidth(600);
             contextDriversStage.setHeight(500);
             contextDriversStage.setResizable(false);
@@ -1048,8 +1190,9 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
 
     private void onRunTruckContainerContextWidow(MouseEvent action) {
         Platform.runLater(() -> {
-            contextTruckContainerTableView.getItems().clear();
+            contextTruckContainerTableView.getItems().removeAll();
             contextTruckContainerTableView.setItems(controller.getTruckContainerContextList());
+            contextTruckContainerFilter = TableFilter.forTableView(contextTruckContainerTableView).apply();
             contextTruckContainersStage.setWidth(600);
             contextTruckContainersStage.setHeight(500);
             contextTruckContainersStage.setResizable(false);
@@ -1061,8 +1204,9 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
 
     private void onRunTruckTrailerContextWidow(MouseEvent action) {
         Platform.runLater(() -> {
-            contextTruckTrailerTableView.getItems().clear();
+            contextTruckTrailerTableView.getItems().removeAll();
             contextTruckTrailerTableView.setItems(controller.getTruckTrailerContextList());
+            contextTruckTrailerTableFilter = TableFilter.forTableView(contextTruckTrailerTableView).apply();
             contextTruckTrailersStage.setWidth(600);
             contextTruckTrailersStage.setHeight(500);
             contextTruckTrailersStage.setResizable(false);
@@ -1074,8 +1218,9 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
 
     private void onRunTankContextWidow(MouseEvent action) {
         Platform.runLater(() -> {
-            contextTanksTableView.getItems().clear();
+            contextTanksTableView.getItems().removeAll();
             contextTanksTableView.setItems(controller.getTanksContextList());
+            contextTanksTableFilter = TableFilter.forTableView(contextTanksTableView).apply();
             contextTanksStage.setWidth(600);
             contextTanksStage.setHeight(500);
             contextTanksStage.setResizable(false);
@@ -1087,8 +1232,9 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
 
     private void onRunProductContextWidow(MouseEvent action) {
         Platform.runLater(() -> {
-            contextProductTableView.getItems().clear();
+            contextProductTableView.getItems().removeAll();
             contextProductTableView.setItems(controller.getMaterialContextList());
+            contextProductTableFilter = TableFilter.forTableView(contextProductTableView).apply();
             contextProductStage.setWidth(600);
             contextProductStage.setHeight(500);
             contextProductStage.setResizable(false);
@@ -1098,17 +1244,31 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         });
     }
 
-
     private void onRunStationContextWidow(MouseEvent action) {
         Platform.runLater(() -> {
-            contextStationsTableView.getItems().clear();
+            contextStationsTableView.getItems().removeAll();
             contextStationsTableView.setItems(controller.getStationContextList());
+            contextStationsTableFilter = TableFilter.forTableView(contextStationsTableView).apply();
             contextStationStage.setWidth(600);
             contextStationStage.setHeight(500);
             contextStationStage.setResizable(false);
             contextStationStage.setX(action.getScreenX());
             contextStationStage.setY(action.getScreenY());
             contextStationStage.show();
+        });
+    }
+
+    private void onRunClientContextWidow(MouseEvent action) {
+        Platform.runLater(() -> {
+            contextClientsTableView.getItems().removeAll();
+            contextClientsTableView.setItems(controller.getClientsContextList());
+            contextClientsFilter = TableFilter.forTableView(contextClientsTableView).apply();
+            contextClientsStage.setWidth(600);
+            contextClientsStage.setHeight(500);
+            contextClientsStage.setResizable(false);
+            contextClientsStage.setX(action.getScreenX() - 75);
+            contextClientsStage.setY(action.getScreenY());
+            contextClientsStage.show();
         });
     }
 

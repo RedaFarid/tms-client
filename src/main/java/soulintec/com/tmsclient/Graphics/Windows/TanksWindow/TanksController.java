@@ -16,12 +16,10 @@ import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.TankDTO;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsModel;
 import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
-import soulintec.com.tmsclient.Services.LogsService;
-import soulintec.com.tmsclient.Services.MaterialService;
-import soulintec.com.tmsclient.Services.StationService;
-import soulintec.com.tmsclient.Services.TanksService;
+import soulintec.com.tmsclient.Services.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,10 +44,10 @@ public class TanksController {
 
     @Autowired
     private TanksService tanksService;
-
     @Autowired
     private MaterialService materialService;
-
+    @Autowired
+    private TransactionService transactionService;
     @Autowired
     private StationService stationService;
     @Autowired
@@ -85,7 +83,6 @@ public class TanksController {
                 model.setDateOfQtySet(String.valueOf(tankDTO.getDateOfQtySet()));
                 model.setUserOfQtySet(tankDTO.getUserOfQtySet());
                 model.setMaterialID(tankDTO.getMaterialID());
-                model.setCalculatedQty(tankDTO.getCalculatedQty());
                 model.setCreatedBy(tableObject.getCreatedByColumn());
                 model.setCreationDate(String.valueOf(tableObject.getCreationDateColumn()));
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
@@ -111,7 +108,7 @@ public class TanksController {
 
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting tanks data"));
-                TanksView.showErrorWindow("Data doesn't exist", "Error getting data for selected tank");
+                MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected tank");
             });
         }
     }
@@ -125,15 +122,15 @@ public class TanksController {
         long materialID = model.getMaterialID();
 
         if (StringUtils.isBlank(name)) {
-            TanksView.showWarningWindow("Missing Data", "Please enter name");
+            MainWindow.showWarningWindow("Missing Data", "Please enter name");
             return;
         }
         if (station == 0) {
-            TanksView.showWarningWindow("Missing Data", "Please enter station");
+            MainWindow.showWarningWindow("Missing Data", "Please enter station");
             return;
         }
         if (capacity <= 0) {
-            TanksView.showWarningWindow("Missing Data", "Please enter capacity");
+            MainWindow.showWarningWindow("Missing Data", "Please enter capacity");
             return;
         }
 
@@ -159,21 +156,21 @@ public class TanksController {
 
                 if (save.equals("saved")) {
                     logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new tank : " + name + " in station : " + stationModel.getName()));
-                    TanksView.showInformationWindow("Info", save);
+                    MainWindow.showInformationWindow("Info", save);
                     update();
 
                 } else {
                     logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                    TanksView.showErrorWindow("Error inserting data", save);
+                    MainWindow.showErrorWindow("Error inserting data", save);
                 }
                 resetModel();
             } else {
-                TanksView.showErrorWindow("Error inserting data", "Tank already exist , please check entered data");
+                MainWindow.showErrorWindow("Error inserting data", "Tank already exist , please check entered data");
             }
 
 
         } catch (Exception e) {
-            TanksView.showErrorWindowForException("Error inserting data", e);
+            MainWindow.showErrorWindowForException("Error inserting data", e);
         }
     }
 
@@ -187,20 +184,20 @@ public class TanksController {
         long materialID = model.getMaterialID();
 
         if (tankId == 0) {
-            TanksView.showWarningWindow("Missing Data", "Please select tank");
+            MainWindow.showWarningWindow("Missing Data", "Please select tank");
             return;
         }
 
         if (StringUtils.isBlank(name)) {
-            TanksView.showWarningWindow("Missing Data", "Please enter name");
+            MainWindow.showWarningWindow("Missing Data", "Please enter name");
             return;
         }
         if (station == 0) {
-            TanksView.showWarningWindow("Missing Data", "Please enter station");
+            MainWindow.showWarningWindow("Missing Data", "Please enter station");
             return;
         }
         if (capacity <= 0) {
-            TanksView.showWarningWindow("Missing Data", "Please enter capacity");
+            MainWindow.showWarningWindow("Missing Data", "Please enter capacity");
             return;
         }
 
@@ -228,21 +225,21 @@ public class TanksController {
 
                 if (save.equals("saved")) {
                     logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for tank : " + model.getName() + " in station : " + stationModel.getName()));
-                    TanksView.showInformationWindow("Info", save);
+                    MainWindow.showInformationWindow("Info", save);
                     update();
 
                 } else {
                     logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                    TanksView.showErrorWindow("Error updating data", save);
+                    MainWindow.showErrorWindow("Error updating data", save);
                 }
                 resetModel();
             } else {
-                TanksView.showErrorWindow("Error inserting data", "tank doesn't exist , please check entered data");
+                MainWindow.showErrorWindow("Error inserting data", "tank doesn't exist , please check entered data");
             }
 
 
         } catch (Exception e) {
-            TanksView.showErrorWindowForException("Error updating data", e);
+            MainWindow.showErrorWindowForException("Error updating data", e);
         }
     }
 
@@ -250,17 +247,22 @@ public class TanksController {
     public void onDelete(MouseEvent mouseEvent) {
 
         long id = model.getTankId();
-        String deletedById = tanksService.deleteById(id);
-        if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting tank : " + model.getName() + " in station : " + stationModel.getName()));
-            TanksView.showInformationWindow("Info", deletedById);
-            update();
-
+        if (transactionService.findAll().stream().filter(i -> i.getTank() == id).count() != 0) {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Tank :  " + model.getName() + " can't be deleted because there are transactions relate to it "));
+            MainWindow.showErrorWindow("Error deleting record", "Tank can't be deleted because there are transactions relate to it \n please delete related transactions first");
         } else {
-            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
-            TanksView.showErrorWindow("Error deleting record", deletedById);
+            String deletedById = tanksService.deleteById(id);
+            if (deletedById.equals("deleted")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting tank : " + model.getName() + " in station : " + stationModel.getName()));
+                MainWindow.showInformationWindow("Info", deletedById);
+                update();
+
+            } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
+                MainWindow.showErrorWindow("Error deleting record", deletedById);
+            }
+            resetModel();
         }
-        resetModel();
     }
 
     public synchronized Task<String> updateTask() {
@@ -315,6 +317,7 @@ public class TanksController {
                 model.setCapacity(0.0);
                 model.setMaterialID(0);
                 model.setQty(0.0);
+                model.setCalculatedQty(0.0);
                 model.setDateOfQtySet(null);
                 model.setUserOfQtySet("");
                 model.setCreatedBy((""));
@@ -344,21 +347,22 @@ public class TanksController {
             for (TanksModel.TableObject item : getDataList()) {
                 try {
                     final TankDTO tank = tankDTOMap.get(item.getTankIdColumn());
-
-                    item.setNameColumn(tank.getName());
-                    item.setStationColumn(tank.getStation());
-                    item.setCapacityColumn(tank.getCapacity());
-                    item.setQtyColumn(tank.getQty());
-                    item.setDateOfQtySetColumn(tank.getDateOfQtySet());
-                    item.setUserOfQtySetColumn(tank.getUserOfQtySet());
-                    item.setMaterialIDColumn(tank.getMaterialID());
-                    item.setCreationDateColumn(tank.getCreationDate());
-                    item.setModifyDateColumn(tank.getModificationDate());
-                    item.setCreatedByColumn(tank.getCreatedBy());
-                    item.setOnTerminalColumn(tank.getOnTerminal());
-                    item.setCalculatedQtyColumn(tank.getCalculatedQty());
-
+                    if (tank != null) {
+                        item.setNameColumn(tank.getName());
+                        item.setStationColumn(tank.getStation());
+                        item.setCapacityColumn(tank.getCapacity());
+                        item.setQtyColumn(tank.getQty());
+                        item.setDateOfQtySetColumn(tank.getDateOfQtySet());
+                        item.setUserOfQtySetColumn(tank.getUserOfQtySet());
+                        item.setMaterialIDColumn(tank.getMaterialID());
+                        item.setCreationDateColumn(tank.getCreationDate());
+                        item.setModifyDateColumn(tank.getModificationDate());
+                        item.setCreatedByColumn(tank.getCreatedBy());
+                        item.setOnTerminalColumn(tank.getOnTerminal());
+                        item.setCalculatedQtyColumn(tank.getCalculatedQty());
+                    }
                 } catch (Exception e) {
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), e.getMessage()));
                     log.fatal(e);
                 }
             }
@@ -366,33 +370,28 @@ public class TanksController {
     }
 
     public void setProductData(MaterialsModel.TableObject selected) {
-
-        materialsModel.setMaterialId(selected.getMaterialIdColumn());
-        materialsModel.setName(selected.getNameColumn());
-        materialsModel.setDescription(selected.getDescriptionColumn());
-
+        if (selected != null) {
+            materialsModel.setMaterialId(selected.getMaterialIdColumn());
+            materialsModel.setName(selected.getNameColumn());
+            materialsModel.setDescription(selected.getDescriptionColumn());
+        }
     }
 
 
     public void setStationData(StationsModel.TableObject selected) {
-
-        stationModel.setName(selected.getNameColumn());
-        stationModel.setLocation(selected.getLocationColumn());
-        stationModel.setComputerName(selected.getComputerNameColumn());
-        stationModel.setStationId(selected.getStationIdColumn());
-
-    }
-
-    @Override
-    public String toString() {
-        return "Tanks";
+        if (selected != null) {
+            stationModel.setName(selected.getNameColumn());
+            stationModel.setLocation(selected.getLocationColumn());
+            stationModel.setComputerName(selected.getComputerNameColumn());
+            stationModel.setStationId(selected.getStationIdColumn());
+        }
     }
 
     public void setQty(double qty) {
         long tankId = model.getTankId();
 
         if (tankId == 0) {
-            TanksView.showWarningWindow("Missing Data", "Please select tank");
+            MainWindow.showWarningWindow("Missing Data", "Please select tank");
             return;
         }
         try {
@@ -402,20 +401,27 @@ public class TanksController {
                 String save = tanksService.save(item);
                 if (save.equals("saved")) {
                     logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating quantity for tank : " + model.getName() + " in station : " + stationModel.getName()));
-                    TanksView.showInformationWindow("Info", save);
+                    MainWindow.showInformationWindow("Info", save);
                     update();
 
                 } else {
                     logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                    TanksView.showErrorWindow("Error updating data", save);
+                    MainWindow.showErrorWindow("Error updating data", save);
                 }
                 resetModel();
             }), () -> {
-                TanksView.showWarningWindow("No selected tank", "Please select tank");
+                MainWindow.showWarningWindow("No selected tank", "Please select tank");
             });
 
         } catch (Exception e) {
-            TanksView.showErrorWindowForException("Error updating data", e);
+            MainWindow.showErrorWindowForException("Error updating data", e);
         }
     }
+
+    @Override
+    public String toString() {
+        return "Tanks";
+    }
+
+
 }

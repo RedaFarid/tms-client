@@ -14,7 +14,7 @@ import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.MaterialDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
-import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsView;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -51,12 +51,12 @@ public class MaterialService {
             body = forEntity.getBody();
 
         } catch (Exception e) {
-            MaterialsView.showErrorWindow("Error loading data", e.getMessage());
+            MainWindow.showErrorWindow("Error loading data", e.getMessage());
         }
         if (body.getException() == null) {
             return body.getMaterials();
         } else {
-            MaterialsView.showErrorWindow("Error loading data", body.getException().getMessage());
+            MainWindow.showErrorWindow("Error loading data", body.getException().getMessage());
             return materials;
         }
     }

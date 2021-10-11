@@ -1,32 +1,28 @@
 package soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow;
 
-
-import javafx.application.Platform;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.table.TableFilter;
-import org.controlsfx.dialog.ExceptionDialog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
-import soulintec.com.tmsclient.Entities.MaterialDTO;
 import soulintec.com.tmsclient.Graphics.Controls.DataEntryPartitionTitled;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedLongField;
@@ -286,48 +282,6 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         });
     }
 
-    @Async
-    private void onUpdate(MouseEvent mouseEvent) {
-        try {
-            if ((nameField.getText().length() > 0) && (creationDateField.getText().length() > 0) && (modificationDateField.getText().length() > 0)) {
-
-                materialService.findById(Long.parseLong(idField.getText())).ifPresentOrElse(materialDTO -> {
-                    materialDTO.setDescription(modificationDateField.getText());
-//                    materialDTO.setSpecificGravity(Double.parseDouble(SpecficGravityField.getText()));
-//                    materialDTO.setStockID(StockIDField.getText());
-                    materialDTO.setName(nameField.getText());
-
-                    materialService.save(materialDTO);
-                }, () -> {
-                });
-                update();
-            } else {
-                showErrorWindow("Error inserting data", "Driver not exist , please check entered data ...");
-            }
-        } catch (Exception e) {
-            showErrorWindowForException("Error updating driver", e);
-        }
-    }
-
-    @Async
-    private void onCreate(MouseEvent mouseEvent) {
-        try {
-            if ((nameField.getText().length() > 0) && (creationDateField.getText().length() > 0) && (modificationDateField.getText().length() > 0)) {
-                MaterialDTO product = new MaterialDTO(nameField.getText(),
-//                        StockIDField.getText(),
-//                        Double.parseDouble(SpecficGravityField.getText()),
-                        modificationDateField.getText());
-                materialService.save(product);
-            } else {
-                showErrorWindow("Error inserting data", "Driver already exist , please check entered data ...");
-            }
-            update();
-        } catch (Exception e) {
-            e.printStackTrace();
-            showErrorWindowForException("Error inserting client", e);
-        }
-    }
-
     public void update() {
         controller.updateDataList();
     }
@@ -336,79 +290,4 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         return root;
     }
 
-    public static void showErrorWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    public static void showErrorWindowForException(String header, Throwable e) {
-        Platform.runLater(() -> {
-            ExceptionDialog exceptionDialog = new ExceptionDialog(e);
-            exceptionDialog.setHeaderText(header);
-            exceptionDialog.getDialogPane().setMaxWidth(500);
-            exceptionDialog.initOwner(initialStage.getInitialStage());
-            exceptionDialog.initModality(Modality.WINDOW_MODAL);
-            exceptionDialog.show();
-
-        });
-    }
-
-    protected static void showErrorWindowForException(String header, Throwable e, Stage stage) {
-        Platform.runLater(() -> {
-            ExceptionDialog exceptionDialog = new ExceptionDialog(e);
-            exceptionDialog.setHeaderText(header);
-            exceptionDialog.getDialogPane().setMaxWidth(500);
-            exceptionDialog.initOwner(stage);
-            exceptionDialog.initModality(Modality.WINDOW_MODAL);
-            exceptionDialog.show();
-
-        });
-    }
-
-    protected static void showErrorWindowOneTime(String header, String content, Stage stage) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(stage);
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    protected static void showWarningWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Warning");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.WINDOW_MODAL);
-            alert.show();
-        });
-    }
-
-    protected static void showInformationWindow(String header, String content) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Notification");
-            alert.setHeaderText(header);
-            alert.setContentText(content);
-            alert.getDialogPane().setMaxWidth(500);
-            alert.initOwner(initialStage.getInitialStage());
-            alert.initModality(Modality.NONE);
-            alert.show();
-        });
-    }
 }

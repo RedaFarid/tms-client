@@ -13,8 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import soulintec.com.tmsclient.Entities.DriverDTO;
 import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
-import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -52,13 +52,13 @@ public class DriverService {
             body = forEntity.getBody();
 
         }catch (Exception e){
-            DriversView.showErrorWindow("Error loading data" , e.getMessage());
+            MainWindow.showErrorWindow("Error loading data" , e.getMessage());
         }
         if (body.getException() == null){
             return body.getDrivers();
         }
         else {
-            DriversView.showErrorWindow("Error loading data" , body.getException().getMessage());
+            MainWindow.showErrorWindow("Error loading data" , body.getException().getMessage());
             return driverDTOS;
         }
     }

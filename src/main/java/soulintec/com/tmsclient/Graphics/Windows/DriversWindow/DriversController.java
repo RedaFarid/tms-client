@@ -13,8 +13,10 @@ import soulintec.com.tmsclient.Entities.DriverDTO;
 import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.Permissions;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Services.DriverService;
 import soulintec.com.tmsclient.Services.LogsService;
+import soulintec.com.tmsclient.Services.TransactionService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,6 +32,8 @@ public class DriversController {
 
     @Autowired
     private DriverService driverService;
+    @Autowired
+    private TransactionService transactionService;
     @Autowired
     private LogsService logsService;
 
@@ -59,7 +63,7 @@ public class DriversController {
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting driver data"));
-                DriversView.showErrorWindow("Data doesn't exist", "Error getting data for selected driver");
+                MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected driver");
             });
         }
     }
@@ -74,23 +78,23 @@ public class DriversController {
         Permissions permissions = model.getPermissions();
 
         if (StringUtils.isBlank(name)) {
-            DriversView.showWarningWindow("Missing Data", "Please enter name");
+            MainWindow.showWarningWindow("Missing Data", "Please enter name");
             return;
         }
         if (StringUtils.isBlank(licenceNumber)) {
-            DriversView.showWarningWindow("Missing Data", "Please enter licence number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter licence number");
             return;
         }
         if (StringUtils.isBlank(mobileNumber)) {
-            DriversView.showWarningWindow("Missing Data", "Please enter mobile number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter mobile number");
             return;
         }
         if (licenceExpirationDate == null) {
-            DriversView.showWarningWindow("Missing Data", "Please enter expiration date");
+            MainWindow.showWarningWindow("Missing Data", "Please enter expiration date");
             return;
         }
         if (Objects.isNull(permissions)) {
-            DriversView.showWarningWindow("Missing Data", "Please select permission");
+            MainWindow.showWarningWindow("Missing Data", "Please select permission");
             return;
         }
 
@@ -107,17 +111,17 @@ public class DriversController {
 
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new driver : " + name));
-                DriversView.showInformationWindow("Info", save);
+                MainWindow.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                DriversView.showErrorWindow("Error inserting data", save);
+                MainWindow.showErrorWindow("Error inserting data", save);
             }
 
             resetModel();
         } else {
-            DriversView.showErrorWindow("Error inserting data", "Driver already exist , please check entered data");
+            MainWindow.showErrorWindow("Error inserting data", "Driver already exist , please check entered data");
         }
     }
 
@@ -132,28 +136,28 @@ public class DriversController {
         Permissions permissions = model.getPermissions();
 
         if (id == 0) {
-            DriversView.showWarningWindow("Missing Data", "Please select driver");
+            MainWindow.showWarningWindow("Missing Data", "Please select driver");
             return;
         }
 
         if (StringUtils.isBlank(name)) {
-            DriversView.showWarningWindow("Missing Data", "Please enter name");
+            MainWindow.showWarningWindow("Missing Data", "Please enter name");
             return;
         }
         if (StringUtils.isBlank(licenceNumber)) {
-            DriversView.showWarningWindow("Missing Data", "Please enter licence number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter licence number");
             return;
         }
         if (StringUtils.isBlank(mobileNumber)) {
-            DriversView.showWarningWindow("Missing Data", "Please enter mobile number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter mobile number");
             return;
         }
         if (licenceExpirationDate == null) {
-            DriversView.showWarningWindow("Missing Data", "Please enter expiration date");
+            MainWindow.showWarningWindow("Missing Data", "Please enter expiration date");
             return;
         }
         if (Objects.isNull(permissions)) {
-            DriversView.showWarningWindow("Missing Data", "Please select permission");
+            MainWindow.showWarningWindow("Missing Data", "Please select permission");
             return;
         }
 
@@ -170,35 +174,43 @@ public class DriversController {
             String save = driverService.save(driverDTO);
 
             if (save.equals("saved")) {
-                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for driver : "+ name));
-                DriversView.showInformationWindow("Info", save);
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for driver : " + name));
+                MainWindow.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                DriversView.showErrorWindow("Error updating data", save);
+                MainWindow.showErrorWindow("Error updating data", save);
             }
 
             resetModel();
         } else {
-            DriversView.showErrorWindow("Error updating data", "Driver doesn't exist , please check selected data");
+            MainWindow.showErrorWindow("Error updating data", "Driver doesn't exist , please check selected data");
         }
     }
 
     @Async
     public void onDelete(MouseEvent mouseEvent) {
         long id = model.getDriverId();
-        String deletedById = driverService.deleteById(id);
-        if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting driver : " + model.getName()));
-            DriversView.showInformationWindow("Info", deletedById);
-            updateDataList();
 
+        if (transactionService.findAll().stream().filter(i -> i.getDriver() == id).count() != 0) {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Driver :  " + model.getName() + " can't be deleted because there are transactions relate to it "));
+            MainWindow.showErrorWindow("Error deleting record", "Driver can't be deleted because there are transactions relate to it \n please delete related transactions first");
         } else {
-            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
-            DriversView.showErrorWindow("Error deleting record", deletedById);
+            String deletedById = driverService.deleteById(id);
+            if (deletedById.equals("deleted")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting driver : " + model.getName()));
+                MainWindow.showInformationWindow("Info", deletedById);
+                updateDataList();
+
+            } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
+                MainWindow.showErrorWindow("Error deleting record", deletedById);
+            }
+            resetModel();
+
         }
-        resetModel();
+
     }
 
     @Async

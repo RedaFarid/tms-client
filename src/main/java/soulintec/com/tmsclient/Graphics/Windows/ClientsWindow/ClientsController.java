@@ -13,8 +13,10 @@ import soulintec.com.tmsclient.Entities.ClientDTO;
 import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Services.ClientsService;
 import soulintec.com.tmsclient.Services.LogsService;
+import soulintec.com.tmsclient.Services.TransactionService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +30,8 @@ public class ClientsController {
 
     @Autowired
     private ClientsService clientsService;
+    @Autowired
+    private TransactionService transactionService;
     @Autowired
     private LogsService logsService;
 
@@ -56,7 +60,7 @@ public class ClientsController {
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Error getting client data"));
-                ClientView.showErrorWindow("Data doesn't exist", "Error getting data for selected client");
+                MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected client");
             });
         }
     }
@@ -71,23 +75,23 @@ public class ClientsController {
         String contactName = model.getContactName();
 
         if (StringUtils.isBlank(name)) {
-            ClientView.showWarningWindow("Missing Data", "Please enter name");
+            MainWindow.showWarningWindow("Missing Data", "Please enter name");
             return;
         }
         if (StringUtils.isBlank(contactEmail)) {
-            ClientView.showWarningWindow("Missing Data", "Please enter email");
+            MainWindow.showWarningWindow("Missing Data", "Please enter email");
             return;
         }
         if (StringUtils.isBlank(mainOffice)) {
-            ClientView.showWarningWindow("Missing Data", "Please enter main office");
+            MainWindow.showWarningWindow("Missing Data", "Please enter main office");
             return;
         }
         if (StringUtils.isBlank(contactTel)) {
-            ClientView.showWarningWindow("Missing Data", "Please enter phone number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter phone number");
             return;
         }
         if (StringUtils.isBlank(contactName)) {
-            ClientView.showWarningWindow("Missing Data", "Please enter  contact name");
+            MainWindow.showWarningWindow("Missing Data", "Please enter  contact name");
             return;
         }
 
@@ -102,16 +106,16 @@ public class ClientsController {
             String save = clientsService.save(clientDTO);
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new client :  " + name));
-                ClientView.showInformationWindow("Info", save);
+                MainWindow.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                ClientView.showErrorWindow("Error inserting data", save);
+                MainWindow.showErrorWindow("Error inserting data", save);
             }
             resetModel();
         } else {
-            ClientView.showErrorWindow("Error inserting data", "Client already exist , please check entered data");
+            MainWindow.showErrorWindow("Error inserting data", "Client already exist , please check entered data");
         }
     }
 
@@ -125,28 +129,28 @@ public class ClientsController {
         String contactName = model.getContactName();
 
         if (id == 0) {
-            DriversView.showWarningWindow("Missing Data", "Please select client");
+            MainWindow.showWarningWindow("Missing Data", "Please select client");
             return;
         }
 
         if (StringUtils.isBlank(name)) {
-            ClientView.showWarningWindow("Missing Data", "Please enter name");
+            MainWindow.showWarningWindow("Missing Data", "Please enter name");
             return;
         }
         if (StringUtils.isBlank(contactEmail)) {
-            ClientView.showWarningWindow("Missing Data", "Please enter email");
+            MainWindow.showWarningWindow("Missing Data", "Please enter email");
             return;
         }
         if (StringUtils.isBlank(mainOffice)) {
-            ClientView.showWarningWindow("Missing Data", "Please enter main office");
+            MainWindow.showWarningWindow("Missing Data", "Please enter main office");
             return;
         }
         if (StringUtils.isBlank(contactTel)) {
-            ClientView.showWarningWindow("Missing Data", "Please enter phone number");
+            MainWindow.showWarningWindow("Missing Data", "Please enter phone number");
             return;
         }
         if (StringUtils.isBlank(contactName)) {
-            ClientView.showWarningWindow("Missing Data", "Please enter  contact name");
+            MainWindow.showWarningWindow("Missing Data", "Please enter  contact name");
             return;
         }
 
@@ -162,16 +166,16 @@ public class ClientsController {
             String save = clientsService.save(clientDTO);
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for client : " + name));
-                ClientView.showInformationWindow("Info", save);
+                MainWindow.showInformationWindow("Info", save);
                 updateDataList();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
-                ClientView.showErrorWindow("Error updating data", save);
+                MainWindow.showErrorWindow("Error updating data", save);
             }
             resetModel();
         } else {
-            ClientView.showErrorWindow("Error updating data", "Client doesn't exist , please check entered data");
+            MainWindow.showErrorWindow("Error updating data", "Client doesn't exist , please check entered data");
         }
     }
 
@@ -179,17 +183,22 @@ public class ClientsController {
     public void onDelete(MouseEvent mouseEvent) {
 
         long id = model.getClientId();
-        String deletedById = clientsService.deleteById(id);
-        if (deletedById.equals("deleted")) {
-            logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting client : " + model.getName()));
-            ClientView.showInformationWindow("Info", deletedById);
-            updateDataList();
-
+        if (transactionService.findAll().stream().filter(i -> i.getClient() == id).count() != 0) {
+            logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Client :  " + model.getName() + " can't be deleted because there are transactions relate to it "));
+            MainWindow.showErrorWindow("Error deleting record", "Client can't be deleted because there are transactions relate to it \n please delete related transactions first");
         } else {
-            logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
-            ClientView.showErrorWindow("Error deleting record", deletedById);
+            String deletedById = clientsService.deleteById(id);
+            if (deletedById.equals("deleted")) {
+                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting client : " + model.getName()));
+                MainWindow.showInformationWindow("Info", deletedById);
+                updateDataList();
+
+            } else {
+                logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
+                MainWindow.showErrorWindow("Error deleting record", deletedById);
+            }
+            resetModel();
         }
-        resetModel();
     }
 
     @Async
