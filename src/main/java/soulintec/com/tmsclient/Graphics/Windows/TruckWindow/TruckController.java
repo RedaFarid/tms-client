@@ -1,21 +1,21 @@
 package soulintec.com.tmsclient.Graphics.Windows.TruckWindow;
 
+import com.google.common.collect.Lists;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
-import soulintec.com.tmsclient.Entities.LogDTO;
-import soulintec.com.tmsclient.Entities.Permissions;
-import soulintec.com.tmsclient.Entities.TruckContainerDTO;
-import soulintec.com.tmsclient.Entities.TruckTrailerDTO;
+import soulintec.com.tmsclient.Entities.*;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
-import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsView;
+import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
 import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.TransactionService;
 import soulintec.com.tmsclient.Services.TruckContainerService;
@@ -23,7 +23,10 @@ import soulintec.com.tmsclient.Services.TruckTrailerService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Executor;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -48,6 +51,12 @@ public class TruckController {
 
     @Autowired
     private LogsService logsService;
+
+    @Autowired(required = false)
+    private Executor containerExecutor;
+
+    @Autowired(required = false)
+    private Executor trailerExecutor;
 
     //Truck Container
     public TruckContainerModel getTruckContainerModel() {
@@ -124,7 +133,7 @@ public class TruckController {
                 if (save.equals("saved")) {
                     logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new truck container : " + containerNumber));
                     MainWindow.showInformationWindow("Info", save);
-                    updateContainerDataList();
+                    updateContainer();
 
                 } else {
                     logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
@@ -184,7 +193,7 @@ public class TruckController {
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for truck container : " + containerNumber));
                 MainWindow.showInformationWindow("Info", save);
-                updateContainerDataList();
+                updateContainer();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
@@ -207,7 +216,7 @@ public class TruckController {
             if (deletedById.equals("deleted")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting truck container : " + truckContainerModel.getContainerNumber()));
                 MainWindow.showInformationWindow("Info", deletedById);
-                updateContainerDataList();
+                updateContainer();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
@@ -217,20 +226,65 @@ public class TruckController {
         }
     }
 
-    @Async
-    public void updateContainerDataList() {
-        List<TruckContainerDTO> list = truckContainerService.findAll();
-        if (list != null) {
-            getTruckContainerDataList().removeAll(list.stream().map(TruckContainerModel.TableObject::createFromTruckContainerDTO)
-                    .filter(item -> !truckContainerTableList.contains(item))
-                    .collect(this::getTruckContainerDataList, ObservableList::add, ObservableList::addAll)
-                    .stream()
-                    .filter(tableListItem -> list.stream().map(TruckContainerModel.TableObject::createFromTruckContainerDTO)
-                            .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
-                    .collect(Collectors.toList()));
-        }
+    public synchronized Task<String> updateTaskContainer() {
+        return new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                List<TruckContainerDTO> dataBaseList = Lists.newArrayList(truckContainerService.findAll());
+
+                Platform.runLater(() -> {
+                    getTruckContainerDataList().removeAll(
+                            dataBaseList
+                                    .stream()
+                                    .map(TruckContainerModel.TableObject::createFromTruckContainerDTO)
+                                    .filter(item -> !getTruckContainerDataList().contains(item))
+                                    .collect(() -> getTruckContainerDataList(), ObservableList::add, ObservableList::addAll)
+                                    .stream()
+                                    .filter(tableListItem -> dataBaseList.stream().map(TruckContainerModel.TableObject::createFromTruckContainerDTO).noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem)))
+                                    .collect(Collectors.toList()));
+                });
+                detailedUpdatesContainer(dataBaseList);
+                return null;
+            }
+        };
+
 
     }
+
+    public ReadOnlyBooleanProperty updateContainer() {
+        final Task<String> updateTask = updateTaskContainer();
+        ReadOnlyBooleanProperty readOnlyBooleanProperty = updateTask.runningProperty();
+        containerExecutor.execute(updateTask);
+        return readOnlyBooleanProperty;
+    }
+
+    public void detailedUpdatesContainer(List<TruckContainerDTO> dataBaseList) {
+        if (getTruckContainerDataList() != null) {
+
+            final Map<Long, TruckContainerDTO> containerDTOMap = dataBaseList.stream().collect(Collectors.toMap(TruckContainerDTO::getId, Function.identity()));
+            for (TruckContainerModel.TableObject item : getTruckContainerDataList()) {
+                try {
+                    final TruckContainerDTO truckContainerDTO = containerDTOMap.get(item.getTruckContainerIdColumn());
+                    if (truckContainerDTO != null) {
+                        item.setContainerNumberColumn(truckContainerDTO.getContainerNumber());
+                        item.setLicenseNumberColumn(truckContainerDTO.getLicenceNumber());
+                        item.setCommentColumn(truckContainerDTO.getComment());
+                        item.setLicenceExpirationDateColumn(truckContainerDTO.getLicenceExpirationDate());
+                        item.setPermissionsColumn(truckContainerDTO.getPermissions());
+                        item.setCreationDateColumn(truckContainerDTO.getCreationDate());
+                        item.setModifyDateColumn(truckContainerDTO.getModifyDate());
+                        item.setCreatedByColumn(truckContainerDTO.getCreatedBy());
+                        item.setOnTerminalColumn(truckContainerDTO.getOnTerminal());
+                    }
+
+                } catch (Exception e) {
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), e.getMessage()));
+                    log.fatal(e);
+                }
+            }
+        }
+    }
+
 
     public void resetContainerModel() {
         Platform.runLater(() -> {
@@ -320,8 +374,7 @@ public class TruckController {
                 if (save.equals("saved")) {
                     logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new truck trailer : " + trailerNumber));
                     MainWindow.showInformationWindow("Info", save);
-                    updateTrailerDataList();
-
+                    updateTrailer();
                 } else {
                     logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
                     MainWindow.showErrorWindow("Error inserting data", save);
@@ -374,7 +427,7 @@ public class TruckController {
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for truck trailer : " + trailerNumber));
                 MainWindow.showInformationWindow("Info", save);
-                updateTrailerDataList();
+                updateTrailer();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
@@ -397,7 +450,7 @@ public class TruckController {
             if (deletedById.equals("deleted")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting truck trailer : " + truckTrailerModel.getTrailerNumber()));
                 MainWindow.showInformationWindow("Info", deletedById);
-                updateTrailerDataList();
+                updateTrailer();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
@@ -407,19 +460,63 @@ public class TruckController {
         }
     }
 
-    @Async
-    public void updateTrailerDataList() {
-        List<TruckTrailerDTO> list = truckTrailerService.findAll();
-        if (list != null) {
-            getTruckTrailerDataList().removeAll(list.stream().map(TruckTrailerModel.TableObject::createFromTruckTrailerDTO)
-                    .filter(item -> !truckTrailerTableList.contains(item))
-                    .collect(this::getTruckTrailerDataList, ObservableList::add, ObservableList::addAll)
-                    .stream()
-                    .filter(tableListItem -> list.stream().map(TruckTrailerModel.TableObject::createFromTruckTrailerDTO)
-                            .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
-                    .collect(Collectors.toList()));
-        }
+    public synchronized Task<String> updateTaskTrailer() {
+        return new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                List<TruckTrailerDTO> dataBaseList = Lists.newArrayList(truckTrailerService.findAll());
 
+                Platform.runLater(() -> {
+                    getTruckTrailerDataList().removeAll(
+                            dataBaseList
+                                    .stream()
+                                    .map(TruckTrailerModel.TableObject::createFromTruckTrailerDTO)
+                                    .filter(item -> !getTruckTrailerDataList().contains(item))
+                                    .collect(() -> getTruckTrailerDataList(), ObservableList::add, ObservableList::addAll)
+                                    .stream()
+                                    .filter(tableListItem -> dataBaseList.stream().map(TruckTrailerModel.TableObject::createFromTruckTrailerDTO).noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem)))
+                                    .collect(Collectors.toList()));
+                });
+                detailedUpdates(dataBaseList);
+                return null;
+            }
+        };
+
+
+    }
+
+    public ReadOnlyBooleanProperty updateTrailer() {
+        final Task<String> updateTask = updateTaskTrailer();
+        ReadOnlyBooleanProperty readOnlyBooleanProperty = updateTask.runningProperty();
+        trailerExecutor.execute(updateTask);
+        return readOnlyBooleanProperty;
+    }
+
+    public void detailedUpdates(List<TruckTrailerDTO> dataBaseList) {
+        if (getTruckTrailerDataList() != null) {
+
+            final Map<Long, TruckTrailerDTO> trailerDTOMap = dataBaseList.stream().collect(Collectors.toMap(TruckTrailerDTO::getId, Function.identity()));
+            for (TruckTrailerModel.TableObject item : getTruckTrailerDataList()) {
+                try {
+                    final TruckTrailerDTO truckTrailerDTO = trailerDTOMap.get(item.getTruckTrailerIdColumn());
+                    if (truckTrailerDTO != null) {
+                        item.setTrailerNumberColumn(truckTrailerDTO.getTrailerNumber());
+                        item.setLicenseNumberColumn(truckTrailerDTO.getLicenceNumber());
+                        item.setCommentColumn(truckTrailerDTO.getComment());
+                        item.setLicenceExpirationDateColumn(truckTrailerDTO.getLicenceExpirationDate());
+                        item.setPermissionsColumn(truckTrailerDTO.getPermissions());
+                        item.setCreationDateColumn(truckTrailerDTO.getCreationDate());
+                        item.setModifyDateColumn(truckTrailerDTO.getModifyDate());
+                        item.setCreatedByColumn(truckTrailerDTO.getCreatedBy());
+                        item.setOnTerminalColumn(truckTrailerDTO.getOnTerminal());
+                    }
+
+                } catch (Exception e) {
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), e.getMessage()));
+                    log.fatal(e);
+                }
+            }
+        }
     }
 
     public void resetTrailerModel() {

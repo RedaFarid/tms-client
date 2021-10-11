@@ -1,13 +1,13 @@
 package soulintec.com.tmsclient.Graphics.Windows.TruckWindow;
 
 import javafx.application.Platform;
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -157,6 +157,10 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
     
     @Autowired
     private TruckTrailerService truckTrailerService;
+
+    private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
+    private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
+
 
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
@@ -657,8 +661,12 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
     }
 
     public  void update() {
-        controller.updateTrailerDataList();
-        controller.updateContainerDataList();
+
+        ReadOnlyBooleanProperty update = controller.updateTrailer();
+        trailersTableView.cursorProperty().bind(Bindings.when(update).then(CURSOR_WAIT).otherwise(CURSOR_DEFAULT));
+
+        ReadOnlyBooleanProperty containerUpdate = controller.updateContainer();
+        containersTableView.cursorProperty().bind(Bindings.when(containerUpdate).then(CURSOR_WAIT).otherwise(CURSOR_DEFAULT));
 
     }
 
