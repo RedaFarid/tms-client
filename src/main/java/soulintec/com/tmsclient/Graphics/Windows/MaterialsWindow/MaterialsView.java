@@ -1,10 +1,10 @@
 package soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow;
 
-import javafx.beans.property.LongProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -82,6 +82,9 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
 
     @Autowired
     private MaterialService materialService;
+
+    private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
+    private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
 
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
@@ -283,7 +286,8 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
     }
 
     public void update() {
-        controller.updateDataList();
+        ReadOnlyBooleanProperty update = controller.update();
+        table.cursorProperty().bind(Bindings.when(update).then(CURSOR_WAIT).otherwise(CURSOR_DEFAULT));
     }
 
     public Node getRoot() {

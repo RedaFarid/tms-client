@@ -1,8 +1,11 @@
 package soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow;
 
+import com.google.common.collect.Lists;
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.scene.input.MouseEvent;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -12,13 +15,18 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.MaterialDTO;
+import soulintec.com.tmsclient.Entities.StationDTO;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
 import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.MaterialService;
 import soulintec.com.tmsclient.Services.TransactionService;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Controller
@@ -26,6 +34,9 @@ import java.util.stream.Collectors;
 public class MaterialController {
     private final MaterialsModel model = new MaterialsModel();
     private final ObservableList<MaterialsModel.TableObject> tableList = FXCollections.observableArrayList();
+
+    @Autowired(required = false)
+    private Executor executor;
 
     @Autowired
     private MaterialService materialService;
@@ -80,7 +91,7 @@ public class MaterialController {
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Inserting new material : " + name));
                 MainWindow.showInformationWindow("Info", save);
-                updateDataList();
+                update();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
@@ -118,7 +129,7 @@ public class MaterialController {
             if (save.equals("saved")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Updating data for material :  " + name));
                 MainWindow.showInformationWindow("Info", save);
-                updateDataList();
+                update();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), save));
@@ -141,7 +152,7 @@ public class MaterialController {
             if (deletedById.equals("deleted")) {
                 logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Deleting material : " + model.getName()));
                 MainWindow.showInformationWindow("Info", deletedById);
-                updateDataList();
+                update();
 
             } else {
                 logsService.save(new LogDTO(LogIdentifier.Error, toString(), deletedById));
@@ -149,21 +160,6 @@ public class MaterialController {
             }
             resetModel();
         }
-    }
-
-    @Async
-    public void updateDataList() {
-        List<MaterialDTO> list = materialService.findAll();
-        if (list != null) {
-            getDataList().removeAll(list.stream().map(MaterialsModel.TableObject::createFromMaterialDTO)
-                    .filter(item -> !tableList.contains(item))
-                    .collect(this::getDataList, ObservableList::add, ObservableList::addAll)
-                    .stream()
-                    .filter(tableListItem -> list.stream().map(MaterialsModel.TableObject::createFromMaterialDTO)
-                            .noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem))).sorted()
-                    .collect(Collectors.toList()));
-        }
-
     }
 
     public void resetModel() {
@@ -181,6 +177,63 @@ public class MaterialController {
             }
         });
     }
+
+    public synchronized Task<String> updateTask() {
+        return new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                List<MaterialDTO> dataBaseList = Lists.newArrayList(materialService.findAll());
+
+                Platform.runLater(() -> {
+                    getDataList().removeAll(
+                            dataBaseList
+                                    .stream()
+                                    .map(MaterialsModel.TableObject::createFromMaterialDTO)
+                                    .filter(item -> !getDataList().contains(item))
+                                    .collect(() -> getDataList(), ObservableList::add, ObservableList::addAll)
+                                    .stream()
+                                    .filter(tableListItem -> dataBaseList.stream().map(MaterialsModel.TableObject::createFromMaterialDTO).noneMatch(dataBaseItem -> dataBaseItem.equals(tableListItem)))
+                                    .collect(Collectors.toList()));
+                });
+                detailedUpdates(dataBaseList);
+                return null;
+            }
+        };
+
+
+    }
+
+    public ReadOnlyBooleanProperty update() {
+        final Task<String> updateTask = updateTask();
+        ReadOnlyBooleanProperty readOnlyBooleanProperty = updateTask.runningProperty();
+        executor.execute(updateTask);
+        return readOnlyBooleanProperty;
+    }
+
+    public void detailedUpdates(List<MaterialDTO> dataBaseList) {
+        if (getDataList() != null) {
+
+            final Map<Long, MaterialDTO> materialDTOMap = dataBaseList.stream().collect(Collectors.toMap(MaterialDTO::getId, Function.identity()));
+            for (MaterialsModel.TableObject item : getDataList()) {
+                try {
+                    final MaterialDTO materialDTO = materialDTOMap.get(item.getMaterialIdColumn());
+                    if (materialDTO != null) {
+                        item.setNameColumn(materialDTO.getName());
+                        item.setDescriptionColumn(materialDTO.getDescription());
+                        item.setCreationDateColumn(materialDTO.getCreationDate());
+                        item.setModifyDateColumn(materialDTO.getModifyDate());
+                        item.setCreatedByColumn(materialDTO.getCreatedBy());
+                        item.setOnTerminalColumn(materialDTO.getOnTerminal());
+                    }
+
+                } catch (Exception e) {
+                    logsService.save(new LogDTO(LogIdentifier.Error , toString() , e.getMessage()));
+                    log.fatal(e);
+                }
+            }
+        }
+    }
+
 
     @Override
     public String toString() {
