@@ -7,14 +7,19 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import soulintec.com.tmsclient.Entities.ClientDTO;
 import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.StationDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -39,16 +44,27 @@ public class StationService {
             logsService.save(new LogDTO(LogIdentifier.Error, "Computer name", e.getMessage()));
             log.error("Can't get computer name");
         }
-        ResponseEntity<String> saveResponseEntity = restTemplate.postForEntity(Utilities.iP + "/saveStations", stationDTO, String.class);
-        return saveResponseEntity.getBody();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(stationDTO, headers);
+
+        try {
+            ResponseEntity<String> saveResponseEntity = restTemplate.exchange(Utilities.iP + "/saveStations", HttpMethod.POST, request, String.class);
+            return saveResponseEntity.getBody();
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     public List<StationDTO> findAll() {
-
         Stations body = new Stations();
         List<StationDTO> stationDTOS = FXCollections.observableArrayList();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(headers);
+
         try {
-            ResponseEntity<Stations> forEntity = restTemplate.getForEntity(Utilities.iP + "/stations", Stations.class);
+            ResponseEntity<Stations> forEntity = restTemplate.exchange(Utilities.iP + "/stations", HttpMethod.GET, request, Stations.class);
             body = forEntity.getBody();
 
         } catch (Exception e) {
@@ -63,20 +79,41 @@ public class StationService {
     }
 
     public Optional<StationDTO> findById(Long id) {
-        ResponseEntity<StationDTO> forEntity = restTemplate.getForEntity(Utilities.iP + "/stationsById/" + id, StationDTO.class);
-
-        return Optional.ofNullable(forEntity.getBody());
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(headers);
+        try {
+            ResponseEntity<StationDTO> forEntity = restTemplate.exchange(Utilities.iP + "/stationsById/" + id, HttpMethod.GET, request, StationDTO.class);
+            return Optional.ofNullable(forEntity.getBody());
+        } catch (Exception e) {
+            MainWindow.showErrorWindow("Error loading data", e.getMessage());
+        }
+        return Optional.ofNullable(null);
     }
 
     public Optional<StationDTO> findByStationName(String stationName) {
-        ResponseEntity<StationDTO> forEntity = restTemplate.getForEntity(Utilities.iP + "/stationByName/" + stationName, StationDTO.class);
-
-        return Optional.ofNullable(forEntity.getBody());
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(headers);
+        try {
+            ResponseEntity<StationDTO> forEntity = restTemplate.exchange(Utilities.iP + "/stationByName/" + stationName, HttpMethod.GET, request, StationDTO.class);
+            return Optional.ofNullable(forEntity.getBody());
+        } catch (Exception e) {
+            MainWindow.showErrorWindow("Error loading data", e.getMessage());
+        }
+        return Optional.ofNullable(null);
     }
 
     public String deleteById(Long id) {
-        ResponseEntity<String> deleteResponseEntity = restTemplate.postForEntity(Utilities.iP + "/deleteStationsById", id, String.class);
-        return deleteResponseEntity.getBody();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(id, headers);
+        try {
+            ResponseEntity<String> deleteResponseEntity = restTemplate.exchange(Utilities.iP + "/deleteStationsById/", HttpMethod.POST, request, String.class);
+            return deleteResponseEntity.getBody();
+        } catch (Exception e) {
+            return (e.getMessage());
+        }
     }
 
     @Data

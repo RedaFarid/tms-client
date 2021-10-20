@@ -46,7 +46,7 @@ public class ClientsService {
         HttpEntity request = new HttpEntity(clientDTO, headers);
 
         try {
-            ResponseEntity<String> saveResponseEntity = new RestTemplate().exchange(Utilities.iP + "/saveClient", HttpMethod.POST, request, String.class);
+            ResponseEntity<String> saveResponseEntity = restTemplate.exchange(Utilities.iP + "/saveClient", HttpMethod.POST, request, String.class);
             return saveResponseEntity.getBody();
         } catch (Exception e) {
             return e.getMessage();
@@ -62,7 +62,7 @@ public class ClientsService {
         headers.add("Authorization", "Bearer " + LoginService.getToken());
         HttpEntity request = new HttpEntity(headers);
         try {
-            ResponseEntity<Clients> forEntity = new RestTemplate().exchange(Utilities.iP + "/clients", HttpMethod.GET, request, Clients.class);
+            ResponseEntity<Clients> forEntity = restTemplate.exchange(Utilities.iP + "/clients", HttpMethod.GET, request, Clients.class);
             body = forEntity.getBody();
         } catch (Exception e) {
             MainWindow.showErrorWindow("Error loading data", e.getMessage());
@@ -80,7 +80,7 @@ public class ClientsService {
         headers.add("Authorization", "Bearer " + LoginService.getToken());
         HttpEntity request = new HttpEntity(headers);
         try {
-            ResponseEntity<ClientDTO> forEntity = new RestTemplate().exchange(Utilities.iP + "/clientById/" + id, HttpMethod.GET, request, ClientDTO.class);
+            ResponseEntity<ClientDTO> forEntity = restTemplate.exchange(Utilities.iP + "/clientById/" + id, HttpMethod.GET, request, ClientDTO.class);
             return Optional.ofNullable(forEntity.getBody());
         } catch (Exception e) {
             MainWindow.showErrorWindow("Error loading data", e.getMessage());
@@ -93,7 +93,7 @@ public class ClientsService {
         headers.add("Authorization", "Bearer " + LoginService.getToken());
         HttpEntity request = new HttpEntity(headers);
         try {
-            ResponseEntity<ClientDTO> forEntity = new RestTemplate().exchange(Utilities.iP + "/clientByName/" + name, HttpMethod.GET, request, ClientDTO.class);
+            ResponseEntity<ClientDTO> forEntity = restTemplate.exchange(Utilities.iP + "/clientByName/" + name, HttpMethod.GET, request, ClientDTO.class);
             return Optional.ofNullable(forEntity.getBody());
         } catch (Exception e) {
             MainWindow.showErrorWindow("Error loading data", e.getMessage());
@@ -106,7 +106,7 @@ public class ClientsService {
         headers.add("Authorization", "Bearer " + LoginService.getToken());
         HttpEntity request = new HttpEntity(id, headers);
         try {
-            ResponseEntity<String> deleteResponseEntity = new RestTemplate().exchange(Utilities.iP + "/deleteClientById/", HttpMethod.POST, request, String.class);
+            ResponseEntity<String> deleteResponseEntity = restTemplate.exchange(Utilities.iP + "/deleteClientById/", HttpMethod.POST, request, String.class);
             return deleteResponseEntity.getBody();
         } catch (Exception e) {
             return (e.getMessage());

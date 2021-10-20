@@ -7,14 +7,19 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import soulintec.com.tmsclient.Entities.ClientDTO;
 import soulintec.com.tmsclient.Entities.TransactionDTO;
 import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -36,43 +41,67 @@ public class TransactionService {
             transactionDTO.setOnTerminal(InetAddress.getLocalHost().getHostName());
         } catch (UnknownHostException e) {
             transactionDTO.setOnTerminal("Unknown computer");
-            logsService.save(new LogDTO(LogIdentifier.Error, "Computer name",e.getMessage() ));
+            logsService.save(new LogDTO(LogIdentifier.Error, "Computer name", e.getMessage()));
             log.error("Can't get computer name");
         }
-        ResponseEntity<String> saveResponseEntity = restTemplate.postForEntity(Utilities.iP +"/saveTransaction",transactionDTO, String.class);
-        return saveResponseEntity.getBody();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(transactionDTO, headers);
+
+        try {
+            ResponseEntity<String> saveResponseEntity = restTemplate.postForEntity(Utilities.iP + "/saveTransaction", transactionDTO, String.class);
+            return saveResponseEntity.getBody();
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     public List<TransactionDTO> findAll() {
-
-        Transactions body= new Transactions();
+        Transactions body = new Transactions();
         List<TransactionDTO> TransactionDTOS = FXCollections.observableArrayList();
-        try{
-            ResponseEntity<Transactions> forEntity = restTemplate.getForEntity(Utilities.iP +"/transactions", Transactions.class);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(headers);
+
+        try {
+            ResponseEntity<Transactions> forEntity = restTemplate.exchange(Utilities.iP + "/transactions", HttpMethod.GET, request, Transactions.class);
             body = forEntity.getBody();
 
-        }catch (Exception e){
-            MainWindow.showErrorWindow("Error loading data" , e.getMessage());
+        } catch (Exception e) {
+            MainWindow.showErrorWindow("Error loading data", e.getMessage());
         }
-        if (body.getException() == null){
+        if (body.getException() == null) {
             return body.getTransaction();
-        }
-        else {
-            MainWindow.showErrorWindow("Error loading data" , body.getException().getMessage());
+        } else {
+            MainWindow.showErrorWindow("Error loading data", body.getException().getMessage());
             return TransactionDTOS;
         }
     }
 
     public Optional<TransactionDTO> findById(Long id) {
-        ResponseEntity<TransactionDTO> forEntity = restTemplate.getForEntity(Utilities.iP +"/transactionById/"+id, TransactionDTO.class);
-
-        return Optional.ofNullable(forEntity.getBody());
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(headers);
+        try {
+            ResponseEntity<TransactionDTO> forEntity = restTemplate.exchange(Utilities.iP + "/transactionById/" + id, HttpMethod.GET, request, TransactionDTO.class);
+            return Optional.ofNullable(forEntity.getBody());
+        } catch (Exception e) {
+            MainWindow.showErrorWindow("Error loading data", e.getMessage());
+        }
+        return Optional.ofNullable(null);
     }
 
-
     public String deleteById(Long id) {
-        ResponseEntity<String> deleteResponseEntity = restTemplate.postForEntity(Utilities.iP +"/deleteTransactionById",id,  String.class);
-        return deleteResponseEntity.getBody();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(id, headers);
+        try {
+            ResponseEntity<String> deleteResponseEntity = restTemplate.exchange(Utilities.iP + "/deleteTransactionById/", HttpMethod.POST, request, String.class);
+            return deleteResponseEntity.getBody();
+        } catch (Exception e) {
+            return (e.getMessage());
+        }
     }
 
     @Data

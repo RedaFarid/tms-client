@@ -31,7 +31,6 @@ public class RolesService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String save(RoleDTO roleDTO) {
-
         ResponseEntity<String> saveResponseEntity = restTemplate.postForEntity(Utilities.iP + "/saveRole", roleDTO, String.class);
         return saveResponseEntity.getBody();
     }
@@ -56,11 +55,11 @@ public class RolesService {
         ResponseEntity<RoleDTO> forEntity = restTemplate.getForEntity(Utilities.iP + "/roleById/" + id, RoleDTO.class);
         return Optional.ofNullable(forEntity.getBody());
     }
-
-    public Optional<RoleDTO> findByUsername(String name) {
-        ResponseEntity<RoleDTO> forEntity = restTemplate.getForEntity(Utilities.iP + "/roleByUserName/" + name, RoleDTO.class);
-        return Optional.ofNullable(forEntity.getBody());
-    }
+//
+//    public Optional<RoleDTO> findByUsername(String name) {
+//        ResponseEntity<RoleDTO> forEntity = restTemplate.getForEntity(Utilities.iP + "/roleByUserName/" + name, RoleDTO.class);
+//        return Optional.ofNullable(forEntity.getBody());
+//    }
 
     public Optional<RoleDTO> findByName(String name) {
         ResponseEntity<RoleDTO> forEntity = restTemplate.getForEntity(Utilities.iP + "/roleByName/" + name, RoleDTO.class);

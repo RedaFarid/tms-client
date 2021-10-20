@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -17,6 +20,7 @@ import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientView;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
+import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -48,8 +52,13 @@ public class LogsService {
     public List<LogDTO> findAll() {
         Logs body = new Logs();
         List<LogDTO> logDTOS = FXCollections.observableArrayList();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(headers);
+
         try {
-            ResponseEntity<Logs> forEntity = restTemplate.getForEntity(Utilities.iP + "/logs", Logs.class);
+            ResponseEntity<Logs> forEntity = restTemplate.exchange(Utilities.iP + "/logs", HttpMethod.GET, request, Logs.class);
             body = forEntity.getBody();
 
         } catch (Exception e) {
