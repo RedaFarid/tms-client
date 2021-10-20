@@ -257,6 +257,7 @@ public class ClientsController {
     }
 
     public ReadOnlyBooleanProperty update() {
+
         final Task<String> updateTask = updateTask();
         ReadOnlyBooleanProperty readOnlyBooleanProperty = updateTask.runningProperty();
         executor.execute(updateTask);

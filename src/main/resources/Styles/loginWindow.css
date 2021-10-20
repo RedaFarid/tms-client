@@ -1,0 +1,44 @@
+.root {
+    -fx-background-color: white;/*linear-gradient( lightblue, white );*/
+    -fx-border-color: orange;
+    -fx-border-width:0;
+    -fx-padding: 10 10 10 10;
+}
+
+.button {
+    -fx-background-color: lightBlue ;
+    -fx-font-size: 13pt ;
+    -fx-font-weight: bold;
+    -fx-padding: 1 1 1 1;
+
+    -fx-text-fill: DARKCYAN;
+}
+
+.button:hover {
+    -fx-background-color:DARKCYAN ;
+    -fx-text-fill: white;
+}
+
+.button:pressed {
+    -fx-background-color:DARKCYAN ;
+    -fx-text-fill: black;
+}
+
+.label {
+    -fx-background-color: transparent;
+    -fx-text-fill:teal;
+    -fx-font-weight: bold;
+    -fx-font-size: 20pt ;
+}
+
+.text-field{
+   -fx-font-family: "arial";
+   -fx-border-width:0 0 2 0;
+   -fx-border-color: DARKCYAN;
+
+   -fx-background-color: transparent;
+   -fx-prompt-text-fill: lightBlue;
+   -fx-font-size: 17pt ;
+   -fx-text-fill: DARKCYAN;
+   /*-fx-font-weight: bold;*/
+}

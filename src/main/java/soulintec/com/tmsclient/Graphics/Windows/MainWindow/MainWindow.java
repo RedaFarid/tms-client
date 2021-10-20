@@ -8,6 +8,7 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
+import soulintec.com.tmsclient.Graphics.Windows.LoginWindow;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogManagerView;
 import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientView;
 import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
@@ -41,6 +43,11 @@ import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationView;
 import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.TanksView;
 import soulintec.com.tmsclient.Graphics.Windows.TransactionsWindow.TransactionView;
 import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
+import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+
 
 @Log4j2
 @Component
@@ -61,6 +68,9 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private StringProperty tempStringProperty = new SimpleStringProperty();
 
     private Clock clock = new Clock();
+
+    @Autowired
+    private Executor executor;
 
     private IconicButton Iconic = new IconicButton(Resources.getResource("Icons/maxminbuttons.png").toString());
 
@@ -121,8 +131,14 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
     @Autowired
     LogManagerView logView;
-
+    @Autowired
+    private LoginWindow loginWindow;
     private Notifications notifications;
+
+    private Stage loginStage;
+
+    @Autowired
+    private LoginService loginService;
 
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
@@ -139,6 +155,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     }
 
     private void graphicsBuild() {
+        loginStage = new Stage();
+        loginStage.initOwner(window);
 
         mainLabel.setStyle("-fx-font-weight:normal;-fx-font-style:italic;-fx-text-fill:Darkblue;-fx-font-size:20;");
         mainLabel.setAlignment(Pos.CENTER);
@@ -222,7 +240,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     }
 
     private void actionHandling() {
-//        window.setOnCloseRequest(Event::consume);
+        window.setOnCloseRequest(Event::consume);
+
         logIn.setOnMouseClicked(this::onLogIn);
         logOut.setOnMouseClicked(this::onLogOut);
         exit.setOnMouseClicked(action -> window.close());
@@ -294,11 +313,19 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     }
 
     private void onLogIn(MouseEvent mouseEvent) {
+        loginWindow.showAndReturnUser(window, executor).thenAccept(loginWindowReturnObject -> {
+            if (loginWindowReturnObject.getStatus().equals(LoginWindow.LoginStatus.OK)) {
+                String login = loginService.login(loginWindowReturnObject.getUserName(), loginWindowReturnObject.getPassword());
 
+                if(!login.equals("")) {
+                    showErrorWindow("Login field", "Wrong username or password");
+                }
+            }
+        });
     }
 
     private void onLogOut(MouseEvent mouseEvent) {
-
+//        userAuthorizationService.requestLogOff();
     }
 
     public Stage getInitialStage() {

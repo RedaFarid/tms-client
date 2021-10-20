@@ -261,7 +261,7 @@ public class TanksController {
     public synchronized Task<String> updateTask() {
         return new Task<>() {
             @Override
-            protected String call() throws Exception {
+            protected String call() {
                 List<TankDTO> dataBaseList = Lists.newArrayList(tanksService.findAll());
 
                 Platform.runLater(() -> {

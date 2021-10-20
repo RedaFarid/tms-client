@@ -25,7 +25,6 @@ import soulintec.com.tmsclient.Services.TanksService;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -109,10 +108,6 @@ public class StationsController {
             MainWindow.showWarningWindow("Missing Data", "Please enter location");
             return;
         }
-//        if (Objects.isNull(computerName)) {
-//            MainWindow.showWarningWindow("Missing Data", "Please select computer");
-//            return;
-//        }
 
         try {
 
@@ -163,10 +158,6 @@ public class StationsController {
             MainWindow.showWarningWindow("Missing Data", "Please enter location");
             return;
         }
-//        if (Objects.isNull(computerName)) {
-//            MainWindow.showWarningWindow("Missing Data", "Please select computer");
-//            return;
-//        }
 
         try {
             if (stationService.findById(id).isPresent()) {

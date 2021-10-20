@@ -61,8 +61,6 @@ public class TruckTrailerService {
             MainWindow.showErrorWindow("Error loading data", body.getException().getMessage());
             return truckTrailerDTOS;
         }
-
-
     }
 
     public Optional<TruckTrailerDTO> findById(Long id) {
