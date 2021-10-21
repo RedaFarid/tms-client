@@ -13,31 +13,45 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import soulintec.com.tmsclient.Entities.Authorization.AppUserDTO;
 import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
+import soulintec.com.tmsclient.Entities.Authorization.RoleRef;
+import soulintec.com.tmsclient.Entities.LogDTO;
+import soulintec.com.tmsclient.Entities.MaterialDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Optional;
 
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class RolesService {
+public class RoleRefService {
 
     @Autowired
     private LogsService logsService;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public String save(RoleDTO roleDTO) {
-        ResponseEntity<String> saveResponseEntity = restTemplate.postForEntity(Utilities.iP + "/saveRole", roleDTO, String.class);
-        return saveResponseEntity.getBody();
+    public String save(RoleRef roleRef) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(roleRef, headers);
+
+        try {
+            ResponseEntity<String> saveResponseEntity = restTemplate.exchange(Utilities.iP + "/saveRoleRef", HttpMethod.POST, request, String.class);
+            return saveResponseEntity.getBody();
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
-    public List<RoleDTO> findAll() {
+
+    public List<RoleRef> findAll() {
 //        // create headers
 //        HttpHeaders headers = new HttpHeaders();
 //        headers.add("Authorization", "Bearer " + LoginService.getToken());
@@ -46,20 +60,21 @@ public class RolesService {
 //        HttpEntity request = new HttpEntity(headers);
 //
 //        // make a request
-//        ResponseEntity<Roles> response = new RestTemplate().exchange(Utilities.iP + "/roles", HttpMethod.GET, request, Roles.class);
+//        ResponseEntity<RoleRefs> response = new RestTemplate().exchange(Utilities.iP + "/roleRefs", HttpMethod.GET, request, RoleRefs.class);
 //
-//        return response.getBody().getRole();
-        Roles body = new Roles();
-        List<RoleDTO> appUserDTOS = FXCollections.observableArrayList();
+//        return response.getBody().getRoleRefs();
+
+        RoleRefs body = new RoleRefs();
+        List<RoleRef> appUserDTOS = FXCollections.observableArrayList();
         try {
-            ResponseEntity<Roles> forEntity = restTemplate.getForEntity(Utilities.iP + "/roles", Roles.class);
+            ResponseEntity<RoleRefs> forEntity = restTemplate.getForEntity(Utilities.iP + "/roleRefs", RoleRefs.class);
             body = forEntity.getBody();
 
         } catch (Exception e) {
             MainWindow.showErrorWindow("Error loading data", e.getMessage());
         }
         if (body.getException() == null) {
-            return body.getRole();
+            return body.getRoleRefs();
         } else {
             MainWindow.showErrorWindow("Error loading data", body.getException().getMessage());
             return appUserDTOS;
@@ -67,11 +82,11 @@ public class RolesService {
 
     }
 
-    //TODO-- add exception
-    public Optional<RoleDTO> findById(Long id) {
-        ResponseEntity<RoleDTO> forEntity = restTemplate.getForEntity(Utilities.iP + "/roleById/" + id, RoleDTO.class);
-        return Optional.ofNullable(forEntity.getBody());
-    }
+//    //TODO-- add exception
+//    public Optional<RoleDTO> findById(Long id) {
+//        ResponseEntity<RoleDTO> forEntity = restTemplate.getForEntity(Utilities.iP + "/roleById/" + id, RoleDTO.class);
+//        return Optional.ofNullable(forEntity.getBody());
+//    }
 //
 //    public Optional<RoleDTO> findByUsername(String name) {
 //        ResponseEntity<RoleDTO> forEntity = restTemplate.getForEntity(Utilities.iP + "/roleByUserName/" + name, RoleDTO.class);
@@ -92,8 +107,8 @@ public class RolesService {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Roles {
-        private List<RoleDTO> role;
+    public static class RoleRefs {
+        private List<RoleRef> roleRefs;
         private Exception exception;
     }
 

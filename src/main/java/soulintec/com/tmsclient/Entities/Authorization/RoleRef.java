@@ -12,4 +12,5 @@ import lombok.ToString;
 
 public class RoleRef {
     private long roleId;
+    private long userId;
 }

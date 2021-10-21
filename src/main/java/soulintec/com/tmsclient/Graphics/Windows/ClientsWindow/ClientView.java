@@ -20,19 +20,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
+import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Graphics.Controls.DataEntryPartitionTitled;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedLongField;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedTextField;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindowController;
 import soulintec.com.tmsclient.Services.ClientsService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ClientView implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private ClientsController controller;
+    private MainWindowController mainWindowController;
     private ClientsModel model;
 
     protected static MainWindow initialStage;
@@ -98,6 +103,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
     private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
     private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
 
+    public List<RoleDTO> authorityDTOSList = new ArrayList<>();
 
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
@@ -111,6 +117,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
     private void initialization() {
         initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
         controller = ApplicationContext.applicationContext.getBean(ClientsController.class);
+        mainWindowController = ApplicationContext.applicationContext.getBean(MainWindowController.class);
         model = controller.getModel();
 
         dataEntryPartitionTitled = new DataEntryPartitionTitled("Client");
@@ -165,7 +172,28 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
     }
 
     private void userAuthorities() {
+        createWindowAuthoritiesTemplate();
+        assignAuthoritiesTemplate();
+    }
 
+    private void createWindowAuthoritiesTemplate() {
+        authorityDTOSList.clear();
+        //Authorities
+        RoleDTO saving = new RoleDTO("Save " + this);
+        RoleDTO deleting = new RoleDTO("Delete " + this);
+
+        authorityDTOSList.add(saving);
+        authorityDTOSList.add(deleting);
+
+        mainWindowController.createWindowAuthorities(authorityDTOSList);
+    }
+
+    private void assignAuthoritiesTemplate() {
+        if (authorityDTOSList.size() != 0) {
+            insertClient.setAuthority(authorityDTOSList.get(0));
+            updateClient.setAuthority(authorityDTOSList.get(1));
+            deleteClient.setAuthority(authorityDTOSList.get(1));
+        }
     }
 
     private void graphicsBuilder() {
@@ -354,5 +382,10 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
     public void update() {
         ReadOnlyBooleanProperty update = controller.update();
         table.cursorProperty().bind(Bindings.when(update).then(CURSOR_WAIT).otherwise(CURSOR_DEFAULT));
+    }
+
+    @Override
+    public String toString() {
+        return "Clients";
     }
 }

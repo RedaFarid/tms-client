@@ -1,5 +1,6 @@
 package soulintec.com.tmsclient.Services;
 
+import javafx.collections.FXCollections;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import soulintec.com.tmsclient.Entities.Authorization.AppUserDTO;
+import soulintec.com.tmsclient.Entities.StationDTO;
 import soulintec.com.tmsclient.Graphics.Controls.Utilities;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
 
 
@@ -37,17 +40,33 @@ public class UserService {
     }
 
     public List<AppUserDTO> findAll() {
-        // create headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + LoginService.getToken());
+//        // create headers
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add("Authorization", "Bearer " + LoginService.getToken());
+//
+//        // create request
+//        HttpEntity request = new HttpEntity(/*headers*/);
+//
+//        // make a request
+//        ResponseEntity<Users> response = new RestTemplate().exchange(Utilities.iP + "/users", HttpMethod.GET, request, Users.class);
+//
+//        return response.getBody().getUser();
 
-        // create request
-        HttpEntity request = new HttpEntity(headers);
+        Users body = new Users();
+        List<AppUserDTO> appUserDTOS = FXCollections.observableArrayList();
+        try {
+            ResponseEntity<Users> forEntity = restTemplate.getForEntity(Utilities.iP + "/users", Users.class);
+            body = forEntity.getBody();
 
-        // make a request
-        ResponseEntity<Users> response = new RestTemplate().exchange(Utilities.iP + "/users", HttpMethod.GET, request, Users.class);
-
-        return response.getBody().getUser();
+        } catch (Exception e) {
+            MainWindow.showErrorWindow("Error loading data", e.getMessage());
+        }
+        if (body.getException() == null) {
+            return body.getUser();
+        } else {
+            MainWindow.showErrorWindow("Error loading data", body.getException().getMessage());
+            return appUserDTOS;
+        }
 
     }
 
