@@ -25,21 +25,26 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
+import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Entities.Permissions;
 import soulintec.com.tmsclient.Graphics.Controls.DataEntryPartitionTitled;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedLongField;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedTextField;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindowController;
 import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
 import soulintec.com.tmsclient.Services.DriverService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class DriversView implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private DriversController controller;
+    private MainWindowController mainWindowController;
     private DriversModel model;
 
     protected static MainWindow initialStage;
@@ -101,6 +106,8 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
     private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
     private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
 
+    public List<RoleDTO> authorityDTOSList = new ArrayList<>();
+
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
         mainWindow = event.getStage();
@@ -113,6 +120,8 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
     private void initialization() {
         initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
         controller = ApplicationContext.applicationContext.getBean(DriversController.class);
+        mainWindowController = ApplicationContext.applicationContext.getBean(MainWindowController.class);
+
         model = controller.getModel();
 
         dataEntryPartitionTitled = new DataEntryPartitionTitled("Driver");
@@ -165,9 +174,29 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
     }
 
     private void userAuthorities() {
-
+        createWindowAuthoritiesTemplate();
+        assignAuthoritiesTemplate();
     }
 
+    private void createWindowAuthoritiesTemplate() {
+        authorityDTOSList.clear();
+        //Authorities
+        RoleDTO saving = new RoleDTO("Save " + this);
+        RoleDTO deleting = new RoleDTO("Delete " + this);
+
+        authorityDTOSList.add(saving);
+        authorityDTOSList.add(deleting);
+
+        mainWindowController.createWindowAuthorities(authorityDTOSList);
+    }
+
+    private void assignAuthoritiesTemplate() {
+        if (authorityDTOSList.size() != 0) {
+            insert.setAuthority(authorityDTOSList.get(0));
+            update.setAuthority(authorityDTOSList.get(1));
+            delete.setAuthority(authorityDTOSList.get(1));
+        }
+    }
     private void graphicsBuilder() {
         headerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:white;-fx-font-size:25;");
         headerLabel.setAlignment(Pos.CENTER);
@@ -368,4 +397,8 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         return root;
     }
 
+    @Override
+    public String toString() {
+        return "Drivers";
+    }
 }
