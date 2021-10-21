@@ -62,6 +62,12 @@ public class LoginService {
         return error;
     }
 
+    public void logOut() {
+        token = "";
+        error = "";
+        userObject.setUsername("");
+    }
+
     public static String getToken() {
         return token;
     }

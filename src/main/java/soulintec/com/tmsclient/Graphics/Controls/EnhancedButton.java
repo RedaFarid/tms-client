@@ -28,7 +28,6 @@ public class EnhancedButton extends Button implements Observer {
     private static List<RoleDTO> roleDTOS = new LinkedList<>();
     private static List<RoleRef> roleRefs = new LinkedList<>();
 
-    private static final ConfigurableApplicationContext applicationContext = ApplicationContext.applicationContext;
     private static final LoginService loginService = ApplicationContext.applicationContext.getBean(LoginService.class);
     private static final UserService userService = ApplicationContext.applicationContext.getBean(UserService.class);
     private static final RolesService rolesService = ApplicationContext.applicationContext.getBean(RolesService.class);
@@ -36,14 +35,15 @@ public class EnhancedButton extends Button implements Observer {
 
     public EnhancedButton(String s) {
         super(s);
+
+    }
+
+    public void setAuthority(RoleDTO authority) {
         if (users.isEmpty() || roleDTOS.isEmpty()) {
             users.addAll(userService.findAll());
             roleDTOS.addAll(rolesService.findAll());
             roleRefs.addAll(roleRef.findAll());
         }
-    }
-
-    public void setAuthority(RoleDTO authority) {
         this.authority = authority;
         loginService.addObserver(this);
         setDisable(authority != null);
@@ -55,22 +55,6 @@ public class EnhancedButton extends Button implements Observer {
     }
 
     public void checkAuthority(String string) {
-//        users.stream().filter(userObject -> userObject.getName().trim().equalsIgnoreCase(string.trim()))
-//                .findFirst()
-//                .ifPresentOrElse(userDTO -> {
-//                            roleDTOS.stream().filter(roleDTO -> roleDTO.getName().equals(authority.getName())).findFirst().ifPresentOrElse(roleDTO -> {
-//                                        RoleRef roleRef = new RoleRef(userDTO.getUserId(), roleDTO.getId());
-//                                        authorized = roleRefs.stream().filter(roleRef1 -> roleRef1.getUserId() == userDTO.getUserId()).collect(Collectors.toList()).contains(roleRef);
-//                                    }
-//                                    , () -> {
-//                                        authorized = false;
-//                                    });
-//                        }
-//                        , () -> {
-//                            authorized = false;
-//                        });
-//        setDisable(!authorized);
-
         users.stream().filter(userObject -> userObject.getName().trim().equalsIgnoreCase(string.trim()))
                 .findFirst()
                 .ifPresentOrElse(userDTO -> {
@@ -90,7 +74,6 @@ public class EnhancedButton extends Button implements Observer {
                             authorized = false;
                         });
         setDisable(!authorized);
-
     }
 }
 

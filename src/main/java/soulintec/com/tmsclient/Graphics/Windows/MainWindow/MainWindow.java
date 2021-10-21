@@ -31,10 +31,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
-import soulintec.com.tmsclient.Graphics.Windows.LoginWindow;
-import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogManagerView;
+import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientView;
 import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
+import soulintec.com.tmsclient.Graphics.Windows.LoginWindow;
+import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogManagerView;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.IconicButton;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.WindowInterfaceMessages;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes.windowReferenceNode;
@@ -45,7 +46,8 @@ import soulintec.com.tmsclient.Graphics.Windows.TransactionsWindow.TransactionVi
 import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
 
-import java.util.concurrent.ExecutionException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 
@@ -68,6 +70,11 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private StringProperty tempStringProperty = new SimpleStringProperty();
 
     private Clock clock = new Clock();
+
+    public List<RoleDTO> authorityDTOSList = new ArrayList<>();
+
+    private MainWindowController controller;
+
 
     @Autowired
     private Executor executor;
@@ -310,14 +317,17 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             logView.update();
             root.setCenter(logView.getRoot());
         });
+
+        userAuthorities();
     }
 
     private void onLogIn(MouseEvent mouseEvent) {
+        root.setCenter(null);
         loginWindow.showAndReturnUser(window, executor).thenAccept(loginWindowReturnObject -> {
             if (loginWindowReturnObject.getStatus().equals(LoginWindow.LoginStatus.OK)) {
                 String login = loginService.login(loginWindowReturnObject.getUserName(), loginWindowReturnObject.getPassword());
 
-                if(!login.equals("")) {
+                if (!login.equals("")) {
                     showErrorWindow("Login field", "Wrong username or password");
                 }
             }
@@ -325,7 +335,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     }
 
     private void onLogOut(MouseEvent mouseEvent) {
-//        userAuthorizationService.requestLogOff();
+        root.setCenter(null);
+        loginService.logOut();
     }
 
     public Stage getInitialStage() {
@@ -345,6 +356,31 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         products.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         stations.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
 
+        controller = ApplicationContext.applicationContext.getBean(MainWindowController.class);
+
+
+    }
+
+    private void userAuthorities() {
+        createWindowAuthoritiesTemplate();
+        assignAuthoritiesTemplate();
+    }
+
+    private void createWindowAuthoritiesTemplate() {
+        authorityDTOSList.clear();
+        //Authorities
+        RoleDTO clientView = new RoleDTO("View Clients");
+
+        authorityDTOSList.add(clientView);
+
+        controller.createWindowAuthorities(authorityDTOSList);
+    }
+
+    private void assignAuthoritiesTemplate() {
+        if (authorityDTOSList.size() != 0) {
+            clients.setAuthority(authorityDTOSList.get(0));
+
+        }
     }
 
 

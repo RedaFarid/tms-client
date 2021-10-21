@@ -15,10 +15,24 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
+import soulintec.com.tmsclient.ApplicationContext;
+import soulintec.com.tmsclient.Entities.Authorization.AppUserDTO;
+import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
+import soulintec.com.tmsclient.Entities.Authorization.RoleRef;
+import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
+import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
+import soulintec.com.tmsclient.Services.RoleRefService;
+import soulintec.com.tmsclient.Services.RolesService;
+import soulintec.com.tmsclient.Services.UserService;
+import soulintec.com.tmsclient.UserObeserver.Observer;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
 
-public class windowReferenceNode extends HBox {
+public class windowReferenceNode extends HBox implements Observer {
 
     private boolean userControl = false;
     private StringProperty windowInterface = new SimpleStringProperty();
@@ -42,6 +56,18 @@ public class windowReferenceNode extends HBox {
     private Background logoffBackground = new Background(new BackgroundFill(Color.CADETBLUE, new CornerRadii(0.1), Insets.EMPTY));
     private Background activeBackground = new Background(new BackgroundFill(Color.ORANGERED, new CornerRadii(0), Insets.EMPTY));
     private Background focusedBackground = new Background(new BackgroundFill(Color.ORANGE, new CornerRadii(0), Insets.EMPTY));
+
+    private RoleDTO authority;
+    private boolean authorized = false;
+
+    private List<AppUserDTO> users = new LinkedList<>();
+    private List<RoleDTO> roleDTOS = new LinkedList<>();
+    private List<RoleRef> roleRefs = new LinkedList<>();
+
+    private LoginService loginService;
+    private UserService userService;
+    private RolesService rolesService;
+    private RoleRefService roleRef;
 
     public windowReferenceNode(String windowIconRef, String labelName, StringProperty tempStringProperty) {
         this.tempStringProperty = tempStringProperty;
@@ -186,4 +212,45 @@ public class windowReferenceNode extends HBox {
         this.callback = callback;
     }
 
+    public void setAuthority(RoleDTO authority) {
+        loginService = ApplicationContext.applicationContext.getBean(LoginService.class);
+        userService = ApplicationContext.applicationContext.getBean(UserService.class);
+        rolesService = ApplicationContext.applicationContext.getBean(RolesService.class);
+        roleRef = ApplicationContext.applicationContext.getBean(RoleRefService.class);
+        if (users.isEmpty() || roleDTOS.isEmpty()) {
+            users.addAll(userService.findAll());
+            roleDTOS.addAll(rolesService.findAll());
+            roleRefs.addAll(roleRef.findAll());
+        }
+        this.authority = authority;
+        loginService.addObserver(this);
+        setDisable(authority != null);
+    }
+
+    @Override
+    public void update(String username) {
+        checkAuthority(username);
+    }
+
+    public void checkAuthority(String string) {
+        users.stream().filter(userObject -> userObject.getName().trim().equalsIgnoreCase(string.trim()))
+                .findFirst()
+                .ifPresentOrElse(userDTO -> {
+                            roleDTOS.stream().filter(roleDTO -> roleDTO.getName().equals(authority.getName()))
+                                    .findFirst()
+                                    .ifPresentOrElse(role -> {
+                                        roleRefs.stream().filter(ref -> ref.getUserId() == userDTO.getUserId()).forEach(item -> {
+                                            if (item.getRoleId() == role.getId()) {
+                                                authorized = true;
+                                            }
+                                        });
+                                    }, () -> {
+                                        authorized = false;
+                                    });
+                        }
+                        , () -> {
+                            authorized = false;
+                        });
+        setDisable(!authorized);
+    }
 }
