@@ -1,5 +1,6 @@
 package soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -224,7 +225,7 @@ public class windowReferenceNode extends HBox implements Observer {
         }
         this.authority = authority;
         loginService.addObserver(this);
-        setDisable(authority != null);
+        windowInterface.setValue(WindowInterfaceMessages.DisableMonitoring.name());
     }
 
     @Override
@@ -242,15 +243,18 @@ public class windowReferenceNode extends HBox implements Observer {
                                         roleRefs.stream().filter(ref -> ref.getUserId() == userDTO.getUserId()).forEach(item -> {
                                             if (item.getRoleId() == role.getId()) {
                                                 authorized = true;
+                                                windowInterface.setValue(WindowInterfaceMessages.EnableMonitoring.name());
                                             }
                                         });
                                     }, () -> {
                                         authorized = false;
+                                        windowInterface.setValue(WindowInterfaceMessages.DisableMonitoring.name());
                                     });
                         }
                         , () -> {
                             authorized = false;
+                            windowInterface.setValue(WindowInterfaceMessages.DisableMonitoring.name());
+
                         });
-        setDisable(!authorized);
     }
 }
