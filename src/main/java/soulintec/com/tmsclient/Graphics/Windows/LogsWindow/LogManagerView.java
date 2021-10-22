@@ -17,16 +17,22 @@ import org.controlsfx.control.table.TableFilter;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
+import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Entities.LogDTO;
+import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindowController;
 import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.TanksController;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class LogManagerView implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private LogController controller;
+    private MainWindowController mainWindowController;
     private LogsModel model;
 
     protected static MainWindow initialStage;
@@ -45,16 +51,18 @@ public class LogManagerView implements ApplicationListener<ApplicationContext.Ap
     private TableColumn<LogsModel.TableObject, StringProperty> onTerminalColumn;
     private TableColumn<LogsModel.TableObject, ObjectProperty<LocalDateTime>> timeColumn;
 
-    private Button export_to_txt_file;
+    private EnhancedButton export_to_txt_file;
 
     private ObjectProperty<Cursor> CURSOR_DEFAULT;
     private ObjectProperty<Cursor> CURSOR_WAIT;
 
+    public List<RoleDTO> authorityDTOSList = new ArrayList<>();
+
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
         mainWindow = event.getStage();
-
         init();
+        userAuthorities();
         graphicsBuilder();
         actionHandling();
     }
@@ -62,6 +70,8 @@ public class LogManagerView implements ApplicationListener<ApplicationContext.Ap
     private void init() {
         initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
         controller = ApplicationContext.applicationContext.getBean(LogController.class);
+        mainWindowController = ApplicationContext.applicationContext.getBean(MainWindowController.class);
+
         model = controller.getModel();
 
         root = new VBox();
@@ -75,7 +85,7 @@ public class LogManagerView implements ApplicationListener<ApplicationContext.Ap
         onTerminalColumn = new TableColumn<>("On terminal");
         timeColumn = new TableColumn<>("Time");
 
-        export_to_txt_file = new Button("Export to csv file");
+        export_to_txt_file = new EnhancedButton("Export to csv file");
 
         CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
         CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
@@ -140,6 +150,26 @@ public class LogManagerView implements ApplicationListener<ApplicationContext.Ap
         root.setPadding(new Insets(10));
         root.setSpacing(10);
     }
+    private void userAuthorities() {
+        createWindowAuthoritiesTemplate();
+        assignAuthoritiesTemplate();
+    }
+
+    private void createWindowAuthoritiesTemplate() {
+        authorityDTOSList.clear();
+        //Authorities
+        RoleDTO export = new RoleDTO("Export " + this);
+
+        authorityDTOSList.add(export);
+
+        mainWindowController.createWindowAuthorities(authorityDTOSList);
+    }
+
+    private void assignAuthoritiesTemplate() {
+        if (authorityDTOSList.size() != 0) {
+            export_to_txt_file.setAuthority(authorityDTOSList.get(0));
+        }
+    }
 
     private void actionHandling() {
         export_to_txt_file.setOnMouseClicked(a -> this.export());
@@ -160,5 +190,8 @@ public class LogManagerView implements ApplicationListener<ApplicationContext.Ap
         return root;
     }
 
-
+    @Override
+    public String toString() {
+        return "Logs";
+    }
 }

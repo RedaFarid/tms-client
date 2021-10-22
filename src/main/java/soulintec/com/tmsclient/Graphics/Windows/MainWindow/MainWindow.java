@@ -371,9 +371,11 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         //Authorities
         RoleDTO clientViewRole = new RoleDTO("View Clients");
         RoleDTO driverViewRole = new RoleDTO("View Drivers");
+        RoleDTO logViewRole = new RoleDTO("View Logs");
 
         authorityDTOSList.add(clientViewRole);
         authorityDTOSList.add(driverViewRole);
+        authorityDTOSList.add(logViewRole);
 
         controller.createWindowAuthorities(authorityDTOSList);
     }
@@ -382,6 +384,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         if (authorityDTOSList.size() != 0) {
             clients.setAuthority(authorityDTOSList.get(0));
             drivers.setAuthority(authorityDTOSList.get(1));
+            logger.setAuthority(authorityDTOSList.get(2));
 
         }
     }
