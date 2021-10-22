@@ -23,19 +23,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
+import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Graphics.Controls.DataEntryPartitionTitled;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedLongField;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedTextField;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindowController;
 import soulintec.com.tmsclient.Services.MaterialService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class MaterialsView implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private MaterialController controller;
+    private MainWindowController mainWindowController;
     private MaterialsModel model;
 
     protected static MainWindow initialStage;
@@ -86,6 +91,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
     private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
     private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
 
+    public List<RoleDTO> authorityDTOSList = new ArrayList<>();
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
         mainWindow = event.getStage();
@@ -99,6 +105,8 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
     private void initialization() {
         initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
         controller = ApplicationContext.applicationContext.getBean(MaterialController.class);
+        mainWindowController = ApplicationContext.applicationContext.getBean(MainWindowController.class);
+
         model = controller.getModel();
 
         root = new VBox();
@@ -140,7 +148,28 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
     }
 
     private void userAuthorities() {
+        createWindowAuthoritiesTemplate();
+        assignAuthoritiesTemplate();
+    }
 
+    private void createWindowAuthoritiesTemplate() {
+        authorityDTOSList.clear();
+        //Authorities
+        RoleDTO saving = new RoleDTO("Save " + this);
+        RoleDTO deleting = new RoleDTO("Delete " + this);
+
+        authorityDTOSList.add(saving);
+        authorityDTOSList.add(deleting);
+
+        mainWindowController.createWindowAuthorities(authorityDTOSList);
+    }
+
+    private void assignAuthoritiesTemplate() {
+        if (authorityDTOSList.size() != 0) {
+            insert.setAuthority(authorityDTOSList.get(0));
+            update.setAuthority(authorityDTOSList.get(1));
+            delete.setAuthority(authorityDTOSList.get(1));
+        }
     }
 
     private void graphicsBuilder() {
@@ -294,4 +323,8 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         return root;
     }
 
+    @Override
+    public String toString() {
+        return "Materials";
+    }
 }

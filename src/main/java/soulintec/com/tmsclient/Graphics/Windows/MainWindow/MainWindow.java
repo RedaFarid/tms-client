@@ -82,7 +82,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private IconicButton Iconic = new IconicButton(Resources.getResource("Icons/maxminbuttons.png").toString());
 
     private windowReferenceNode logger = new windowReferenceNode(Resources.getResource("Icons/log.png").toString(), "Log", tempStringProperty);
-    private windowReferenceNode products = new windowReferenceNode(Resources.getResource("Icons/stocks.png").toString(), "Materials", tempStringProperty);
+    private windowReferenceNode materials = new windowReferenceNode(Resources.getResource("Icons/stocks.png").toString(), "Materials", tempStringProperty);
     private windowReferenceNode clients = new windowReferenceNode(Resources.getResource("Icons/clients.png").toString(), "Clients", tempStringProperty);
     private windowReferenceNode drivers = new windowReferenceNode(Resources.getResource("Icons/drivers.png").toString(), "Drivers", tempStringProperty);
     private windowReferenceNode tanks = new windowReferenceNode(Resources.getResource("Icons/tanks.png").toString(), "Tanks", tempStringProperty);
@@ -191,7 +191,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         buttonsview.getChildren().add(logger);
         buttonsview.getChildren().add(new Separator());
         buttonsview.getChildren().add(stations);
-        buttonsview.getChildren().add(products);
+        buttonsview.getChildren().add(materials);
         buttonsview.getChildren().add(clients);
         buttonsview.getChildren().add(drivers);
         buttonsview.getChildren().add(tanks);
@@ -260,7 +260,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
                 Timeline timeline = new Timeline(frame);
                 timeline.play();
                 logger.setIconic(IconicStatus);
-                products.setIconic(IconicStatus);
+                materials.setIconic(IconicStatus);
                 clients.setIconic(IconicStatus);
                 drivers.setIconic(IconicStatus);
                 tanks.setIconic(IconicStatus);
@@ -273,7 +273,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
                 timeline.play();
                 timeline.setOnFinished(a -> {
                     logger.setIconic(IconicStatus);
-                    products.setIconic(IconicStatus);
+                    materials.setIconic(IconicStatus);
                     clients.setIconic(IconicStatus);
                     drivers.setIconic(IconicStatus);
                     tanks.setIconic(IconicStatus);
@@ -295,7 +295,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             driversView.update();
             root.setCenter(driversView.getRoot());
         });
-        products.setOnIconClicked((String param) -> {
+        materials.setOnIconClicked((String param) -> {
             materialsView.update();
             root.setCenter(materialsView.getRoot());
         });
@@ -353,7 +353,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         tanks.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         drivers.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         clients.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
-        products.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
+        materials.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         stations.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
 
         controller = ApplicationContext.applicationContext.getBean(MainWindowController.class);
@@ -372,10 +372,12 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         RoleDTO clientViewRole = new RoleDTO("View Clients");
         RoleDTO driverViewRole = new RoleDTO("View Drivers");
         RoleDTO logViewRole = new RoleDTO("View Logs");
+        RoleDTO materialViewRole = new RoleDTO("View Materials");
 
         authorityDTOSList.add(clientViewRole);
         authorityDTOSList.add(driverViewRole);
         authorityDTOSList.add(logViewRole);
+        authorityDTOSList.add(materialViewRole);
 
         controller.createWindowAuthorities(authorityDTOSList);
     }
@@ -385,6 +387,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             clients.setAuthority(authorityDTOSList.get(0));
             drivers.setAuthority(authorityDTOSList.get(1));
             logger.setAuthority(authorityDTOSList.get(2));
+            materials.setAuthority(authorityDTOSList.get(3));
 
         }
     }
