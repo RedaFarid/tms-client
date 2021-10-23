@@ -193,7 +193,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
     private void assignAuthoritiesTemplate() {
         if (authorityDTOSList.size() != 0) {
             insert.setAuthority(authorityDTOSList.get(0));
-            update.setAuthority(authorityDTOSList.get(1));
+            update.setAuthority(authorityDTOSList.get(0));
             delete.setAuthority(authorityDTOSList.get(1));
         }
     }

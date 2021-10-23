@@ -7,6 +7,7 @@ import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Services.RolesService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @Log4j2
@@ -16,7 +17,7 @@ public class MainWindowController {
 
     public void createWindowAuthorities(List<RoleDTO> authList) {
         authList.forEach(roleDTO -> {
-            boolean contains = rolesService.findAll().contains(roleDTO);
+            boolean contains = rolesService.findAll().stream().map(RoleDTO::getName).collect(Collectors.toList()).contains(roleDTO.getName());
             if(!contains){
                 rolesService.save(roleDTO);
             }

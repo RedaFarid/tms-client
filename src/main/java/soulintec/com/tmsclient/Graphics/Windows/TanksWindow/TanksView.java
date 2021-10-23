@@ -23,18 +23,23 @@ import org.controlsfx.dialog.ExceptionDialog;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
+import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Graphics.Controls.*;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindowController;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsModel;
 import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Log4j2
 @Component
 public class TanksView implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private TanksController controller;
+    private MainWindowController mainWindowController;
     private TanksModel model;
     private MaterialsModel materialsModel;
     private StationsModel stationsModel;
@@ -148,6 +153,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
     private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
 
+    public List<RoleDTO> authorityDTOSList = new ArrayList<>();
 
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
@@ -155,19 +161,46 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         contextProductStage = new Stage();
         contextStationStage = new Stage();
         qtyStage = new Stage();
-        userAuthorities();
         init();
+        userAuthorities();
         graphicsBuilder();
         actionHandling();
     }
 
     private void userAuthorities() {
-
+        createWindowAuthoritiesTemplate();
+        assignAuthoritiesTemplate();
     }
 
-    private void init() {
+    private void createWindowAuthoritiesTemplate() {
+        authorityDTOSList.clear();
+        //Authorities
+        RoleDTO saving = new RoleDTO("Save " + this);
+        RoleDTO deleting = new RoleDTO("Delete " + this);
+        RoleDTO setQty = new RoleDTO("Set Quantity In " + this);
+
+        authorityDTOSList.add(saving);
+        authorityDTOSList.add(deleting);
+        authorityDTOSList.add(setQty);
+
+        mainWindowController.createWindowAuthorities(authorityDTOSList);
+    }
+
+    private void assignAuthoritiesTemplate() {
+        if (authorityDTOSList.size() != 0) {
+            insertTank.setAuthority(authorityDTOSList.get(0));
+            updateTank.setAuthority(authorityDTOSList.get(0));
+            deleteTank.setAuthority(authorityDTOSList.get(1));
+            setQty.setAuthority(authorityDTOSList.get(2));
+        }
+    }
+
+
+        private void init() {
         initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
         controller = ApplicationContext.applicationContext.getBean(TanksController.class);
+        mainWindowController = ApplicationContext.applicationContext.getBean(MainWindowController.class);
+
         model = controller.getModel();
         materialsModel = controller.getMaterialsModel();
         stationsModel = controller.getStationsModel();
@@ -719,4 +752,8 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         return root;
     }
 
+    @Override
+    public String toString() {
+        return "Tanks";
+    }
 }

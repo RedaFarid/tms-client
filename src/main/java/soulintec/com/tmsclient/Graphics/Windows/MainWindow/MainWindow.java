@@ -47,7 +47,9 @@ import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 
@@ -71,7 +73,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
     private Clock clock = new Clock();
 
-    public List<RoleDTO> authorityDTOSList = new ArrayList<>();
+    public Map<String,RoleDTO> authorityDTOSList = new HashMap<>();
 
     private MainWindowController controller;
 
@@ -89,6 +91,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private windowReferenceNode trucks = new windowReferenceNode(Resources.getResource("Icons/trucks.png").toString(), "Trucks", tempStringProperty);
     private windowReferenceNode stations = new windowReferenceNode(Resources.getResource("Icons/stations.png").toString(), "Stations", tempStringProperty);
 
+    private Image mainImage = new Image(Resources.getResource("Icons/SoulintecMain.png").toString());
     private Image loginImage = new Image(Resources.getResource("Icons/login.png").toString());
     private Image logoutimage = new Image(Resources.getResource("Icons/logout.png").toString());
     private Image dashboardimage = new Image(Resources.getResource("Icons/dashboard.png").toString());
@@ -164,6 +167,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private void graphicsBuild() {
         loginStage = new Stage();
         loginStage.initOwner(window);
+
+        root.setCenter(new ImageView(mainImage));
 
         mainLabel.setStyle("-fx-font-weight:normal;-fx-font-style:italic;-fx-text-fill:Darkblue;-fx-font-size:20;");
         mainLabel.setAlignment(Pos.CENTER);
@@ -322,7 +327,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     }
 
     private void onLogIn(MouseEvent mouseEvent) {
-        root.setCenter(null);
+        root.setCenter(new ImageView(mainImage));
         loginWindow.showAndReturnUser(window, executor).thenAccept(loginWindowReturnObject -> {
             if (loginWindowReturnObject.getStatus().equals(LoginWindow.LoginStatus.OK)) {
                 String login = loginService.login(loginWindowReturnObject.getUserName(), loginWindowReturnObject.getPassword());
@@ -335,7 +340,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     }
 
     private void onLogOut(MouseEvent mouseEvent) {
-        root.setCenter(null);
+        root.setCenter(new ImageView(mainImage));
         loginService.logOut();
     }
 
@@ -373,21 +378,27 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         RoleDTO driverViewRole = new RoleDTO("View Drivers");
         RoleDTO logViewRole = new RoleDTO("View Logs");
         RoleDTO materialViewRole = new RoleDTO("View Materials");
+        RoleDTO stationViewRole = new RoleDTO("View Stations");
+        RoleDTO tankViewRole = new RoleDTO("View Tanks");
 
-        authorityDTOSList.add(clientViewRole);
-        authorityDTOSList.add(driverViewRole);
-        authorityDTOSList.add(logViewRole);
-        authorityDTOSList.add(materialViewRole);
+        authorityDTOSList.put("Clients",clientViewRole);
+        authorityDTOSList.put("Drivers",driverViewRole);
+        authorityDTOSList.put("Logs",logViewRole);
+        authorityDTOSList.put("Materials",materialViewRole);
+        authorityDTOSList.put("Stations",stationViewRole);
+        authorityDTOSList.put("Tanks",tankViewRole);
 
-        controller.createWindowAuthorities(authorityDTOSList);
+        controller.createWindowAuthorities(authorityDTOSList.values().stream().toList());
     }
 
     private void assignAuthoritiesTemplate() {
         if (authorityDTOSList.size() != 0) {
-            clients.setAuthority(authorityDTOSList.get(0));
-            drivers.setAuthority(authorityDTOSList.get(1));
-            logger.setAuthority(authorityDTOSList.get(2));
-            materials.setAuthority(authorityDTOSList.get(3));
+            clients.setAuthority(authorityDTOSList.get("Clients"));
+            drivers.setAuthority(authorityDTOSList.get("Drivers"));
+            logger.setAuthority(authorityDTOSList.get("Logs"));
+            materials.setAuthority(authorityDTOSList.get("Materials"));
+            stations.setAuthority(authorityDTOSList.get("Stations"));
+            tanks.setAuthority(authorityDTOSList.get("Tanks"));
 
         }
     }

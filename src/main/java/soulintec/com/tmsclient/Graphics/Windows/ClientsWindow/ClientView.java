@@ -188,7 +188,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
     private void assignAuthoritiesTemplate() {
         if (authorityDTOSList.size() != 0) {
             insertClient.setAuthority(authorityDTOSList.get(0));
-            updateClient.setAuthority(authorityDTOSList.get(1));
+            updateClient.setAuthority(authorityDTOSList.get(0));
             deleteClient.setAuthority(authorityDTOSList.get(1));
         }
     }
