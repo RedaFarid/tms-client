@@ -1,10 +1,8 @@
 package soulintec.com.tmsclient.Graphics.Windows.TruckWindow;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -14,31 +12,32 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.table.TableFilter;
-import org.controlsfx.dialog.ExceptionDialog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
+import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Entities.Permissions;
-import soulintec.com.tmsclient.Entities.TruckTrailerDTO;
 import soulintec.com.tmsclient.Graphics.Controls.DataEntryPartitionTitled;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedLongField;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedTextField;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
-import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.TanksModel;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindowController;
 import soulintec.com.tmsclient.Services.TruckContainerService;
 import soulintec.com.tmsclient.Services.TruckTrailerService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class TruckView implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private TruckController controller;
+    private MainWindowController mainWindowController;
     private TruckContainerModel containerModel;
     private TruckTrailerModel trailerModel;
 
@@ -154,26 +153,29 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
 
     @Autowired
     private TruckContainerService truckContainerService;
-    
+
     @Autowired
     private TruckTrailerService truckTrailerService;
 
     private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
     private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
 
+    public List<RoleDTO> authorityDTOSList = new ArrayList<>();
 
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
         mainWindow = event.getStage();
         initialization();
-        userAuthorities();
         graphicsBuilder();
         actionHandling();
+        userAuthorities();
     }
 
     private void initialization() {
         initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
         controller = ApplicationContext.applicationContext.getBean(TruckController.class);
+        mainWindowController = ApplicationContext.applicationContext.getBean(MainWindowController.class);
+
         containerModel = controller.getTruckContainerModel();
         trailerModel = controller.getTruckTrailerModel();
 
@@ -279,10 +281,39 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
     }
 
     private void userAuthorities() {
-
+        createWindowAuthoritiesTemplate();
+        assignAuthoritiesTemplate();
     }
 
-    private  void graphicsBuilder() {
+    private void createWindowAuthoritiesTemplate() {
+        authorityDTOSList.clear();
+        //Authorities
+        RoleDTO savingTrailer = new RoleDTO("Save Truck Trailers");
+        RoleDTO deletingTrailer = new RoleDTO("Delete Truck Trailers");
+        RoleDTO savingContainer = new RoleDTO("Save Truck Containers");
+        RoleDTO deletingContainer = new RoleDTO("Delete Truck Containers");
+
+        authorityDTOSList.add(savingTrailer);
+        authorityDTOSList.add(deletingTrailer);
+        authorityDTOSList.add(savingContainer);
+        authorityDTOSList.add(deletingContainer);
+
+        mainWindowController.createWindowAuthorities(authorityDTOSList);
+    }
+
+    private void assignAuthoritiesTemplate() {
+        if (authorityDTOSList.size() != 0) {
+            insertTrailer.setAuthority(authorityDTOSList.get(0));
+            updateTrailer.setAuthority(authorityDTOSList.get(0));
+            deleteTrailer.setAuthority(authorityDTOSList.get(1));
+
+            insertContainer.setAuthority(authorityDTOSList.get(2));
+            updateContainer.setAuthority(authorityDTOSList.get(2));
+            deleteContainer.setAuthority(authorityDTOSList.get(3));
+        }
+    }
+
+    private void graphicsBuilder() {
         headerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:white;-fx-font-size:25;");
         headerLabel.setAlignment(Pos.CENTER);
         headerLabel.setTextAlignment(TextAlignment.CENTER);
@@ -298,7 +329,8 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         root.setCenter(tabContainer);
         root.setPadding(new Insets(10));
     }
-    private  void trailersGraphicsBuilder() {
+
+    private void trailersGraphicsBuilder() {
         //control buttons configuration
         insertTrailer.setPrefWidth(160);
         deleteTrailer.setPrefWidth(160);
@@ -377,7 +409,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailerLicenceNumberField.setMaxLength(14);
         trailerNumberField.setMaxLength(14);
         trailerNumberField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue!=null){
+            if (newValue != null) {
                 if (!newValue.matches("[0-9]*")) {
                     trailerNumberField.setText(oldValue);
                 }
@@ -398,7 +430,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailersDataEntry.add(trailerLicenceExpirationDateLabel, 3, 2);
         trailersDataEntry.add(trailerLicenceExpirationDateField, 4, 2);
         trailersDataEntry.add(trailerCommentLabel, 5, 2);
-        trailersDataEntry.add(trailerCommentField, 6, 2,3,1);
+        trailersDataEntry.add(trailerCommentField, 6, 2, 3, 1);
 
         trailersDataEntry.add(trailerCreationDateLabel, 1, 3);
         trailersDataEntry.add(trailerCreationDateField, 2, 3);
@@ -461,7 +493,8 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailerModificationDateField.textProperty().bindBidirectional(trailerModel.modifyDateProperty());
         trailerCreationDateField.textProperty().bindBidirectional(trailerModel.creationDateProperty());
     }
-    private  void containersGraphicBuilder() {
+
+    private void containersGraphicBuilder() {
         //control buttons configuration
         insertContainer.setPrefWidth(160);
         deleteContainer.setPrefWidth(160);
@@ -546,10 +579,10 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containerNumberField.setMaxLength(14);
         containerMaxWeightField.setRestrict("[0-9].");
         containerNumberField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue!=null){
-            if (!newValue.matches("[0-9]*")) {
-                containerNumberField.setText(oldValue);
-            }
+            if (newValue != null) {
+                if (!newValue.matches("[0-9]*")) {
+                    containerNumberField.setText(oldValue);
+                }
             }
         });
         containerMaxWeightField.setMaxLength(14);
@@ -570,7 +603,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containersDataEntry.add(containerLicenceExpirationDateLabel, 3, 2);
         containersDataEntry.add(containerLicenceExpirationDateField, 4, 2);
         containersDataEntry.add(containerCommentLabel, 5, 2);
-        containersDataEntry.add(containerCommentField, 6, 2,3,1);
+        containersDataEntry.add(containerCommentField, 6, 2, 3, 1);
 
         containersDataEntry.add(containerCreationDateLabel, 1, 3);
         containersDataEntry.add(containerCreationDateField, 2, 3);
@@ -637,11 +670,12 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containerCreationDateField.textProperty().bindBidirectional(containerModel.creationDateProperty());
     }
 
-    private  void actionHandling() {
+    private void actionHandling() {
         trailersActionHandling();
         containersActionHandling();
     }
-    private  void trailersActionHandling() {
+
+    private void trailersActionHandling() {
         insertTrailer.setOnMouseClicked(controller::onInsertTruckTrailer);
         deleteTrailer.setOnMouseClicked(controller::onTrailerDelete);
         updateTrailer.setOnMouseClicked(controller::onUpdateTruckTrailer);
@@ -650,7 +684,8 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
             controller.onTruckTrailerTableSelection(trailersTableView.getSelectionModel().getSelectedItems());
         });
     }
-    private  void containersActionHandling() {
+
+    private void containersActionHandling() {
         insertContainer.setOnMouseClicked(controller::onInsertTruckContainer);
         deleteContainer.setOnMouseClicked(controller::onContainerDelete);
         updateContainer.setOnMouseClicked(controller::onUpdateTruckContainer);
@@ -660,7 +695,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         });
     }
 
-    public  void update() {
+    public void update() {
 
         ReadOnlyBooleanProperty update = controller.updateTrailer();
         trailersTableView.cursorProperty().bind(Bindings.when(update).then(CURSOR_WAIT).otherwise(CURSOR_DEFAULT));

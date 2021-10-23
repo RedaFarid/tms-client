@@ -23,12 +23,14 @@ import org.controlsfx.control.table.TableFilter;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
+import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Entities.OperationType;
 import soulintec.com.tmsclient.Entities.Permissions;
 import soulintec.com.tmsclient.Graphics.Controls.*;
 import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientsModel;
 import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversModel;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindowController;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsModel;
 import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
 import soulintec.com.tmsclient.Graphics.Windows.TanksWindow.TanksModel;
@@ -37,12 +39,15 @@ import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckContainerModel;
 import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckTrailerModel;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Log4j2
 @Component
 public class TransactionView implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private TransactionsController controller;
+    private MainWindowController mainWindowController;
     private TransactionsModel model;
 
     private MaterialsModel materialsModel;
@@ -236,6 +241,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
     private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
 
+    public List<RoleDTO> authorityDTOSList = new ArrayList<>();
 
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
@@ -247,19 +253,42 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         contextTruckContainersStage = new Stage();
         contextTruckTrailersStage = new Stage();
         contextClientsStage = new Stage();
-        userAuthorities();
+
         init();
+        userAuthorities();
         graphicsBuilder();
         actionHandling();
     }
 
     private void userAuthorities() {
+        createWindowAuthoritiesTemplate();
+        assignAuthoritiesTemplate();
+    }
 
+    private void createWindowAuthoritiesTemplate() {
+        authorityDTOSList.clear();
+        //Authorities
+        RoleDTO saving = new RoleDTO("Save " + this);
+        RoleDTO deleting = new RoleDTO("Delete " + this);
+
+        authorityDTOSList.add(saving);
+        authorityDTOSList.add(deleting);
+
+        mainWindowController.createWindowAuthorities(authorityDTOSList);
+    }
+
+    private void assignAuthoritiesTemplate() {
+        if (authorityDTOSList.size() != 0) {
+            insert.setAuthority(authorityDTOSList.get(0));
+            update.setAuthority(authorityDTOSList.get(0));
+            delete.setAuthority(authorityDTOSList.get(1));
+        }
     }
 
     private void init() {
         initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
         controller = ApplicationContext.applicationContext.getBean(TransactionsController.class);
+        mainWindowController = ApplicationContext.applicationContext.getBean(MainWindowController.class);
 
         model = controller.getModel();
         materialsModel = controller.getMaterialsModel();
@@ -1282,4 +1311,8 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         return root;
     }
 
+    @Override
+    public String toString() {
+        return "Transactions";
+    }
 }

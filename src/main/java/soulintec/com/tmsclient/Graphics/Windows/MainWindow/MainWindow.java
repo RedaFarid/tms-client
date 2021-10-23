@@ -32,6 +32,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
 import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
+import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
 import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientView;
 import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
 import soulintec.com.tmsclient.Graphics.Windows.LoginWindow;
@@ -46,9 +47,7 @@ import soulintec.com.tmsclient.Graphics.Windows.TransactionsWindow.TransactionVi
 import soulintec.com.tmsclient.Graphics.Windows.TruckWindow.TruckView;
 import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
@@ -76,7 +75,6 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     public Map<String,RoleDTO> authorityDTOSList = new HashMap<>();
 
     private MainWindowController controller;
-
 
     @Autowired
     private Executor executor;
@@ -107,7 +105,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
     private Button logIn = new Button("Log in", loginview);
     private Button logOut = new Button("Log out", logoutview);
-    private Button dashBoardButton = new Button("Dashboard", dashboardview);
+    private EnhancedButton dashBoardButton;
     private Button exit = new Button("Exit", exitview);
     private boolean IconicStatus = true;
 
@@ -152,6 +150,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
+        controller = ApplicationContext.applicationContext.getBean(MainWindowController.class);
         window = event.getStage();
         notifications = Notifications
                 .create()
@@ -222,6 +221,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         clock.setSkinType(Clock.ClockSkinType.TEXT);
         clock.setPrefHeight(40);
         clock.setRunning(true);
+
+        dashBoardButton.setGraphic(dashboardview);
 
         fastActionsBar.getItems().addAll(logIn, logOut, new Separator(), dashBoardButton, new Separator(), exit, currentUserLabel, clock /*, clock */);
         fastActionsBar.setBackground(new Background(new BackgroundFill(Color.CADETBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -353,6 +354,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     }
 
     public void init() {
+        dashBoardButton = new EnhancedButton("Dashboard");
         logger.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         trucks.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         tanks.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
@@ -360,10 +362,6 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         clients.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         materials.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         stations.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
-
-        controller = ApplicationContext.applicationContext.getBean(MainWindowController.class);
-
-
     }
 
     private void userAuthorities() {
@@ -380,6 +378,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         RoleDTO materialViewRole = new RoleDTO("View Materials");
         RoleDTO stationViewRole = new RoleDTO("View Stations");
         RoleDTO tankViewRole = new RoleDTO("View Tanks");
+        RoleDTO transactionViewRole = new RoleDTO("View Transactions");
+        RoleDTO trucksViewRole = new RoleDTO("View Trucks");
 
         authorityDTOSList.put("Clients",clientViewRole);
         authorityDTOSList.put("Drivers",driverViewRole);
@@ -387,6 +387,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         authorityDTOSList.put("Materials",materialViewRole);
         authorityDTOSList.put("Stations",stationViewRole);
         authorityDTOSList.put("Tanks",tankViewRole);
+        authorityDTOSList.put("Transactions",transactionViewRole);
+        authorityDTOSList.put("Trucks",trucksViewRole);
 
         controller.createWindowAuthorities(authorityDTOSList.values().stream().toList());
     }
@@ -399,7 +401,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             materials.setAuthority(authorityDTOSList.get("Materials"));
             stations.setAuthority(authorityDTOSList.get("Stations"));
             tanks.setAuthority(authorityDTOSList.get("Tanks"));
-
+            dashBoardButton.setAuthority(authorityDTOSList.get("Transactions"));
+            trucks.setAuthority(authorityDTOSList.get("Trucks"));
         }
     }
 
