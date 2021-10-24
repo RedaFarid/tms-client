@@ -7,15 +7,14 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.controlsfx.control.table.TableFilter;
-import org.controlsfx.dialog.ExceptionDialog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -182,9 +181,11 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         //Authorities
         RoleDTO saving = new RoleDTO("Save " + this);
         RoleDTO deleting = new RoleDTO("Delete " + this);
+        RoleDTO reporting = new RoleDTO("Generate Reports for " + this);
 
         authorityDTOSList.add(saving);
         authorityDTOSList.add(deleting);
+        authorityDTOSList.add(reporting);
 
         mainWindowController.createWindowAuthorities(authorityDTOSList);
     }
@@ -194,6 +195,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
             insertStation.setAuthority(authorityDTOSList.get(0));
             updateStation.setAuthority(authorityDTOSList.get(0));
             deleteStation.setAuthority(authorityDTOSList.get(1));
+            report.setAuthority(authorityDTOSList.get(2));
         }
     }
 
@@ -330,7 +332,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         dataEntryPartitionTitled.setVgap(5);
         dataEntryPartitionTitled.setHgap(5);
 
-        stationsHbox.getItems().addAll(insertStation, updateStation, deleteStation);
+        stationsHbox.getItems().addAll(insertStation, updateStation, deleteStation,new Separator(),report);
 
         stationsVbox.getChildren().addAll(dataEntryPartitionTitled, stationsHbox);
         stationsVbox.setPadding(new Insets(5));
@@ -361,6 +363,25 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
             controller.updateComputers();
             computerNameField.setItems(controller.getComputers());
         });
+
+        report.setOnAction(e -> {
+            controller.onReport(stationsTableFilter.getFilteredList()).whenComplete((pane, throwable) -> {
+                if (throwable != null) {
+                    MainWindow.showErrorWindowForException(throwable.getMessage(), throwable);
+                    return;
+                }
+                Platform.runLater(() -> {
+                    Stage stage = new Stage();
+                    stage.setScene(new Scene(pane));
+                    stage.setTitle("Stations Report");
+                    stage.initOwner(mainStage);
+                    stage.setWidth(1300);
+                    stage.show();
+                });
+            });
+        });
+
+
         table.setOnMouseClicked((a) -> {
             controller.onTableSelection(table.getSelectionModel().getSelectedItems());
         });

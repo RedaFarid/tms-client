@@ -162,7 +162,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         //Authorities
         RoleDTO saving = new RoleDTO("Save " + this);
         RoleDTO deleting = new RoleDTO("Delete " + this);
-        RoleDTO reporting = new RoleDTO("Generate Reports for  " + this);
+        RoleDTO reporting = new RoleDTO("Generate Reports for " + this);
 
         authorityDTOSList.add(saving);
         authorityDTOSList.add(deleting);

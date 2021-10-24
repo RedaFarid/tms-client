@@ -8,6 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,11 @@ import soulintec.com.tmsclient.Entities.LogDTO;
 import soulintec.com.tmsclient.Entities.StationDTO;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsModel;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.DTO;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.Materials;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.Stations;
+import soulintec.com.tmsclient.Reporting.ReportsDetails.ReportDetailsFactory;
 import soulintec.com.tmsclient.Services.ComputersService;
 import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.StationService;
@@ -25,6 +31,7 @@ import soulintec.com.tmsclient.Services.TanksService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -48,6 +55,9 @@ public class StationsController {
     private ComputersService computersService;
     @Autowired
     private LogsService logsService;
+    @Autowired
+    private ReportDetailsFactory reportDetailsFactory;
+
 
     public StationsModel getModel() {
         return model;
@@ -290,6 +300,27 @@ public class StationsController {
             }
         }
     }
+
+    @Async
+    public CompletableFuture<Pane> onReport(List<StationsModel.TableObject> list) {
+        try {
+            List<DTO> collect = list.stream().map(listItem -> new Stations(
+                            String.valueOf(listItem.getStationIdColumn()),
+                            String.valueOf(listItem.getNameColumn()),
+                            String.valueOf(listItem.getLocationColumn()),
+                            String.valueOf(listItem.getComputerNameColumn()),
+                            String.valueOf(listItem.getCommentColumn())
+                    )
+            ).collect(Collectors.toList());
+
+            Pane reportPane = reportDetailsFactory.getReportDetailsPaneFor("Stations", collect);
+
+            return CompletableFuture.completedFuture(reportPane);
+        } catch (Exception e) {
+            return CompletableFuture.failedFuture(e);
+        }
+    }
+
 
     @Override
     public String toString() {

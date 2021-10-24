@@ -25,6 +25,7 @@ public class ReportsDataSetFactory {
             case "Drivers" ->  new DriversDataSet(dataList);
             case "Trailers" ->  new TrailersDataSet(dataList);
             case "Containers" ->  new ContainersDataSet(dataList);
+            case "Stations" ->  new StationsDataSet(dataList);
             default -> throw new IllegalStateException("Unexpected value: " + report);
         };
     }
