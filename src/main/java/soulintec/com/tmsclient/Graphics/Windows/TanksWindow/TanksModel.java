@@ -19,6 +19,7 @@ public class TanksModel {
     private final StringProperty modifyDate = new SimpleStringProperty();
     private final StringProperty creationDate = new SimpleStringProperty();
     private final StringProperty createdBy = new SimpleStringProperty();
+    private final StringProperty modifiedBy = new SimpleStringProperty();
     private final StringProperty onTerminal = new SimpleStringProperty();
     private final DoubleProperty calculatedQty = new SimpleDoubleProperty(0.0);
 
@@ -154,6 +155,18 @@ public class TanksModel {
         this.createdBy.set(createdBy);
     }
 
+    public String getModifiedBy() {
+        return modifiedBy.get();
+    }
+
+    public StringProperty modifiedByProperty() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy.set(modifiedBy);
+    }
+
     public String getOnTerminal() {
         return onTerminal.get();
     }
@@ -190,10 +203,13 @@ public class TanksModel {
         private final ObjectProperty<LocalDateTime> creationDateColumn;
         private final ObjectProperty<LocalDateTime> modifyDateColumn;
         private final StringProperty createdByColumn;
+        private final StringProperty modifiedByColumn;
         private final StringProperty onTerminalColumn;
         private final DoubleProperty calculatedQtyColumn;
 
-        public TableObject(LongProperty tankIdColumn, StringProperty nameColumn, LongProperty stationColumn, DoubleProperty capacityColumn, DoubleProperty qtyColumn, ObjectProperty<LocalDateTime> dateOfQtySetColumn, StringProperty userOfQtySetColumn, LongProperty materialIDColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn, DoubleProperty calculatedQtyColumn) {
+        public TableObject(LongProperty tankIdColumn, StringProperty nameColumn, LongProperty stationColumn, DoubleProperty capacityColumn, DoubleProperty qtyColumn,
+                           ObjectProperty<LocalDateTime> dateOfQtySetColumn, StringProperty userOfQtySetColumn, LongProperty materialIDColumn, ObjectProperty<LocalDateTime> creationDateColumn,
+                           ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty modifiedByColumn, StringProperty onTerminalColumn, DoubleProperty calculatedQtyColumn) {
             this.tankIdColumn = tankIdColumn;
             this.nameColumn = nameColumn;
             this.stationColumn = stationColumn;
@@ -205,6 +221,7 @@ public class TanksModel {
             this.creationDateColumn = creationDateColumn;
             this.modifyDateColumn = modifyDateColumn;
             this.createdByColumn = createdByColumn;
+            this.modifiedByColumn = modifiedByColumn;
             this.onTerminalColumn = onTerminalColumn;
             this.calculatedQtyColumn = calculatedQtyColumn;
         }
@@ -341,6 +358,18 @@ public class TanksModel {
             this.createdByColumn.set(createdByColumn);
         }
 
+        public String getModifiedByColumn() {
+            return modifiedByColumn.get();
+        }
+
+        public StringProperty modifiedByColumnProperty() {
+            return modifiedByColumn;
+        }
+
+        public void setModifiedByColumn(String modifiedByColumn) {
+            this.modifiedByColumn.set(modifiedByColumn);
+        }
+
         public String getOnTerminalColumn() {
             return onTerminalColumn.get();
         }
@@ -378,6 +407,7 @@ public class TanksModel {
                     new SimpleObjectProperty<>(tankDTO.getCreationDate()),
                     new SimpleObjectProperty<>(tankDTO.getModificationDate()),
                     new SimpleStringProperty(tankDTO.getCreatedBy()),
+                    new SimpleStringProperty(tankDTO.getLastModifiedBy()),
                     new SimpleStringProperty(tankDTO.getOnTerminal()),
                     new SimpleDoubleProperty(tankDTO.getCalculatedQty()));
         }

@@ -1,8 +1,10 @@
 package soulintec.com.tmsclient.Services.GeneralServices.LoggingService;
 
 
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -33,6 +35,8 @@ public class LoginService {
     static String error;
     private  UserObject userObject = new UserObject();
 
+    public static StringProperty observedUsername = new SimpleStringProperty("No logged in user");
+
     public void addObserver(Observer observer){
         userObject.add(observer);
     }
@@ -40,6 +44,7 @@ public class LoginService {
         token = "";
         error = "";
         userObject.setUsername("");
+        Platform.runLater(()->setObservedUsername("No logged in user"));
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", MediaType.APPLICATION_FORM_URLENCODED.toString());
         headers.add("Accept", MediaType.APPLICATION_JSON.toString());
@@ -58,6 +63,7 @@ public class LoginService {
         } else {
             token = response.getBody().get("access_Token").toString();
             userObject.setUsername(username);
+            Platform.runLater(()->setObservedUsername("Current user : "+username));
         }
         return error;
     }
@@ -65,7 +71,7 @@ public class LoginService {
     public void logOut() {
         token = "";
         error = "";
-        userObject.setUsername("");
+        setObservedUsername("No logged in user");
     }
 
     public static String getToken() {
@@ -74,6 +80,18 @@ public class LoginService {
 
     public  UserObject getUserObject() {
         return userObject;
+    }
+
+    public static String getObservedUsername() {
+        return observedUsername.get();
+    }
+
+    public  StringProperty observedUsernameProperty() {
+        return observedUsername;
+    }
+
+    public static void setObservedUsername(String observedUsername) {
+        LoginService.observedUsername.set(observedUsername);
     }
 
     @AllArgsConstructor
@@ -107,7 +125,6 @@ public class LoginService {
             for (Observer observer:observerList){
                 observer.update(username);
             }
-
         }
     }
 }

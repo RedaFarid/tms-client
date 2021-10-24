@@ -20,6 +20,7 @@ import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsModel;
 import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
 import soulintec.com.tmsclient.Services.*;
+import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -87,7 +88,7 @@ public class TanksController {
                 model.setCreationDate(String.valueOf(tableObject.getCreationDateColumn()));
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
-
+                model.setModifiedBy(tableObject.getModifiedByColumn());
                 materialService.findById(tankDTO.getMaterialID()).ifPresentOrElse(materialDTO -> {
                     materialsModel.setName(materialDTO.getName());
                     materialsModel.setDescription(materialDTO.getDescription());
@@ -316,6 +317,7 @@ public class TanksController {
                 model.setCreatedBy((""));
                 model.setCreationDate("");
                 model.setModifyDate("");
+                model.setModifiedBy("");
                 model.setOnTerminal("");
 
                 materialsModel.setName("");
@@ -349,6 +351,7 @@ public class TanksController {
                         item.setCreationDateColumn(tank.getCreationDate());
                         item.setModifyDateColumn(tank.getModificationDate());
                         item.setCreatedByColumn(tank.getCreatedBy());
+                        item.setModifiedByColumn(tank.getLastModifiedBy());
                         item.setOnTerminalColumn(tank.getOnTerminal());
                         item.setCalculatedQtyColumn(tank.getCalculatedQty());
                     }
@@ -387,6 +390,7 @@ public class TanksController {
         }
         try {
             tanksService.findById(tankId).ifPresentOrElse((item -> {
+                item.setUserOfQtySet(LoginService.getObservedUsername());
                 item.setQty(qty);
                 item.setDateOfQtySet(LocalDateTime.now());
                 String save = tanksService.save(item);

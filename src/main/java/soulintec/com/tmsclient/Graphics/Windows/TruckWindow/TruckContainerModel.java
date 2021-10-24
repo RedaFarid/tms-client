@@ -20,6 +20,7 @@ public class TruckContainerModel {
     private final StringProperty modifyDate = new SimpleStringProperty();
     private final StringProperty creationDate = new SimpleStringProperty();
     private final StringProperty createdBy = new SimpleStringProperty();
+    private final StringProperty modifiedBy = new SimpleStringProperty();
     private final StringProperty onTerminal = new SimpleStringProperty();
 
     public long getTruckContainerId() {
@@ -142,6 +143,18 @@ public class TruckContainerModel {
         this.createdBy.set(createdBy);
     }
 
+    public String getModifiedBy() {
+        return modifiedBy.get();
+    }
+
+    public StringProperty modifiedByProperty() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy.set(modifiedBy);
+    }
+
     public String getOnTerminal() {
         return onTerminal.get();
     }
@@ -154,7 +167,7 @@ public class TruckContainerModel {
         this.onTerminal.set(onTerminal);
     }
 
-    public static class TableObject implements Comparable<TruckContainerModel.TableObject>{
+    public static class TableObject implements Comparable<TruckContainerModel.TableObject> {
 
         private final LongProperty truckContainerIdColumn;
         private final StringProperty containerNumberColumn;
@@ -166,9 +179,10 @@ public class TruckContainerModel {
         private final ObjectProperty<LocalDateTime> creationDateColumn;
         private final ObjectProperty<LocalDateTime> modifyDateColumn;
         private final StringProperty createdByColumn;
+        private final StringProperty modifiedByColumn;
         private final StringProperty onTerminalColumn;
 
-        public TableObject(LongProperty truckContainerIdColumn, StringProperty containerNumberColumn, StringProperty licenseNumberColumn, ObjectProperty<LocalDate> licenceExpirationDateColumn, DoubleProperty maximumWeightConstrainColumn, ObjectProperty<Permissions> permissionsColumn, StringProperty commentColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn) {
+        public TableObject(LongProperty truckContainerIdColumn, StringProperty containerNumberColumn, StringProperty licenseNumberColumn, ObjectProperty<LocalDate> licenceExpirationDateColumn, DoubleProperty maximumWeightConstrainColumn, ObjectProperty<Permissions> permissionsColumn, StringProperty commentColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty modifiedByColumn, StringProperty onTerminalColumn) {
             this.truckContainerIdColumn = truckContainerIdColumn;
             this.containerNumberColumn = containerNumberColumn;
             this.licenseNumberColumn = licenseNumberColumn;
@@ -179,6 +193,7 @@ public class TruckContainerModel {
             this.creationDateColumn = creationDateColumn;
             this.modifyDateColumn = modifyDateColumn;
             this.createdByColumn = createdByColumn;
+            this.modifiedByColumn = modifiedByColumn;
             this.onTerminalColumn = onTerminalColumn;
         }
 
@@ -302,6 +317,18 @@ public class TruckContainerModel {
             this.createdByColumn.set(createdByColumn);
         }
 
+        public String getModifiedByColumn() {
+            return modifiedByColumn.get();
+        }
+
+        public StringProperty modifiedByColumnProperty() {
+            return modifiedByColumn;
+        }
+
+        public void setModifiedByColumn(String modifiedByColumn) {
+            this.modifiedByColumn.set(modifiedByColumn);
+        }
+
         public String getOnTerminalColumn() {
             return onTerminalColumn.get();
         }
@@ -313,6 +340,7 @@ public class TruckContainerModel {
         public void setOnTerminalColumn(String onTerminalColumn) {
             this.onTerminalColumn.set(onTerminalColumn);
         }
+
         public static TruckContainerModel.TableObject createFromTruckContainerDTO(TruckContainerDTO truckContainerDTO) {
             return new TruckContainerModel.TableObject(
                     new SimpleLongProperty(truckContainerDTO.getId()),
@@ -325,6 +353,7 @@ public class TruckContainerModel {
                     new SimpleObjectProperty<>(truckContainerDTO.getCreationDate()),
                     new SimpleObjectProperty<>(truckContainerDTO.getModifyDate()),
                     new SimpleStringProperty(truckContainerDTO.getCreatedBy()),
+                    new SimpleStringProperty(truckContainerDTO.getLastModifiedBy()),
                     new SimpleStringProperty(truckContainerDTO.getOnTerminal()));
         }
 
@@ -333,24 +362,26 @@ public class TruckContainerModel {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             TableObject that = (TableObject) o;
-            return Objects.equal(truckContainerIdColumn.getValue(), that.truckContainerIdColumn.getValue()) &&
-                    Objects.equal(containerNumberColumn.getValue(), that.containerNumberColumn.getValue()) &&
-                    Objects.equal(licenseNumberColumn.getValue(), that.licenseNumberColumn.getValue()) &&
-                    Objects.equal(licenceExpirationDateColumn.getValue(), that.licenceExpirationDateColumn.getValue()) &&
-                    Objects.equal(maximumWeightConstrainColumn.getValue(), that.maximumWeightConstrainColumn.getValue()) &&
-                    Objects.equal(permissionsColumn.getValue(), that.permissionsColumn.getValue()) &&
-                    Objects.equal(commentColumn.getValue(), that.commentColumn.getValue()) &&
-                    Objects.equal(creationDateColumn.getValue(), that.creationDateColumn.getValue()) &&
-                    Objects.equal(modifyDateColumn.getValue(), that.modifyDateColumn.getValue()) &&
-                    Objects.equal(createdByColumn.getValue(), that.createdByColumn.getValue()) &&
-                    Objects.equal(onTerminalColumn.getValue(), that.onTerminalColumn.getValue());
+            return Objects.equal(truckContainerIdColumn.getValue(), that.truckContainerIdColumn.getValue());
+//            &&
+//                    Objects.equal(containerNumberColumn.getValue(), that.containerNumberColumn.getValue()) &&
+//                    Objects.equal(licenseNumberColumn.getValue(), that.licenseNumberColumn.getValue()) &&
+//                    Objects.equal(licenceExpirationDateColumn.getValue(), that.licenceExpirationDateColumn.getValue()) &&
+//                    Objects.equal(maximumWeightConstrainColumn.getValue(), that.maximumWeightConstrainColumn.getValue()) &&
+//                    Objects.equal(permissionsColumn.getValue(), that.permissionsColumn.getValue()) &&
+//                    Objects.equal(commentColumn.getValue(), that.commentColumn.getValue()) &&
+//                    Objects.equal(creationDateColumn.getValue(), that.creationDateColumn.getValue()) &&
+//                    Objects.equal(modifyDateColumn.getValue(), that.modifyDateColumn.getValue()) &&
+//                    Objects.equal(createdByColumn.getValue(), that.createdByColumn.getValue()) &&
+//                    Objects.equal(onTerminalColumn.getValue(), that.onTerminalColumn.getValue());
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(truckContainerIdColumn.getValue(), containerNumberColumn.getValue(), licenseNumberColumn.getValue(),
-                    licenceExpirationDateColumn.getValue(), maximumWeightConstrainColumn.getValue(), permissionsColumn.getValue(),
-                    commentColumn.getValue(), creationDateColumn.getValue(), modifyDateColumn.getValue(), createdByColumn.getValue(), onTerminalColumn.getValue());
+            return Objects.hashCode(truckContainerIdColumn.getValue());
+//            , containerNumberColumn.getValue(), licenseNumberColumn.getValue(),
+//                    licenceExpirationDateColumn.getValue(), maximumWeightConstrainColumn.getValue(), permissionsColumn.getValue(),
+//                    commentColumn.getValue(), creationDateColumn.getValue(), modifyDateColumn.getValue(), createdByColumn.getValue(), onTerminalColumn.getValue());
         }
 
         @Override

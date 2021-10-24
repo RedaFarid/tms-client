@@ -79,6 +79,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     private TableColumn<TanksModel.TableObject, StringProperty> userOfQtySetColumn;
     private TableColumn<TanksModel.TableObject, DoubleProperty> calcQtyColumn;
     private TableColumn<TanksModel.TableObject, StringProperty> createdByColumn;
+    private TableColumn<TanksModel.TableObject, StringProperty> modifiedByColumn;
     private TableColumn<TanksModel.TableObject, StringProperty> onTerminalColumn;
     private TableColumn<TanksModel.TableObject, ObjectProperty<LocalDateTime>> creationDateColumn;
     private TableColumn<TanksModel.TableObject, ObjectProperty<LocalDateTime>> modifyDateColumn;
@@ -116,6 +117,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     private Label modificationLabel;
     private Label onTerminalLabel;
     private Label createdByLabel;
+    private Label modifiedByLabel;
 
     private Label contextProductNameLabel;
     private Label contextProductDescriptionLabel;
@@ -136,6 +138,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     private EnhancedTextField creationDateField;
     private EnhancedTextField modificationDateField;
     private EnhancedTextField createdByField;
+    private EnhancedTextField modifiedByField;
     private EnhancedTextField onTerminalField;
 
     private Label contextProductNameFieldField;
@@ -196,7 +199,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
     }
 
 
-        private void init() {
+    private void init() {
         initialStage = ApplicationContext.applicationContext.getBean(MainWindow.class);
         controller = ApplicationContext.applicationContext.getBean(TanksController.class);
         mainWindowController = ApplicationContext.applicationContext.getBean(MainWindowController.class);
@@ -230,6 +233,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         userOfQtySetColumn = new TableColumn<>("User of quantity set");
         calcQtyColumn = new TableColumn<>("Calculated quantity");
         createdByColumn = new TableColumn<>("Created By");
+        modifiedByColumn = new TableColumn<>("Modified By");
         onTerminalColumn = new TableColumn<>("On Terminal");
         creationDateColumn = new TableColumn<>("Creation Date");
         modifyDateColumn = new TableColumn<>("Modification Date");
@@ -265,6 +269,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         modificationLabel = new Label("Modification Date :");
         onTerminalLabel = new Label("On Terminal :");
         createdByLabel = new Label("Created By :");
+        modifiedByLabel = new Label("Modified By :");
 
         contextProductNameLabel = new Label("Name :");
         contextProductDescriptionLabel = new Label("Description :");
@@ -285,6 +290,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         creationDateField = new EnhancedTextField();
         modificationDateField = new EnhancedTextField();
         createdByField = new EnhancedTextField();
+        modifiedByField = new EnhancedTextField();
         onTerminalField = new EnhancedTextField();
 
         contextProductNameFieldField = new Label();
@@ -345,6 +351,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         modificationLabel.setPrefWidth(150);
         onTerminalLabel.setPrefWidth(150);
         createdByLabel.setPrefWidth(150);
+        modifiedByLabel.setPrefWidth(150);
 
         idLabel.setTextAlignment(TextAlignment.RIGHT);
         nameLabel.setTextAlignment(TextAlignment.RIGHT);
@@ -361,6 +368,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         modificationLabel.setTextAlignment(TextAlignment.RIGHT);
         onTerminalLabel.setTextAlignment(TextAlignment.RIGHT);
         createdByLabel.setTextAlignment(TextAlignment.RIGHT);
+        modifiedByLabel.setTextAlignment(TextAlignment.RIGHT);
 
         idLabel.setAlignment(Pos.BASELINE_RIGHT);
         nameLabel.setAlignment(Pos.BASELINE_RIGHT);
@@ -377,6 +385,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         modificationLabel.setAlignment(Pos.BASELINE_RIGHT);
         onTerminalLabel.setAlignment(Pos.BASELINE_RIGHT);
         createdByLabel.setAlignment(Pos.BASELINE_RIGHT);
+        modifiedByLabel.setAlignment(Pos.BASELINE_RIGHT);
 
         idLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         nameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
@@ -393,6 +402,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         modificationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         onTerminalLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         createdByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        modifiedByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
         tankIdField.setPrefWidth(250);
         nameField.setPrefWidth(250);
@@ -407,6 +417,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         modificationDateField.setPrefWidth(250);
         createdByField.setPrefWidth(250);
         onTerminalField.setPrefWidth(250);
+        modifiedByField.setPrefWidth(250);
 
         tankIdField.setEditable(false);
         dateOfQtySetField.setEditable(false);
@@ -417,6 +428,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         modificationDateField.setEditable(false);
         createdByField.setEditable(false);
         onTerminalField.setEditable(false);
+        modifiedByField.setEditable(false);
 
         //alocating in the window 
         tanksDataEntry.add(idLabel, 1, 1);
@@ -455,8 +467,11 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         tanksDataEntry.add(createdByLabel, 5, 4);
         tanksDataEntry.add(createdByField, 6, 4);
 
-        tanksDataEntry.add(onTerminalLabel, 7, 4);
-        tanksDataEntry.add(onTerminalField, 8, 4);
+        tanksDataEntry.add(modifiedByLabel, 7, 4);
+        tanksDataEntry.add(modifiedByField, 8, 4);
+
+        tanksDataEntry.add(onTerminalLabel, 1, 5);
+        tanksDataEntry.add(onTerminalField, 2, 5);
 
         //table configuration
         tankIdColumn.setCellValueFactory(new PropertyValueFactory<>("tankIdColumn"));
@@ -472,27 +487,29 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         modifyDateColumn.setCellValueFactory(new PropertyValueFactory<>("modifyDateColumn"));
         createdByColumn.setCellValueFactory(new PropertyValueFactory<>("createdByColumn"));
         onTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
+        modifiedByColumn.setCellValueFactory(new PropertyValueFactory<>("modifiedByColumn"));
 
         tanksTableView.getColumns().addAll(tankIdColumn, nameColumn, stationColumn, productColumn, capacityColumn, qtyColumn, calcQtyColumn, dateOfQtySetColumn,
-                userOfQtySetColumn, creationDateColumn, modifyDateColumn, createdByColumn, onTerminalColumn);
+                userOfQtySetColumn, creationDateColumn, modifyDateColumn, createdByColumn,modifiedByColumn, onTerminalColumn);
         tanksTableView.prefHeightProperty().bind(root.heightProperty().subtract(tanksVbox.heightProperty()));
         tanksTableView.setItems(controller.getDataList());
         tableFilter = TableFilter.forTableView(tanksTableView).apply();
 //        TanksTableView.setRowFactory((TableView<TanksModel.TableObject> param) -> new EnhancedTableRow());
 
-        tankIdColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(1));
-        nameColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(3));
-        capacityColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(1));
-        productColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(1));
-        stationColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(1));
-        qtyColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(2));
-        calcQtyColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(2));
-        dateOfQtySetColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(3));
-        userOfQtySetColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(3));
-        creationDateColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(3));
-        modifyDateColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(3));
-        createdByColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(3));
-        onTerminalColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(29).multiply(3));
+        tankIdColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(1));
+        nameColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(3));
+        capacityColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(1));
+        productColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(1));
+        stationColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(1));
+        qtyColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(2));
+        calcQtyColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(2));
+        dateOfQtySetColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(3));
+        userOfQtySetColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(3));
+        creationDateColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(3));
+        modifyDateColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(3));
+        createdByColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(3));
+        modifiedByColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(3));
+        onTerminalColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(3));
 
         //stage configuration
         tanksHbox.getItems().addAll(insertTank, updateTank, deleteTank, new Separator(), setQty);
@@ -544,7 +561,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         modificationDateField.textProperty().bindBidirectional(model.modifyDateProperty());
         createdByField.textProperty().bindBidirectional(model.createdByProperty());
         onTerminalField.textProperty().bindBidirectional(model.onTerminalProperty());
-
+        modifiedByField.textProperty().bindBidirectional(model.modifiedByProperty());
     }
 
     private void productsContextGraphicsBuilder() {
@@ -672,7 +689,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
 
         qtyStageButton.setOnMouseClicked(action -> {
             controller.setQty(qtyStageField.getDoubleValue());
-            contextStationStage.close();
+            qtyStage.close();
         });
 
         tanksTableView.setOnMouseClicked((a) -> {
@@ -688,7 +705,6 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
                 contextProductStage.close();
             }
         });
-
 
         stationIdField.setOnMouseClicked(this::onRunStationContextWidow);
         contextStationsTableView.setOnMouseClicked(action -> {

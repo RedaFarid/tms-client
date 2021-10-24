@@ -68,6 +68,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
     private TableColumn<DriversModel.TableObject, StringProperty> permissionsColumn;
     private TableColumn<DriversModel.TableObject, StringProperty> commentColumn;
     private TableColumn<DriversModel.TableObject, StringProperty> createdByColumn;
+    private TableColumn<DriversModel.TableObject, StringProperty> modifiedByColumn;
     private TableColumn<DriversModel.TableObject, StringProperty> onTerminalColumn;
     private TableColumn<DriversModel.TableObject, ObjectProperty<LocalDateTime>> creationDateColumn;
     private TableColumn<DriversModel.TableObject, ObjectProperty<LocalDateTime>> modifyDateColumn;
@@ -85,6 +86,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
     private Label commentLabel;
     private Label creationDateLabel;
     private Label modificationLabel;
+    private Label modifiedByLabel;
     private Label onTerminalLabel;
     private Label createdByLabel;
 
@@ -98,6 +100,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
     private EnhancedTextField creationDateField;
     private EnhancedTextField modificationDateField;
     private EnhancedTextField createdByField;
+    private EnhancedTextField modifiedByField;
     private EnhancedTextField onTerminalField;
 
     @Autowired
@@ -139,6 +142,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         permissionsColumn = new TableColumn<>("Permissions");
         commentColumn = new TableColumn<>("Comment");
         createdByColumn = new TableColumn<>("Created By");
+        modifiedByColumn = new TableColumn<>("Modified By");
         onTerminalColumn = new TableColumn<>("On Terminal");
         creationDateColumn = new TableColumn<>("Creation Date");
         modifyDateColumn = new TableColumn<>("Modification Date");
@@ -159,6 +163,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         modificationLabel = new Label("Modification Date :");
         onTerminalLabel = new Label("On Terminal :");
         createdByLabel = new Label("Created By :");
+        modifiedByLabel = new Label("Modified By :");
 
         idField = new EnhancedLongField();
         nameField = new EnhancedTextField();
@@ -171,6 +176,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         modificationDateField = new EnhancedTextField();
         createdByField = new EnhancedTextField();
         onTerminalField = new EnhancedTextField();
+        modifiedByField = new EnhancedTextField();
     }
 
     private void userAuthorities() {
@@ -222,6 +228,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         modificationLabel.setPrefWidth(150);
         createdByLabel.setPrefWidth(150);
         onTerminalLabel.setPrefWidth(150);
+        modifiedByLabel.setPrefWidth(150);
 
         idLabel.setTextAlignment(TextAlignment.RIGHT);
         nameLabel.setTextAlignment(TextAlignment.RIGHT);
@@ -234,6 +241,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         modificationLabel.setTextAlignment(TextAlignment.RIGHT);
         createdByLabel.setTextAlignment(TextAlignment.RIGHT);
         onTerminalLabel.setTextAlignment(TextAlignment.RIGHT);
+        modifiedByLabel.setTextAlignment(TextAlignment.RIGHT);
 
         idLabel.setAlignment(Pos.BASELINE_RIGHT);
         nameLabel.setAlignment(Pos.BASELINE_RIGHT);
@@ -246,6 +254,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         modificationLabel.setAlignment(Pos.BASELINE_RIGHT);
         createdByLabel.setAlignment(Pos.BASELINE_RIGHT);
         onTerminalLabel.setAlignment(Pos.BASELINE_RIGHT);
+        modifiedByLabel.setAlignment(Pos.BASELINE_RIGHT);
 
         idLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         nameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
@@ -258,6 +267,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         modificationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         createdByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         onTerminalLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        modifiedByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
         idField.setPrefWidth(250);
         nameField.setPrefWidth(250);
@@ -270,12 +280,14 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         modificationDateField.setPrefWidth(250);
         createdByField.setPrefWidth(250);
         onTerminalField.setPrefWidth(250);
+        modifiedByField.setPrefWidth(250);
 
         idField.setEditable(false);
         creationDateField.setEditable(false);
         modificationDateField.setEditable(false);
         createdByField.setEditable(false);
         onTerminalField.setEditable(false);
+        modifiedByField.setEditable(false);
 
         //restriction handling
         nameField.setRestrict("[a-zA-Z ]");
@@ -328,8 +340,11 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         dataEntryPartitionTitled.add(createdByLabel, 5, 3);
         dataEntryPartitionTitled.add(createdByField, 6, 3);
 
-        dataEntryPartitionTitled.add(onTerminalLabel, 7, 3);
-        dataEntryPartitionTitled.add(onTerminalField, 8, 3);
+        dataEntryPartitionTitled.add(modifiedByLabel, 7, 3);
+        dataEntryPartitionTitled.add(modifiedByField, 8, 3);
+
+        dataEntryPartitionTitled.add(onTerminalLabel, 1, 4);
+        dataEntryPartitionTitled.add(onTerminalField, 2, 4);
 
         //table configuration
         idColumn.setCellValueFactory(new PropertyValueFactory<>("driverIdColumn"));
@@ -343,10 +358,11 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         modifyDateColumn.setCellValueFactory(new PropertyValueFactory<>("modifyDateColumn"));
         createdByColumn.setCellValueFactory(new PropertyValueFactory<>("createdByColumn"));
         onTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
+        modifiedByColumn.setCellValueFactory(new PropertyValueFactory<>("modifiedByColumn"));
 
 
         table.getColumns().addAll(idColumn, nameColumn, licenceNumberColumn, licenceExpirationDateColumn,
-                mobileNumberColumn, permissionsColumn, commentColumn,creationDateColumn, modifyDateColumn, createdByColumn, onTerminalColumn);
+                mobileNumberColumn, permissionsColumn, commentColumn,creationDateColumn, modifyDateColumn, createdByColumn,modifiedByColumn, onTerminalColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.prefHeightProperty().bind(root.heightProperty().subtract(vbox.heightProperty()));
         table.setItems(controller.getDataList());
@@ -375,6 +391,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         onTerminalField.textProperty().bindBidirectional(model.onTerminalProperty());
         modificationDateField.textProperty().bindBidirectional(model.modifyDateProperty());
         creationDateField.textProperty().bindBidirectional(model.creationDateProperty());
+        modifiedByField.textProperty().bindBidirectional(model.modifiedByProperty());
 
     }
 

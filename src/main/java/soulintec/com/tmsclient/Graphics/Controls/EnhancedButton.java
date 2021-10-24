@@ -75,6 +75,7 @@ public class EnhancedButton extends Button implements Observer {
                         });
         setDisable(!authorized);
     }
+
 }
 
 

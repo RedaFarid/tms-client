@@ -25,6 +25,7 @@ public class TruckContainerDTO {
     private LocalDateTime creationDate;
     private LocalDateTime modifyDate;
     private String createdBy;
+    private String lastModifiedBy;
     private String onTerminal;
 
 

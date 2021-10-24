@@ -69,6 +69,7 @@ public class ClientsController {
                 model.setCreationDate(String.valueOf(tableObject.getCreationDateColumn()));
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
+                model.setLastModifiedBy(tableObject.getLastModifiedByColumn());
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Info, toString(), "Error getting client data"));
                 MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected client");
@@ -225,6 +226,7 @@ public class ClientsController {
                 model.setCreationDate("");
                 model.setModifyDate("");
                 model.setOnTerminal("");
+                model.setLastModifiedBy("");
             } catch (Exception e) {
                 log.fatal(e);
             }
@@ -282,6 +284,7 @@ public class ClientsController {
                         item.setModifyDateColumn(clientDTO.getModifyDate());
                         item.setCreatedByColumn(clientDTO.getCreatedBy());
                         item.setOnTerminalColumn(clientDTO.getOnTerminal());
+                        item.setLastModifiedByColumn(clientDTO.getLastModifiedBy());
                     }
 
                 } catch (Exception e) {

@@ -24,24 +24,8 @@ public class ClientDTO {
     private LocalDateTime creationDate;
     private LocalDateTime modifyDate;
     private String createdBy;
+    private String lastModifiedBy;
     private String onTerminal;
-
-    public ClientDTO(String name, String mainOfficeAddress, String contactName, String contactTelNumber, String contactEmail) {
-        this.name = name;
-        this.mainOfficeAddress = mainOfficeAddress;
-        this.contactName = contactName;
-        this.contactTelNumber = contactTelNumber;
-        this.contactEmail = contactEmail;
-    }
-
-    public ClientDTO(long id, String name, String mainOfficeAddress, String contactName, String contactTelNumber, String contactEmail) {
-        this.id = id;
-        this.name = name;
-        this.mainOfficeAddress = mainOfficeAddress;
-        this.contactName = contactName;
-        this.contactTelNumber = contactTelNumber;
-        this.contactEmail = contactEmail;
-    }
 
     @Override
     public boolean equals(Object o) {

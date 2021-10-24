@@ -60,9 +60,9 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
     private TableColumn<MaterialsModel.TableObject, StringProperty> descriptionColumn;
     private TableColumn<MaterialsModel.TableObject, StringProperty> createdByColumn;
     private TableColumn<MaterialsModel.TableObject, StringProperty> onTerminalColumn;
+    private TableColumn<MaterialsModel.TableObject, StringProperty> modifiedByColumn;
     private TableColumn<MaterialsModel.TableObject, ObjectProperty<LocalDateTime>> creationDateColumn;
     private TableColumn<MaterialsModel.TableObject, ObjectProperty<LocalDateTime>> modifyDateColumn;
-
 
     private EnhancedButton insert;
     private EnhancedButton delete;
@@ -76,6 +76,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
     private Label modificationLabel;
     private Label onTerminalLabel;
     private Label createdByLabel;
+    private Label modifiedByLabel;
 
     private EnhancedLongField idField;
     private EnhancedTextField nameField;
@@ -83,6 +84,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
     private EnhancedTextField creationDateField;
     private EnhancedTextField modificationDateField;
     private EnhancedTextField createdByField;
+    private EnhancedTextField modifiedByField;
     private EnhancedTextField onTerminalField;
 
     @Autowired
@@ -121,6 +123,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         nameColumn = new TableColumn<>("Name");
         descriptionColumn = new TableColumn<>("Description");
         createdByColumn = new TableColumn<>("Created By");
+        modifiedByColumn = new TableColumn<>("Modified By");
         onTerminalColumn = new TableColumn<>("On Terminal");
         creationDateColumn = new TableColumn<>("Creation Date");
         modifyDateColumn = new TableColumn<>("Modification Date");
@@ -137,6 +140,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         modificationLabel = new Label("Modification Date :");
         onTerminalLabel = new Label("On Terminal :");
         createdByLabel = new Label("Created By :");
+        modifiedByLabel = new Label("Modified By :");
 
         idField = new EnhancedLongField();
         nameField = new EnhancedTextField();
@@ -145,6 +149,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         modificationDateField = new EnhancedTextField();
         createdByField = new EnhancedTextField();
         onTerminalField = new EnhancedTextField();
+        modifiedByField = new EnhancedTextField();
     }
 
     private void userAuthorities() {
@@ -193,6 +198,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         modificationLabel.setPrefWidth(150);
         createdByLabel.setPrefWidth(150);
         onTerminalLabel.setPrefWidth(150);
+        modifiedByLabel.setPrefWidth(150);
 
         idLabel.setTextAlignment(TextAlignment.RIGHT);
         nameLabel.setTextAlignment(TextAlignment.RIGHT);
@@ -201,6 +207,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         modificationLabel.setTextAlignment(TextAlignment.RIGHT);
         createdByLabel.setTextAlignment(TextAlignment.RIGHT);
         onTerminalLabel.setTextAlignment(TextAlignment.RIGHT);
+        modifiedByLabel.setTextAlignment(TextAlignment.RIGHT);
 
         idLabel.setAlignment(Pos.BASELINE_RIGHT);
         nameLabel.setAlignment(Pos.BASELINE_RIGHT);
@@ -209,6 +216,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         modificationLabel.setAlignment(Pos.BASELINE_RIGHT);
         createdByLabel.setAlignment(Pos.BASELINE_RIGHT);
         onTerminalLabel.setAlignment(Pos.BASELINE_RIGHT);
+        modifiedByLabel.setAlignment(Pos.BASELINE_RIGHT);
 
         idLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         nameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
@@ -217,6 +225,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         modificationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         createdByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         onTerminalLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        modifiedByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
         idField.setPrefWidth(250);
         nameField.setPrefWidth(250);
@@ -225,12 +234,14 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         modificationDateField.setPrefWidth(250);
         createdByField.setPrefWidth(250);
         onTerminalField.setPrefWidth(250);
+        modifiedByField.setPrefWidth(250);
 
         idField.setEditable(false);
         creationDateField.setEditable(false);
         modificationDateField.setEditable(false);
         createdByField.setEditable(false);
         onTerminalField.setEditable(false);
+        modifiedByField.setEditable(false);
 
         //restriction handling
         nameField.setRestrict("[a-zA-Z-_/. ]");
@@ -249,7 +260,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         dataEntryPartitionTitled.add(creationDateLabel, 1, 3);
         dataEntryPartitionTitled.add(modificationLabel, 3, 3);
         dataEntryPartitionTitled.add(createdByLabel, 5, 3);
-        dataEntryPartitionTitled.add(onTerminalLabel, 7, 3);
+        dataEntryPartitionTitled.add(modifiedByLabel, 7, 3);
 
         dataEntryPartitionTitled.add(idField, 2, 2);
         dataEntryPartitionTitled.add(nameField, 4, 2);
@@ -258,7 +269,10 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         dataEntryPartitionTitled.add(creationDateField, 2, 3);
         dataEntryPartitionTitled.add(modificationDateField, 4, 3);
         dataEntryPartitionTitled.add(createdByField, 6, 3);
-        dataEntryPartitionTitled.add(onTerminalField, 8, 3);
+        dataEntryPartitionTitled.add(modifiedByField, 8, 3);
+
+        dataEntryPartitionTitled.add(onTerminalLabel, 1, 4);
+        dataEntryPartitionTitled.add(onTerminalField, 2, 4);
 
         //table configuration
         idColumn.setCellValueFactory(new PropertyValueFactory<>("materialIdColumn"));
@@ -268,6 +282,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         modifyDateColumn.setCellValueFactory(new PropertyValueFactory<>("modifyDateColumn"));
         createdByColumn.setCellValueFactory(new PropertyValueFactory<>("createdByColumn"));
         onTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
+        modifiedByColumn.setCellValueFactory(new PropertyValueFactory<>("modifiedByColumn"));
 
         idColumn.setReorderable(false);
         nameColumn.setReorderable(false);
@@ -276,8 +291,9 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         modifyDateColumn.setReorderable(false);
         createdByColumn.setReorderable(false);
         onTerminalColumn.setReorderable(false);
+        modifiedByColumn.setReorderable(false);
 
-        table.getColumns().addAll(idColumn, nameColumn, descriptionColumn, creationDateColumn, modifyDateColumn, createdByColumn, onTerminalColumn);
+        table.getColumns().addAll(idColumn, nameColumn, descriptionColumn, creationDateColumn, modifyDateColumn, createdByColumn,modifiedByColumn, onTerminalColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.prefHeightProperty().bind(root.heightProperty().subtract(dataEntryPartitionTitled.heightProperty().add(hbox.heightProperty())));
         table.setItems(controller.getDataList());
@@ -302,6 +318,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         descriptionField.textProperty().bindBidirectional(model.descriptionProperty());
         modificationDateField.textProperty().bindBidirectional(model.modifyDateProperty());
         creationDateField.textProperty().bindBidirectional(model.creationDateProperty());
+        modifiedByField.textProperty().bindBidirectional(model.modifiedByProperty());
     }
 
     private void actionHandling() {

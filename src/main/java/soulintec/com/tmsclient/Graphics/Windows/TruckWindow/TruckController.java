@@ -82,6 +82,8 @@ public class TruckController {
                 truckContainerModel.setCreationDate(String.valueOf(tableObject.getCreationDateColumn()));
                 truckContainerModel.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 truckContainerModel.setOnTerminal(tableObject.getOnTerminalColumn());
+                truckContainerModel.setModifiedBy(tableObject.getModifiedByColumn());
+
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting truck container data"));
                 MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected truck container");
@@ -275,6 +277,7 @@ public class TruckController {
                         item.setModifyDateColumn(truckContainerDTO.getModifyDate());
                         item.setCreatedByColumn(truckContainerDTO.getCreatedBy());
                         item.setOnTerminalColumn(truckContainerDTO.getOnTerminal());
+                        item.setModifiedByColumn(truckContainerDTO.getLastModifiedBy());
                     }
 
                 } catch (Exception e) {
@@ -300,6 +303,7 @@ public class TruckController {
                 truckContainerModel.setCreationDate("");
                 truckContainerModel.setModifyDate("");
                 truckContainerModel.setOnTerminal("");
+                truckContainerModel.setModifiedBy("");
             } catch (Exception e) {
                 log.fatal(e);
             }
@@ -329,6 +333,7 @@ public class TruckController {
                 truckTrailerModel.setCreationDate(String.valueOf(tableObject.getCreationDateColumn()));
                 truckTrailerModel.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 truckTrailerModel.setOnTerminal(tableObject.getOnTerminalColumn());
+                truckTrailerModel.setModifiedBy(tableObject.getModifiedByColumn());
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting truck trailer data "));
                 MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected truck trailer");
@@ -509,6 +514,7 @@ public class TruckController {
                         item.setModifyDateColumn(truckTrailerDTO.getModifyDate());
                         item.setCreatedByColumn(truckTrailerDTO.getCreatedBy());
                         item.setOnTerminalColumn(truckTrailerDTO.getOnTerminal());
+                        item.setModifiedByColumn(truckTrailerDTO.getLastModifiedBy());
                     }
 
                 } catch (Exception e) {
@@ -532,6 +538,7 @@ public class TruckController {
                 truckTrailerModel.setCreationDate("");
                 truckTrailerModel.setModifyDate("");
                 truckTrailerModel.setOnTerminal("");
+                truckTrailerModel.setModifiedBy("");
             } catch (Exception e) {
                 log.fatal(e);
             }

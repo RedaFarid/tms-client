@@ -72,6 +72,7 @@ public class DriversController {
                 model.setCreationDate(String.valueOf(tableObject.getCreationDateColumn()));
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
+                model.setModifiedBy(tableObject.getModifiedByColumn());
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting driver data"));
                 MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected driver");
@@ -273,6 +274,7 @@ public class DriversController {
                         item.setModifyDateColumn(driverDTO.getModifyDate());
                         item.setCreatedByColumn(driverDTO.getCreatedBy());
                         item.setOnTerminalColumn(driverDTO.getOnTerminal());
+                        item.setModifiedByColumn(driverDTO.getLastModifiedBy());
                     }
 
                 } catch (Exception e) {
@@ -297,6 +299,7 @@ public class DriversController {
                 model.setCreationDate("");
                 model.setModifyDate("");
                 model.setOnTerminal("");
+                model.setModifiedBy("");
             } catch (Exception e) {
                 log.fatal(e);
             }

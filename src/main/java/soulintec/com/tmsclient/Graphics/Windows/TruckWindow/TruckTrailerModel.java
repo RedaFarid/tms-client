@@ -19,6 +19,7 @@ public class TruckTrailerModel {
     private final StringProperty modifyDate = new SimpleStringProperty();
     private final StringProperty creationDate = new SimpleStringProperty();
     private final StringProperty createdBy = new SimpleStringProperty();
+    private final StringProperty modifiedBy = new SimpleStringProperty();
     private final StringProperty onTerminal = new SimpleStringProperty();
 
     public long getTruckTrailerId() {
@@ -129,6 +130,18 @@ public class TruckTrailerModel {
         this.createdBy.set(createdBy);
     }
 
+    public String getModifiedBy() {
+        return modifiedBy.get();
+    }
+
+    public StringProperty modifiedByProperty() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy.set(modifiedBy);
+    }
+
     public String getOnTerminal() {
         return onTerminal.get();
     }
@@ -152,9 +165,10 @@ public class TruckTrailerModel {
         private final ObjectProperty<LocalDateTime> creationDateColumn;
         private final ObjectProperty<LocalDateTime> modifyDateColumn;
         private final StringProperty createdByColumn;
+        private final StringProperty modifiedByColumn;
         private final StringProperty onTerminalColumn;
 
-        public TableObject(LongProperty truckTrailerIdColumn, StringProperty trailerNumberColumn, StringProperty licenseNumberColumn, ObjectProperty<LocalDate> licenceExpirationDateColumn, ObjectProperty<Permissions> permissionsColumn, StringProperty commentColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn) {
+        public TableObject(LongProperty truckTrailerIdColumn, StringProperty trailerNumberColumn, StringProperty licenseNumberColumn, ObjectProperty<LocalDate> licenceExpirationDateColumn, ObjectProperty<Permissions> permissionsColumn, StringProperty commentColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty modifiedByColumn, StringProperty onTerminalColumn) {
             this.truckTrailerIdColumn = truckTrailerIdColumn;
             this.trailerNumberColumn = trailerNumberColumn;
             this.licenseNumberColumn = licenseNumberColumn;
@@ -164,6 +178,7 @@ public class TruckTrailerModel {
             this.creationDateColumn = creationDateColumn;
             this.modifyDateColumn = modifyDateColumn;
             this.createdByColumn = createdByColumn;
+            this.modifiedByColumn = modifiedByColumn;
             this.onTerminalColumn = onTerminalColumn;
         }
 
@@ -275,6 +290,18 @@ public class TruckTrailerModel {
             this.createdByColumn.set(createdByColumn);
         }
 
+        public String getModifiedByColumn() {
+            return modifiedByColumn.get();
+        }
+
+        public StringProperty modifiedByColumnProperty() {
+            return modifiedByColumn;
+        }
+
+        public void setModifiedByColumn(String modifiedByColumn) {
+            this.modifiedByColumn.set(modifiedByColumn);
+        }
+
         public String getOnTerminalColumn() {
             return onTerminalColumn.get();
         }
@@ -298,6 +325,7 @@ public class TruckTrailerModel {
                     new SimpleObjectProperty<>(truckTrailerDTO.getCreationDate()),
                     new SimpleObjectProperty<>(truckTrailerDTO.getModifyDate()),
                     new SimpleStringProperty(truckTrailerDTO.getCreatedBy()),
+                    new SimpleStringProperty(truckTrailerDTO.getLastModifiedBy()),
                     new SimpleStringProperty(truckTrailerDTO.getOnTerminal()));
         }
 
@@ -306,23 +334,25 @@ public class TruckTrailerModel {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             TableObject that = (TableObject) o;
-            return Objects.equal(truckTrailerIdColumn.getValue(), that.truckTrailerIdColumn.getValue()) &&
-                    Objects.equal(trailerNumberColumn.getValue(), that.trailerNumberColumn.getValue()) &&
-                    Objects.equal(licenseNumberColumn.getValue(), that.licenseNumberColumn.getValue()) &&
-                    Objects.equal(licenceExpirationDateColumn.getValue(), that.licenceExpirationDateColumn.getValue()) &&
-                    Objects.equal(permissionsColumn.getValue(), that.permissionsColumn.getValue()) &&
-                    Objects.equal(commentColumn.getValue(), that.commentColumn.getValue()) &&
-                    Objects.equal(creationDateColumn.getValue(), that.creationDateColumn.getValue()) &&
-                    Objects.equal(modifyDateColumn.getValue(), that.modifyDateColumn.getValue()) &&
-                    Objects.equal(createdByColumn.getValue(), that.createdByColumn.getValue()) &&
-                    Objects.equal(onTerminalColumn.getValue(), that.onTerminalColumn.getValue());
+            return Objects.equal(truckTrailerIdColumn.getValue(), that.truckTrailerIdColumn.getValue()) ;
+//            &&
+//                    Objects.equal(trailerNumberColumn.getValue(), that.trailerNumberColumn.getValue()) &&
+//                    Objects.equal(licenseNumberColumn.getValue(), that.licenseNumberColumn.getValue()) &&
+//                    Objects.equal(licenceExpirationDateColumn.getValue(), that.licenceExpirationDateColumn.getValue()) &&
+//                    Objects.equal(permissionsColumn.getValue(), that.permissionsColumn.getValue()) &&
+//                    Objects.equal(commentColumn.getValue(), that.commentColumn.getValue()) &&
+//                    Objects.equal(creationDateColumn.getValue(), that.creationDateColumn.getValue()) &&
+//                    Objects.equal(modifyDateColumn.getValue(), that.modifyDateColumn.getValue()) &&
+//                    Objects.equal(createdByColumn.getValue(), that.createdByColumn.getValue()) &&
+//                    Objects.equal(onTerminalColumn.getValue(), that.onTerminalColumn.getValue());
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(truckTrailerIdColumn.getValue(), trailerNumberColumn.getValue(), licenseNumberColumn.getValue(),
-                    licenceExpirationDateColumn.getValue(), permissionsColumn.getValue(),
-                    commentColumn.getValue(), creationDateColumn.getValue(), modifyDateColumn.getValue(), createdByColumn.getValue(), onTerminalColumn.getValue());
+            return Objects.hashCode(truckTrailerIdColumn.getValue());
+//            , trailerNumberColumn.getValue(), licenseNumberColumn.getValue(),
+//                    licenceExpirationDateColumn.getValue(), permissionsColumn.getValue(),
+//                    commentColumn.getValue(), creationDateColumn.getValue(), modifyDateColumn.getValue(), createdByColumn.getValue(), onTerminalColumn.getValue());
         }
 
         @Override

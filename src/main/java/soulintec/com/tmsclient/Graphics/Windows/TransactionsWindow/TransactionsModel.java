@@ -24,6 +24,7 @@ public class TransactionsModel {
     private final StringProperty modifyDate = new SimpleStringProperty();
     private final StringProperty creationDate = new SimpleStringProperty();
     private final StringProperty createdBy = new SimpleStringProperty();
+    private final StringProperty modifiedBy = new SimpleStringProperty();
     private final StringProperty onTerminal = new SimpleStringProperty();
 
     public long getTransactionId() {
@@ -194,6 +195,18 @@ public class TransactionsModel {
         this.createdBy.set(createdBy);
     }
 
+    public String getModifiedBy() {
+        return modifiedBy.get();
+    }
+
+    public StringProperty modifiedByProperty() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy.set(modifiedBy);
+    }
+
     public String getOnTerminal() {
         return onTerminal.get();
     }
@@ -221,9 +234,10 @@ public class TransactionsModel {
         private final ObjectProperty<LocalDateTime> creationDateColumn;
         private final ObjectProperty<LocalDateTime> modifyDateColumn;
         private final StringProperty createdByColumn;
+        private final StringProperty modifiedByColumn;
         private final StringProperty onTerminalColumn;
 
-        public TableObject(LongProperty transactionIdColumn, LongProperty materialColumn, LongProperty stationColumn, LongProperty tankColumn, LongProperty driverColumn, LongProperty truckTrailerColumn, LongProperty truckContainerColumn, LongProperty clientColumn, ObjectProperty<OperationType> operationTypeColumn, DoubleProperty qtyColumn, ObjectProperty<LocalDateTime> dateTimeColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn) {
+        public TableObject(LongProperty transactionIdColumn, LongProperty materialColumn, LongProperty stationColumn, LongProperty tankColumn, LongProperty driverColumn, LongProperty truckTrailerColumn, LongProperty truckContainerColumn, LongProperty clientColumn, ObjectProperty<OperationType> operationTypeColumn, DoubleProperty qtyColumn, ObjectProperty<LocalDateTime> dateTimeColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty modifiedByColumn, StringProperty onTerminalColumn) {
             this.transactionIdColumn = transactionIdColumn;
             this.materialColumn = materialColumn;
             this.stationColumn = stationColumn;
@@ -238,6 +252,7 @@ public class TransactionsModel {
             this.creationDateColumn = creationDateColumn;
             this.modifyDateColumn = modifyDateColumn;
             this.createdByColumn = createdByColumn;
+            this.modifiedByColumn = modifiedByColumn;
             this.onTerminalColumn = onTerminalColumn;
         }
 
@@ -409,6 +424,18 @@ public class TransactionsModel {
             this.createdByColumn.set(createdByColumn);
         }
 
+        public String getModifiedByColumn() {
+            return modifiedByColumn.get();
+        }
+
+        public StringProperty modifiedByColumnProperty() {
+            return modifiedByColumn;
+        }
+
+        public void setModifiedByColumn(String modifiedByColumn) {
+            this.modifiedByColumn.set(modifiedByColumn);
+        }
+
         public String getOnTerminalColumn() {
             return onTerminalColumn.get();
         }
@@ -437,6 +464,7 @@ public class TransactionsModel {
                     new SimpleObjectProperty<>(transactionDTO.getCreationDate()),
                     new SimpleObjectProperty<>(transactionDTO.getModifyDate()),
                     new SimpleStringProperty(transactionDTO.getCreatedBy()),
+                    new SimpleStringProperty(transactionDTO.getLastModifiedBy()),
                     new SimpleStringProperty(transactionDTO.getOnTerminal()));
         }
 

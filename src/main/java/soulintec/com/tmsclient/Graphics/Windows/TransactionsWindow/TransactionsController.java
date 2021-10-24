@@ -135,6 +135,7 @@ public class TransactionsController {
                 model.setCreationDate(String.valueOf(tableObject.getCreationDateColumn()));
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
+                model.setModifiedBy(tableObject.getModifiedByColumn());
 
                 materialService.findById(transactionDTO.getMaterial()).ifPresentOrElse(materialDTO -> {
                     materialsModel.setMaterialId(materialDTO.getId());
@@ -462,6 +463,7 @@ public class TransactionsController {
                         item.setModifyDateColumn(transactionDTO.getModifyDate());
                         item.setCreatedByColumn(transactionDTO.getCreatedBy());
                         item.setOnTerminalColumn(transactionDTO.getOnTerminal());
+                        item.setModifiedByColumn(transactionDTO.getLastModifiedBy());
                     }
                 } catch (Exception e) {
                     logsService.save(new LogDTO(LogIdentifier.Error , toString() , e.getMessage()));
@@ -488,6 +490,7 @@ public class TransactionsController {
                 model.setCreatedBy((""));
                 model.setCreationDate("");
                 model.setModifyDate("");
+                model.setModifiedBy("");
                 model.setOnTerminal("");
 
                 materialsModel.setMaterialId(0);

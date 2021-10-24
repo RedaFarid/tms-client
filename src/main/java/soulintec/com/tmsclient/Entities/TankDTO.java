@@ -27,6 +27,7 @@ public class TankDTO {
     private String createdBy;
     private String onTerminal;
     private double calculatedQty;
+    private String lastModifiedBy;
 
     public Long getMaterialID() {
         if (Objects.isNull(materialID))

@@ -1,6 +1,5 @@
 package soulintec.com.tmsclient.Graphics.Windows.MainWindow.mainWindowSubNodes;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -16,13 +15,10 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.ConfigurableApplicationContext;
 import soulintec.com.tmsclient.ApplicationContext;
 import soulintec.com.tmsclient.Entities.Authorization.AppUserDTO;
 import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Entities.Authorization.RoleRef;
-import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
 import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
 import soulintec.com.tmsclient.Services.RoleRefService;
 import soulintec.com.tmsclient.Services.RolesService;

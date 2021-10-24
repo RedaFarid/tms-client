@@ -63,6 +63,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
     private TableColumn<ClientsModel.TableObject, StringProperty> clientContactTelNumberColumn;
     private TableColumn<ClientsModel.TableObject, StringProperty> cientContactEmailColumn;
     private TableColumn<ClientsModel.TableObject, StringProperty> createdByColumn;
+    private TableColumn<ClientsModel.TableObject, StringProperty> lastModifiedByColumn;
     private TableColumn<ClientsModel.TableObject, StringProperty> onTerminalColumn;
     private TableColumn<ClientsModel.TableObject, ObjectProperty<LocalDateTime>> creationDateColumn;
     private TableColumn<ClientsModel.TableObject, ObjectProperty<LocalDateTime>> modifyDateColumn;
@@ -82,6 +83,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
     private Label modificationLabel;
     private Label onTerminalLabel;
     private Label createdByLabel;
+    private Label modifiedByLabel;
 
     private EnhancedLongField idField;
     private EnhancedTextField nameField;
@@ -92,6 +94,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
     private EnhancedTextField creationDateField;
     private EnhancedTextField modificationDateField;
     private EnhancedTextField createdByField;
+    private EnhancedTextField modifiedByField;
     private EnhancedTextField onTerminalField;
 
     @Autowired
@@ -136,6 +139,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         clientContactTelNumberColumn = new TableColumn<>("Tel Number");
         cientContactEmailColumn = new TableColumn<>("Email");
         createdByColumn = new TableColumn<>("Created By");
+        lastModifiedByColumn = new TableColumn<>("Modified By");
         onTerminalColumn = new TableColumn<>("On Terminal");
         creationDateColumn = new TableColumn<>("Creation Date");
         modifyDateColumn = new TableColumn<>("Modification Date");
@@ -155,6 +159,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         modificationLabel = new Label("Modification Date :");
         onTerminalLabel = new Label("On Terminal :");
         createdByLabel = new Label("Created By :");
+        modifiedByLabel = new Label("Modified By :");
 
         idField = new EnhancedLongField();
         nameField = new EnhancedTextField();
@@ -166,6 +171,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         modificationDateField = new EnhancedTextField();
         createdByField = new EnhancedTextField();
         onTerminalField = new EnhancedTextField();
+        modifiedByField = new EnhancedTextField();
     }
 
     private void userAuthorities() {
@@ -220,12 +226,14 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         creationDateLabel.setPrefWidth(150);
         modificationLabel.setPrefWidth(150);
         createdByLabel.setPrefWidth(150);
+        modifiedByLabel.setPrefWidth(150);
         onTerminalLabel.setPrefWidth(150);
 
         idField.setEditable(false);
         creationDateField.setEditable(false);
         modificationDateField.setEditable(false);
         createdByField.setEditable(false);
+        modifiedByField.setEditable(false);
         onTerminalField.setEditable(false);
 
         idLabel.setTextAlignment(TextAlignment.RIGHT);
@@ -237,6 +245,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         creationDateLabel.setTextAlignment(TextAlignment.RIGHT);
         modificationLabel.setTextAlignment(TextAlignment.RIGHT);
         createdByLabel.setTextAlignment(TextAlignment.RIGHT);
+        modifiedByLabel.setTextAlignment(TextAlignment.RIGHT);
         onTerminalLabel.setTextAlignment(TextAlignment.RIGHT);
 
         idLabel.setAlignment(Pos.BASELINE_RIGHT);
@@ -248,6 +257,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         creationDateLabel.setAlignment(Pos.BASELINE_RIGHT);
         modificationLabel.setAlignment(Pos.BASELINE_RIGHT);
         createdByLabel.setAlignment(Pos.BASELINE_RIGHT);
+        modifiedByLabel.setAlignment(Pos.BASELINE_RIGHT);
         onTerminalLabel.setAlignment(Pos.BASELINE_RIGHT);
 
         idLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
@@ -259,18 +269,19 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         creationDateLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         modificationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         createdByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        modifiedByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         onTerminalLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
         idField.setPrefWidth(250);
-//        mainOfficeAdressField.setPrefWidth(650);
+        mainOfficeAdressField.setPrefWidth(520);
         contactNameField.setPrefWidth(250);
         contactTelNumberField.setPrefWidth(250);
-//        contactEmailField.setPrefWidth(650);
         nameField.setPrefWidth(250);
         creationDateField.setPrefWidth(250);
         modificationDateField.setPrefWidth(250);
         createdByField.setPrefWidth(250);
         onTerminalField.setPrefWidth(250);
+        modifiedByField.setPrefWidth(250);
 
         //restriction handling
         nameField.setRestrict("[a-zA-Z-_ ]");
@@ -311,11 +322,14 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         dataEntryPartitionTitled.add(modificationLabel, 3, 3);
         dataEntryPartitionTitled.add(modificationDateField, 4, 3);
 
+        dataEntryPartitionTitled.add(onTerminalLabel, 1, 4);
+        dataEntryPartitionTitled.add(onTerminalField, 2, 4);
+
         dataEntryPartitionTitled.add(createdByLabel, 5, 3);
         dataEntryPartitionTitled.add(createdByField, 6, 3);
 
-        dataEntryPartitionTitled.add(onTerminalLabel, 7, 3);
-        dataEntryPartitionTitled.add(onTerminalField, 8, 3);
+        dataEntryPartitionTitled.add(modifiedByLabel, 7,3);
+        dataEntryPartitionTitled.add(modifiedByField, 8,3);
 
         //table configuration
         clientIDColumn.setCellValueFactory(new PropertyValueFactory<>("clientIdColumn"));
@@ -327,9 +341,10 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         creationDateColumn.setCellValueFactory(new PropertyValueFactory<>("creationDateColumn"));
         modifyDateColumn.setCellValueFactory(new PropertyValueFactory<>("modifyDateColumn"));
         createdByColumn.setCellValueFactory(new PropertyValueFactory<>("createdByColumn"));
+        lastModifiedByColumn.setCellValueFactory(new PropertyValueFactory<>("lastModifiedByColumn"));
         onTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
 
-        table.getColumns().addAll(clientIDColumn, clientNameColumn, clientMainOfficeColumn, clientContactNameColumn, clientContactTelNumberColumn, cientContactEmailColumn, creationDateColumn, modifyDateColumn, createdByColumn, onTerminalColumn);
+        table.getColumns().addAll(clientIDColumn, clientNameColumn, clientMainOfficeColumn, clientContactNameColumn, clientContactTelNumberColumn, cientContactEmailColumn, creationDateColumn, modifyDateColumn, createdByColumn,lastModifiedByColumn, onTerminalColumn);
         table.prefHeightProperty().bind(root.heightProperty().subtract(clientsVbox.heightProperty()));
         table.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -359,6 +374,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         createdByField.textProperty().bindBidirectional(model.createdByProperty());
         onTerminalField.textProperty().bindBidirectional(model.onTerminalProperty());
         modificationDateField.textProperty().bindBidirectional(model.modifyDateProperty());
+        modifiedByField.textProperty().bindBidirectional(model.lastModifiedByProperty());
         creationDateField.textProperty().bindBidirectional(model.creationDateProperty());
     }
 

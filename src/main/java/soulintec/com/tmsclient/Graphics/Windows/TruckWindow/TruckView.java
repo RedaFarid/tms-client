@@ -76,6 +76,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
     private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerPermissionsColumn;
     private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerCommentColumn;
     private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerCreatedByColumn;
+    private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerModifiedByColumn;
     private TableColumn<TruckTrailerModel.TableObject, StringProperty> trailerOnTerminalColumn;
     private TableColumn<TruckTrailerModel.TableObject, ObjectProperty<LocalDateTime>> trailerCreationDateColumn;
     private TableColumn<TruckTrailerModel.TableObject, ObjectProperty<LocalDateTime>> trailerModifyDateColumn;
@@ -91,6 +92,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
     private TableColumn<TruckContainerModel.TableObject, StringProperty> containerPermissionsColumn;
     private TableColumn<TruckContainerModel.TableObject, StringProperty> containerCommentColumn;
     private TableColumn<TruckContainerModel.TableObject, StringProperty> containerCreatedByColumn;
+    private TableColumn<TruckContainerModel.TableObject, StringProperty> containerModifiedByColumn;
     private TableColumn<TruckContainerModel.TableObject, StringProperty> containerOnTerminalColumn;
     private TableColumn<TruckContainerModel.TableObject, ObjectProperty<LocalDateTime>> containerCreationDateColumn;
     private TableColumn<TruckContainerModel.TableObject, ObjectProperty<LocalDateTime>> containerModifyDateColumn;
@@ -115,6 +117,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
     private Label trailerModificationLabel;
     private Label trailerOnTerminalLabel;
     private Label trailerCreatedByLabel;
+    private Label trailerModifiedByLabel;
 
     private Label containerIdLabel;
     private Label containerNumberLabel;
@@ -127,6 +130,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
     private Label containerModificationLabel;
     private Label containerOnTerminalLabel;
     private Label containerCreatedByLabel;
+    private Label containerModifiedByLabel;
 
     private EnhancedLongField trailerIdField;
     private EnhancedTextField trailerNumberField;
@@ -137,6 +141,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
     private EnhancedTextField trailerCreationDateField;
     private EnhancedTextField trailerModificationDateField;
     private EnhancedTextField trailerCreatedByField;
+    private EnhancedTextField trailerModifiedByField;
     private EnhancedTextField trailerOnTerminalField;
 
     private EnhancedLongField containerIdField;
@@ -149,6 +154,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
     private EnhancedTextField containerCreationDateField;
     private EnhancedTextField containerModificationDateField;
     private EnhancedTextField containerCreatedByField;
+    private EnhancedTextField containerModifiedByField;
     private EnhancedTextField containerOnTerminalField;
 
     @Autowired
@@ -205,6 +211,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailerPermissionsColumn = new TableColumn<>("Permissions");
         trailerCommentColumn = new TableColumn<>("Comment");
         trailerCreatedByColumn = new TableColumn<>("Created By");
+        trailerModifiedByColumn = new TableColumn<>("Modified By");
         trailerOnTerminalColumn = new TableColumn<>("On Terminal");
         trailerCreationDateColumn = new TableColumn<>("Creation Date");
         trailerModifyDateColumn = new TableColumn<>("Modification Date");
@@ -224,6 +231,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailerModificationLabel = new Label("Modification Date :");
         trailerOnTerminalLabel = new Label("On Terminal :");
         trailerCreatedByLabel = new Label("Created By :");
+        trailerModifiedByLabel = new Label("Modified By :");
 
         trailerIdField = new EnhancedLongField();
         trailerNumberField = new EnhancedTextField();
@@ -235,6 +243,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailerModificationDateField = new EnhancedTextField();
         trailerCreatedByField = new EnhancedTextField();
         trailerOnTerminalField = new EnhancedTextField();
+        trailerModifiedByField = new EnhancedTextField();
 
         //Containers
         containersTableView = new TableView<>();
@@ -246,6 +255,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containerPermissionsColumn = new TableColumn<>("Permissions");
         containerCommentColumn = new TableColumn<>("Comment");
         containerCreatedByColumn = new TableColumn<>("Created By");
+        containerModifiedByColumn = new TableColumn<>("Modified By");
         containerOnTerminalColumn = new TableColumn<>("On Terminal");
         containerCreationDateColumn = new TableColumn<>("Creation Date");
         containerModifyDateColumn = new TableColumn<>("Modification Date");
@@ -266,6 +276,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containerModificationLabel = new Label("Modification Date :");
         containerOnTerminalLabel = new Label("On Terminal :");
         containerCreatedByLabel = new Label("Created By :");
+        containerModifiedByLabel = new Label("Modified By :");
 
         containerIdField = new EnhancedLongField();
         containerNumberField = new EnhancedTextField();
@@ -277,6 +288,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containerCreationDateField = new EnhancedTextField();
         containerModificationDateField = new EnhancedTextField();
         containerCreatedByField = new EnhancedTextField();
+        containerModifiedByField = new EnhancedTextField();
         containerOnTerminalField = new EnhancedTextField();
     }
 
@@ -345,6 +357,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailerPermissionLabel.setPrefWidth(150);
         trailerCommentLabel.setPrefWidth(150);
         trailerCreatedByLabel.setPrefWidth(150);
+        trailerModifiedByLabel.setPrefWidth(150);
         trailerOnTerminalLabel.setPrefWidth(150);
         trailerModificationLabel.setPrefWidth(150);
         trailerCreationDateLabel.setPrefWidth(150);
@@ -359,6 +372,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailerOnTerminalLabel.setTextAlignment(TextAlignment.RIGHT);
         trailerModificationLabel.setTextAlignment(TextAlignment.RIGHT);
         trailerCreationDateLabel.setTextAlignment(TextAlignment.RIGHT);
+        trailerModifiedByLabel.setTextAlignment(TextAlignment.RIGHT);
 
         trailerIdLabel.setAlignment(Pos.BASELINE_RIGHT);
         trailerNumberLabel.setAlignment(Pos.BASELINE_RIGHT);
@@ -370,6 +384,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailerOnTerminalLabel.setAlignment(Pos.BASELINE_RIGHT);
         trailerModificationLabel.setAlignment(Pos.BASELINE_RIGHT);
         trailerCreationDateLabel.setAlignment(Pos.BASELINE_RIGHT);
+        trailerModifiedByLabel.setAlignment(Pos.BASELINE_RIGHT);
 
         trailerIdLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         trailerNumberLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
@@ -381,6 +396,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailerOnTerminalLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         trailerModificationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         trailerCreationDateLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        trailerModifiedByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
         trailerIdField.setPrefWidth(250);
         trailerNumberField.setPrefWidth(250);
@@ -392,12 +408,14 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailerCreationDateField.setPrefWidth(250);
         trailerOnTerminalField.setPrefWidth(250);
         trailerModificationDateField.setPrefWidth(250);
+        trailerModifiedByField.setPrefWidth(250);
 
         trailerIdField.setEditable(false);
         trailerCreatedByField.setEditable(false);
         trailerCreationDateField.setEditable(false);
         trailerOnTerminalField.setEditable(false);
         trailerModificationDateField.setEditable(false);
+        trailerModifiedByField.setEditable(false);
 
         //restriction handling
         trailerLicenceNumberField.setRestrict("[0-9]");
@@ -438,8 +456,11 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailersDataEntry.add(trailerModificationDateField, 4, 3);
         trailersDataEntry.add(trailerCreatedByLabel, 5, 3);
         trailersDataEntry.add(trailerCreatedByField, 6, 3);
-        trailersDataEntry.add(trailerOnTerminalLabel, 7, 3);
-        trailersDataEntry.add(trailerOnTerminalField, 8, 3);
+        trailersDataEntry.add(trailerModifiedByLabel, 7, 3);
+        trailersDataEntry.add(trailerModifiedByField, 8, 3);
+
+        trailersDataEntry.add(trailerOnTerminalLabel, 1, 4);
+        trailersDataEntry.add(trailerOnTerminalField, 2, 4);
 
         trailerPermissionField.getItems().addAll(FXCollections.observableArrayList(Permissions.values()));
 
@@ -454,10 +475,11 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailerOnTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
         trailerCreationDateColumn.setCellValueFactory(new PropertyValueFactory<>("creationDateColumn"));
         trailerModifyDateColumn.setCellValueFactory(new PropertyValueFactory<>("modifyDateColumn"));
+        trailerModifiedByColumn.setCellValueFactory(new PropertyValueFactory<>("modifiedByColumn"));
 
         trailersTableView.getColumns().addAll(trailerIdColumn, trailerNumColumn, trailerLicenceColumn, trailerLicenceExpirationDateColumn,
                 trailerPermissionsColumn, trailerCommentColumn, trailerCreationDateColumn,
-                trailerModifyDateColumn, trailerCreatedByColumn, trailerOnTerminalColumn);
+                trailerModifyDateColumn, trailerCreatedByColumn, trailerModifiedByColumn,trailerOnTerminalColumn);
         trailersTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         trailersTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         trailersTableView.prefHeightProperty().bind(tabContainer.heightProperty().subtract(trailersVbox.heightProperty()));
@@ -492,6 +514,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailerOnTerminalField.textProperty().bindBidirectional(trailerModel.onTerminalProperty());
         trailerModificationDateField.textProperty().bindBidirectional(trailerModel.modifyDateProperty());
         trailerCreationDateField.textProperty().bindBidirectional(trailerModel.creationDateProperty());
+        trailerModifiedByField.textProperty().bindBidirectional(trailerModel.modifiedByProperty());
     }
 
     private void containersGraphicBuilder() {
@@ -510,6 +533,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containerPermissionLabel.setPrefWidth(150);
         containerCommentLabel.setPrefWidth(150);
         containerCreatedByLabel.setPrefWidth(150);
+        containerModifiedByLabel.setPrefWidth(150);
         containerOnTerminalLabel.setPrefWidth(150);
         containerModificationLabel.setPrefWidth(150);
         containerCreationDateLabel.setPrefWidth(150);
@@ -525,6 +549,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containerOnTerminalLabel.setTextAlignment(TextAlignment.RIGHT);
         containerModificationLabel.setTextAlignment(TextAlignment.RIGHT);
         containerCreationDateLabel.setTextAlignment(TextAlignment.RIGHT);
+        containerModifiedByLabel.setTextAlignment(TextAlignment.RIGHT);
 
         containerIdLabel.setAlignment(Pos.BASELINE_RIGHT);
         containerNumberLabel.setAlignment(Pos.BASELINE_RIGHT);
@@ -537,6 +562,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containerOnTerminalLabel.setAlignment(Pos.BASELINE_RIGHT);
         containerModificationLabel.setAlignment(Pos.BASELINE_RIGHT);
         containerCreationDateLabel.setAlignment(Pos.BASELINE_RIGHT);
+        containerModifiedByLabel.setAlignment(Pos.BASELINE_RIGHT);
 
         containerIdLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         containerNumberLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
@@ -549,6 +575,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containerOnTerminalLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         containerModificationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         containerCreationDateLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        containerModifiedByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
         containerIdField.setPrefWidth(250);
         containerNumberField.setPrefWidth(250);
@@ -561,12 +588,14 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containerCreationDateField.setPrefWidth(250);
         containerOnTerminalField.setPrefWidth(250);
         containerModificationDateField.setPrefWidth(250);
+        containerModifiedByField.setPrefWidth(250);
 
         containerIdField.setEditable(false);
         containerCreatedByField.setEditable(false);
         containerCreationDateField.setEditable(false);
         containerOnTerminalField.setEditable(false);
         containerModificationDateField.setEditable(false);
+        containerModifiedByField.setEditable(false);
 
         //restriction handling
         containerLicenceNumberField.setRestrict("[0-9]");
@@ -611,8 +640,11 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containersDataEntry.add(containerModificationDateField, 4, 3);
         containersDataEntry.add(containerCreatedByLabel, 5, 3);
         containersDataEntry.add(containerCreatedByField, 6, 3);
-        containersDataEntry.add(containerOnTerminalLabel, 7, 3);
-        containersDataEntry.add(containerOnTerminalField, 8, 3);
+        containersDataEntry.add(containerModifiedByLabel, 7, 3);
+        containersDataEntry.add(containerModifiedByField, 8, 3);
+
+        containersDataEntry.add(containerOnTerminalLabel, 1, 4);
+        containersDataEntry.add(containerOnTerminalField, 2, 4);
 
         containerPermissionField.getItems().addAll(FXCollections.observableArrayList(Permissions.values()));
 
@@ -625,6 +657,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containerPermissionsColumn.setCellValueFactory(new PropertyValueFactory<>("permissionsColumn"));
         containerCommentColumn.setCellValueFactory(new PropertyValueFactory<>("commentColumn"));
         containerCreatedByColumn.setCellValueFactory(new PropertyValueFactory<>("createdByColumn"));
+        containerModifiedByColumn.setCellValueFactory(new PropertyValueFactory<>("modifiedByColumn"));
         containerOnTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
         containerCreationDateColumn.setCellValueFactory(new PropertyValueFactory<>("creationDateColumn"));
         containerModifyDateColumn.setCellValueFactory(new PropertyValueFactory<>("modifyDateColumn"));
@@ -632,7 +665,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containersTableView.getColumns().addAll(containerIdColumn, containerNumColumn, containerLicenceColumn, containerLicenceExpirationDateColumn,
                 containerMaximumWeightColumn,
                 containerPermissionsColumn, containerCommentColumn, containerCreationDateColumn,
-                containerModifyDateColumn, containerCreatedByColumn, containerOnTerminalColumn);
+                containerModifyDateColumn, containerCreatedByColumn,containerModifiedByColumn, containerOnTerminalColumn);
         trailersTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         containersTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         containersTableView.prefHeightProperty().bind(tabContainer.heightProperty().subtract(containersVvox.heightProperty()));
@@ -665,6 +698,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containerPermissionField.valueProperty().bindBidirectional(containerModel.permissionsProperty());
         containerCommentField.textProperty().bindBidirectional(containerModel.commentProperty());
         containerCreatedByField.textProperty().bindBidirectional(containerModel.createdByProperty());
+        containerModifiedByField.textProperty().bindBidirectional(containerModel.modifiedByProperty());
         containerOnTerminalField.textProperty().bindBidirectional(containerModel.onTerminalProperty());
         containerModificationDateField.textProperty().bindBidirectional(containerModel.modifyDateProperty());
         containerCreationDateField.textProperty().bindBidirectional(containerModel.creationDateProperty());

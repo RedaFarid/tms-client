@@ -21,6 +21,7 @@ public class MaterialDTO implements Comparable<MaterialDTO>, Cloneable, Serializ
     private LocalDateTime creationDate;
     private LocalDateTime modifyDate;
     private String createdBy;
+    private String lastModifiedBy;
     private String onTerminal;
 
     public MaterialDTO(String name, String description) {

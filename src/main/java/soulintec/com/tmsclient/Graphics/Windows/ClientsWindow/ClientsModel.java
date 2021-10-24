@@ -16,6 +16,7 @@ public class ClientsModel {
     private final StringProperty modifyDate = new SimpleStringProperty();
     private final StringProperty creationDate = new SimpleStringProperty();
     private final StringProperty createdBy = new SimpleStringProperty();
+    private final StringProperty lastModifiedBy = new SimpleStringProperty();
     private final StringProperty onTerminal = new SimpleStringProperty();
 
     public long getClientId() {
@@ -126,6 +127,18 @@ public class ClientsModel {
         this.createdBy.set(createdBy);
     }
 
+    public String getLastModifiedBy() {
+        return lastModifiedBy.get();
+    }
+
+    public StringProperty lastModifiedByProperty() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy.set(lastModifiedBy);
+    }
+
     public String getOnTerminal() {
         return onTerminal.get();
     }
@@ -148,9 +161,10 @@ public class ClientsModel {
         private final ObjectProperty<LocalDateTime> creationDateColumn;
         private final ObjectProperty<LocalDateTime> modifyDateColumn;
         private final StringProperty createdByColumn;
+        private final StringProperty lastModifiedByColumn;
         private final StringProperty onTerminalColumn;
 
-        public TableObject(LongProperty clientIdColumn, StringProperty nameColumn, StringProperty mainOfficeAddressColumn, StringProperty contactNameColumn, StringProperty contactTelNumberColumn, StringProperty contactEmailColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn) {
+        public TableObject(LongProperty clientIdColumn, StringProperty nameColumn, StringProperty mainOfficeAddressColumn, StringProperty contactNameColumn, StringProperty contactTelNumberColumn, StringProperty contactEmailColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty lastModifiedByColumn, StringProperty onTerminalColumn) {
             this.clientIdColumn = clientIdColumn;
             this.nameColumn = nameColumn;
             this.mainOfficeAddressColumn = mainOfficeAddressColumn;
@@ -160,10 +174,9 @@ public class ClientsModel {
             this.creationDateColumn = creationDateColumn;
             this.modifyDateColumn = modifyDateColumn;
             this.createdByColumn = createdByColumn;
+            this.lastModifiedByColumn = lastModifiedByColumn;
             this.onTerminalColumn = onTerminalColumn;
         }
-
-
 
         public long getClientIdColumn() {
             return clientIdColumn.get();
@@ -273,6 +286,18 @@ public class ClientsModel {
             this.createdByColumn.set(createdByColumn);
         }
 
+        public String getLastModifiedByColumn() {
+            return lastModifiedByColumn.get();
+        }
+
+        public StringProperty lastModifiedByColumnProperty() {
+            return lastModifiedByColumn;
+        }
+
+        public void setLastModifiedByColumn(String lastModifiedByColumn) {
+            this.lastModifiedByColumn.set(lastModifiedByColumn);
+        }
+
         public String getOnTerminalColumn() {
             return onTerminalColumn.get();
         }
@@ -296,6 +321,7 @@ public class ClientsModel {
                     new SimpleObjectProperty<>(clientDTO.getCreationDate()),
                     new SimpleObjectProperty<>(clientDTO.getModifyDate()),
                     new SimpleStringProperty(clientDTO.getCreatedBy()),
+                    new SimpleStringProperty(clientDTO.getLastModifiedBy()),
                     new SimpleStringProperty(clientDTO.getOnTerminal()));
         }
 
@@ -304,23 +330,24 @@ public class ClientsModel {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             TableObject that = (TableObject) o;
-            return Objects.equal(clientIdColumn.getValue(), that.clientIdColumn.getValue())
-                    && Objects.equal(nameColumn.getValue(), that.nameColumn.getValue())
-                    && Objects.equal(mainOfficeAddressColumn.getValue(), that.mainOfficeAddressColumn.getValue())
-                    && Objects.equal(contactNameColumn.getValue(), that.contactNameColumn.getValue())
-                    && Objects.equal(contactTelNumberColumn.getValue(), that.contactTelNumberColumn.getValue())
-                    && Objects.equal(contactEmailColumn.getValue(), that.contactEmailColumn.getValue())
-                    && Objects.equal(creationDateColumn.getValue(), that.creationDateColumn.getValue())
-                    && Objects.equal(modifyDateColumn.getValue(), that.modifyDateColumn.getValue())
-                    && Objects.equal(createdByColumn.getValue(), that.createdByColumn.getValue())
-                    && Objects.equal(onTerminalColumn.getValue(), that.onTerminalColumn.getValue());
+            return Objects.equal(clientIdColumn.getValue(), that.clientIdColumn.getValue());
+//                    && Objects.equal(nameColumn.getValue(), that.nameColumn.getValue())
+//                    && Objects.equal(mainOfficeAddressColumn.getValue(), that.mainOfficeAddressColumn.getValue())
+//                    && Objects.equal(contactNameColumn.getValue(), that.contactNameColumn.getValue())
+//                    && Objects.equal(contactTelNumberColumn.getValue(), that.contactTelNumberColumn.getValue())
+//                    && Objects.equal(contactEmailColumn.getValue(), that.contactEmailColumn.getValue())
+//                    && Objects.equal(creationDateColumn.getValue(), that.creationDateColumn.getValue())
+//                    && Objects.equal(modifyDateColumn.getValue(), that.modifyDateColumn.getValue())
+//                    && Objects.equal(createdByColumn.getValue(), that.createdByColumn.getValue())
+//                    && Objects.equal(onTerminalColumn.getValue(), that.onTerminalColumn.getValue());
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(clientIdColumn.getValue(), nameColumn.getValue(), mainOfficeAddressColumn.getValue(),
-                    contactNameColumn.getValue(), contactTelNumberColumn.getValue(), contactEmailColumn.getValue(),
-                    creationDateColumn.getValue(), modifyDateColumn.getValue(), createdByColumn.getValue(), onTerminalColumn.getValue());
+            return Objects.hashCode(clientIdColumn.getValue());
+//            , nameColumn.getValue(), mainOfficeAddressColumn.getValue(),
+//                    contactNameColumn.getValue(), contactTelNumberColumn.getValue(), contactEmailColumn.getValue(),
+//                    creationDateColumn.getValue(), modifyDateColumn.getValue(), createdByColumn.getValue(), onTerminalColumn.getValue());
         }
 
         @Override

@@ -65,6 +65,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
     private TableColumn<StationsModel.TableObject, ObjectProperty<String>> computerNameColumn;
     private TableColumn<StationsModel.TableObject, StringProperty> commentColumn;
     private TableColumn<StationsModel.TableObject, StringProperty> createdByColumn;
+    private TableColumn<StationsModel.TableObject, StringProperty> modifiedByColumn;
     private TableColumn<StationsModel.TableObject, StringProperty> onTerminalColumn;
     private TableColumn<StationsModel.TableObject, ObjectProperty<LocalDateTime>> creationDateColumn;
     private TableColumn<StationsModel.TableObject, ObjectProperty<LocalDateTime>> modifyDateColumn;
@@ -83,6 +84,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
     private Label modificationLabel;
     private Label onTerminalLabel;
     private Label createdByLabel;
+    private Label modifiedByLabel;
 
     private EnhancedLongField idField;
     private EnhancedTextField nameField;
@@ -92,6 +94,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
     private EnhancedTextField creationDateField;
     private EnhancedTextField modificationDateField;
     private EnhancedTextField createdByField;
+    private EnhancedTextField modifiedByField;
     private EnhancedTextField onTerminalField;
 
     @Autowired
@@ -136,6 +139,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         computerNameColumn = new TableColumn<>("Computer name");
         commentColumn = new TableColumn<>("Comment");
         createdByColumn = new TableColumn<>("Created By");
+        modifiedByColumn = new TableColumn<>("Modified By");
         onTerminalColumn = new TableColumn<>("On Terminal");
         creationDateColumn = new TableColumn<>("Creation Date");
         modifyDateColumn = new TableColumn<>("Modification Date");
@@ -154,6 +158,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         modificationLabel = new Label("Modification Date :");
         onTerminalLabel = new Label("On Terminal :");
         createdByLabel = new Label("Created By :");
+        modifiedByLabel = new Label("Modified By :");
 
         idField = new EnhancedLongField();
         nameField = new EnhancedTextField();
@@ -163,6 +168,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         creationDateField = new EnhancedTextField();
         modificationDateField = new EnhancedTextField();
         createdByField = new EnhancedTextField();
+        modifiedByField = new EnhancedTextField();
         onTerminalField = new EnhancedTextField();
     }
 
@@ -217,6 +223,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         creationDateLabel.setPrefWidth(150);
         modificationLabel.setPrefWidth(150);
         createdByLabel.setPrefWidth(150);
+        modifiedByLabel.setPrefWidth(150);
         onTerminalLabel.setPrefWidth(150);
 
         idField.setEditable(false);
@@ -224,6 +231,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         modificationDateField.setEditable(false);
         createdByField.setEditable(false);
         onTerminalField.setEditable(false);
+        modifiedByField.setEditable(false);
 
         idLabel.setTextAlignment(TextAlignment.RIGHT);
         nameLabel.setTextAlignment(TextAlignment.RIGHT);
@@ -234,6 +242,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         modificationLabel.setTextAlignment(TextAlignment.RIGHT);
         createdByLabel.setTextAlignment(TextAlignment.RIGHT);
         onTerminalLabel.setTextAlignment(TextAlignment.RIGHT);
+        modifiedByLabel.setTextAlignment(TextAlignment.RIGHT);
 
         idLabel.setAlignment(Pos.BASELINE_RIGHT);
         nameLabel.setAlignment(Pos.BASELINE_RIGHT);
@@ -244,6 +253,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         modificationLabel.setAlignment(Pos.BASELINE_RIGHT);
         createdByLabel.setAlignment(Pos.BASELINE_RIGHT);
         onTerminalLabel.setAlignment(Pos.BASELINE_RIGHT);
+        modifiedByLabel.setAlignment(Pos.BASELINE_RIGHT);
 
         idLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         nameLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
@@ -254,6 +264,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         modificationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         createdByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         onTerminalLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        modifiedByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
         idField.setPrefWidth(250);
 //        mainOfficeAdressField.setPrefWidth(650);
@@ -265,6 +276,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         modificationDateField.setPrefWidth(250);
         createdByField.setPrefWidth(250);
         onTerminalField.setPrefWidth(250);
+        modifiedByField.setPrefWidth(250);
 
         dataEntryPartitionTitled.add(idLabel, 1, 1);
         dataEntryPartitionTitled.add(idField, 2, 1);
@@ -290,8 +302,11 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         dataEntryPartitionTitled.add(createdByLabel, 5, 3);
         dataEntryPartitionTitled.add(createdByField, 6, 3);
 
-        dataEntryPartitionTitled.add(onTerminalLabel, 7, 3);
-        dataEntryPartitionTitled.add(onTerminalField, 8, 3);
+        dataEntryPartitionTitled.add(modifiedByLabel, 7, 3);
+        dataEntryPartitionTitled.add(modifiedByField, 8, 3);
+
+        dataEntryPartitionTitled.add(onTerminalLabel, 1, 4);
+        dataEntryPartitionTitled.add(onTerminalField, 2, 4);
 
         //table configuration
         stationIDColumn.setCellValueFactory(new PropertyValueFactory<>("stationIdColumn"));
@@ -303,8 +318,9 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         modifyDateColumn.setCellValueFactory(new PropertyValueFactory<>("modifyDateColumn"));
         createdByColumn.setCellValueFactory(new PropertyValueFactory<>("createdByColumn"));
         onTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
+        modifiedByColumn.setCellValueFactory(new PropertyValueFactory<>("modifiedByColumn"));
 
-        table.getColumns().addAll(stationIDColumn, stationNameColumn, locationColumn, computerNameColumn, commentColumn, creationDateColumn, modifyDateColumn, createdByColumn, onTerminalColumn);
+        table.getColumns().addAll(stationIDColumn, stationNameColumn, locationColumn, computerNameColumn, commentColumn, creationDateColumn, modifyDateColumn, createdByColumn, modifiedByColumn,onTerminalColumn);
         table.prefHeightProperty().bind(root.heightProperty().subtract(stationsVbox.heightProperty()));
         table.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -334,6 +350,7 @@ public class StationView implements ApplicationListener<ApplicationContext.Appli
         onTerminalField.textProperty().bindBidirectional(model.onTerminalProperty());
         modificationDateField.textProperty().bindBidirectional(model.modifyDateProperty());
         creationDateField.textProperty().bindBidirectional(model.creationDateProperty());
+        modifiedByField.textProperty().bindBidirectional(model.modifiedByProperty());
     }
 
     private void actionHandling() {

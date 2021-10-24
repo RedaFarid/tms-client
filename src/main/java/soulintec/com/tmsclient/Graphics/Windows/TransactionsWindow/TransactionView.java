@@ -103,6 +103,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private TableColumn<TransactionsModel.TableObject, DoubleProperty> qtyColumn;
     private TableColumn<TransactionsModel.TableObject, ObjectProperty<LocalDateTime>> dateTimeColumn;
     private TableColumn<TransactionsModel.TableObject, StringProperty> createdByColumn;
+    private TableColumn<TransactionsModel.TableObject, StringProperty> modifiedByColumn;
     private TableColumn<TransactionsModel.TableObject, StringProperty> onTerminalColumn;
     private TableColumn<TransactionsModel.TableObject, ObjectProperty<LocalDateTime>> creationDateColumn;
     private TableColumn<TransactionsModel.TableObject, ObjectProperty<LocalDateTime>> modifyDateColumn;
@@ -173,6 +174,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private Label modificationLabel;
     private Label onTerminalLabel;
     private Label createdByLabel;
+    private Label modifiedByLabel;
 
     private Label contextProductNameLabel;
     private Label contextProductDescriptionLabel;
@@ -212,6 +214,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
     private EnhancedTextField creationDateField;
     private EnhancedTextField modificationDateField;
     private EnhancedTextField createdByField;
+    private EnhancedTextField modifiedByField;
     private EnhancedTextField onTerminalField;
 
     private Label contextProductNameFieldField;
@@ -330,6 +333,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         truckContainerColumn = new TableColumn<>("Container");
         operationTypeColumn = new TableColumn<>("Operation type");
         createdByColumn = new TableColumn<>("Created By");
+        modifiedByColumn = new TableColumn<>("Modified By");
         onTerminalColumn = new TableColumn<>("On Terminal");
         creationDateColumn = new TableColumn<>("Creation Date");
         modifyDateColumn = new TableColumn<>("Modification Date");
@@ -393,6 +397,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         modificationLabel = new Label("Modification Date :");
         onTerminalLabel = new Label("On Terminal :");
         createdByLabel = new Label("Created By :");
+        modifiedByLabel = new Label("Modified By :");
 
         contextProductNameLabel = new Label("Name :");
         contextProductDescriptionLabel = new Label("Description :");
@@ -432,6 +437,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         creationDateField = new EnhancedTextField();
         modificationDateField = new EnhancedTextField();
         createdByField = new EnhancedTextField();
+        modifiedByField = new EnhancedTextField();
         onTerminalField = new EnhancedTextField();
 
         contextProductNameFieldField = new Label();
@@ -509,6 +515,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         modificationLabel.setPrefWidth(150);
         onTerminalLabel.setPrefWidth(150);
         createdByLabel.setPrefWidth(150);
+        modifiedByLabel.setPrefWidth(150);
 
         idLabel.setTextAlignment(TextAlignment.LEFT);
         materialLabel.setTextAlignment(TextAlignment.LEFT);
@@ -527,6 +534,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         modificationLabel.setTextAlignment(TextAlignment.LEFT);
         onTerminalLabel.setTextAlignment(TextAlignment.LEFT);
         createdByLabel.setTextAlignment(TextAlignment.LEFT);
+        modifiedByLabel.setTextAlignment(TextAlignment.LEFT);
 
         idLabel.setAlignment(Pos.BASELINE_LEFT);
         materialLabel.setAlignment(Pos.BASELINE_LEFT);
@@ -545,6 +553,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         modificationLabel.setAlignment(Pos.BASELINE_LEFT);
         onTerminalLabel.setAlignment(Pos.BASELINE_LEFT);
         createdByLabel.setAlignment(Pos.BASELINE_LEFT);
+        modifiedByLabel.setAlignment(Pos.BASELINE_LEFT);
 
         idLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         materialLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
@@ -563,6 +572,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         modificationLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         onTerminalLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
         createdByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
+        modifiedByLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:DARKCYAN;");
 
         transactionIdField.setPrefWidth(250);
         tankIdField.setPrefWidth(250);
@@ -579,6 +589,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         modificationDateField.setPrefWidth(250);
         createdByField.setPrefWidth(250);
         onTerminalField.setPrefWidth(250);
+        modifiedByField.setPrefWidth(250);
 
         transactionIdField.setEditable(false);
 
@@ -586,6 +597,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         modificationDateField.setEditable(false);
         createdByField.setEditable(false);
         onTerminalField.setEditable(false);
+        modifiedByField.setEditable(false);
 
         //allocating in the window
         transactionsDataEntry.add(idLabel, 1, 1);
@@ -632,8 +644,11 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         transactionsDataEntry.add(createdByLabel, 5, 4);
         transactionsDataEntry.add(createdByField, 6, 4);
 
-        transactionsDataEntry.add(onTerminalLabel, 7, 4);
-        transactionsDataEntry.add(onTerminalField, 8, 4);
+        transactionsDataEntry.add(modifiedByLabel, 7, 4);
+        transactionsDataEntry.add(modifiedByField, 8, 4);
+
+        transactionsDataEntry.add(onTerminalLabel, 1, 5);
+        transactionsDataEntry.add(onTerminalField, 2, 5);
 
         //table configuration
         transactionIdColumn.setCellValueFactory(new PropertyValueFactory<>("transactionIdColumn"));
@@ -651,29 +666,31 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         modifyDateColumn.setCellValueFactory(new PropertyValueFactory<>("modifyDateColumn"));
         createdByColumn.setCellValueFactory(new PropertyValueFactory<>("createdByColumn"));
         onTerminalColumn.setCellValueFactory(new PropertyValueFactory<>("onTerminalColumn"));
+        modifiedByColumn.setCellValueFactory(new PropertyValueFactory<>("modifiedByColumn"));
 
         tableView.getColumns().addAll(transactionIdColumn, materialColumn, stationColumn, tankColumn, clientColumn, driverColumn, truckTrailerColumn, truckContainerColumn, qtyColumn, operationTypeColumn, dateTimeColumn,
-                creationDateColumn, modifyDateColumn, createdByColumn, onTerminalColumn);
+                creationDateColumn, modifyDateColumn, createdByColumn, modifiedByColumn,onTerminalColumn);
         tableView.prefHeightProperty().bind(root.heightProperty().subtract(transactionsVbox.heightProperty()));
         tableView.setItems(controller.getDataList());
         tableView.setRowFactory((TableView<TransactionsModel.TableObject> param) -> new EnhancedTableRow());
         tableFilter = TableFilter.forTableView(tableView).apply();
 
-        transactionIdColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(1));
-        materialColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(1));
-        tankColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(1));
-        driverColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(1));
-        stationColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(1));
-        clientColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(1));
-        operationTypeColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(2));
-        qtyColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(2));
-        truckContainerColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(2));
-        dateTimeColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(3));
-        truckTrailerColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(2));
-        creationDateColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(3));
-        modifyDateColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(3));
-        createdByColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(3));
-        onTerminalColumn.prefWidthProperty().bind(tableView.widthProperty().divide(29).multiply(3));
+        transactionIdColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(1));
+        materialColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(1));
+        tankColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(1));
+        driverColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(1));
+        stationColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(1));
+        clientColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(1));
+        operationTypeColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(2));
+        qtyColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(2));
+        truckContainerColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(2));
+        dateTimeColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(3));
+        truckTrailerColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(2));
+        creationDateColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(3));
+        modifyDateColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(3));
+        createdByColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(3));
+        onTerminalColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(3));
+        modifiedByColumn.prefWidthProperty().bind(tableView.widthProperty().divide(32).multiply(3));
 
         operationTypeComboBox.getItems().addAll(FXCollections.observableArrayList(OperationType.values()));
 
@@ -706,6 +723,7 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         modificationDateField.textProperty().bindBidirectional(model.modifyDateProperty());
         createdByField.textProperty().bindBidirectional(model.createdByProperty());
         onTerminalField.textProperty().bindBidirectional(model.onTerminalProperty());
+        modifiedByField.textProperty().bindBidirectional(model.modifiedByProperty());
 
     }
 

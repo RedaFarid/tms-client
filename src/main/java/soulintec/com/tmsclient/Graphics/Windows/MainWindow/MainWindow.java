@@ -60,6 +60,8 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private BorderPane root = new BorderPane();
     private Scene scene;
 
+    private Label loggedUser = new Label("No logged in user");
+
     private ToolBar fastActionsBar = new ToolBar();
     private StatusBar statusbar = new StatusBar();
 
@@ -106,7 +108,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private Button logIn = new Button("Log in", loginview);
     private Button logOut = new Button("Log out", logoutview);
     private EnhancedButton dashBoardButton;
-    private Button exit = new Button("Exit", exitview);
+    private EnhancedButton exit;
     private boolean IconicStatus = true;
 
     private final double SIDE_BAR_COLLAPSED_HEIGHT = 60;
@@ -224,9 +226,16 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
         dashBoardButton.setGraphic(dashboardview);
 
+        exit.setGraphic(exitview);
+
         fastActionsBar.getItems().addAll(logIn, logOut, new Separator(), dashBoardButton, new Separator(), exit, currentUserLabel, clock /*, clock */);
         fastActionsBar.setBackground(new Background(new BackgroundFill(Color.CADETBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
         fastActionsBar.setBorder(new Border(new BorderStroke(Color.CADETBLUE.darker(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 0, 1, 0))));
+
+        statusbar.setText("");
+        statusbar.getLeftItems().add(loggedUser);
+        statusbar.setBackground(new Background(new BackgroundFill(Color.CADETBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+        statusbar.setBorder(new Border(new BorderStroke(Color.CADETBLUE.darker(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(1, 0, 1, 0))));
 
         root.setTop(fastActionsBar);
         root.setLeft(buttonsview);
@@ -250,6 +259,10 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         } catch (Exception e) {
             e.printStackTrace();
         }
+        loggedUser.setPrefWidth(200);
+//        loggedUser.setAlignment(Pos.BASELINE_LEFT);
+        loggedUser.setTextAlignment(TextAlignment.RIGHT);
+        loggedUser.textProperty().bind(loginService.observedUsernameProperty());
     }
 
     private void actionHandling() {
@@ -355,6 +368,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
     public void init() {
         dashBoardButton = new EnhancedButton("Dashboard");
+        exit = new EnhancedButton("Exit");
         logger.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         trucks.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         tanks.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
@@ -380,6 +394,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         RoleDTO tankViewRole = new RoleDTO("View Tanks");
         RoleDTO transactionViewRole = new RoleDTO("View Transactions");
         RoleDTO trucksViewRole = new RoleDTO("View Trucks");
+        RoleDTO exitRole = new RoleDTO("Exit");
 
         authorityDTOSList.put("Clients",clientViewRole);
         authorityDTOSList.put("Drivers",driverViewRole);
@@ -389,6 +404,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         authorityDTOSList.put("Tanks",tankViewRole);
         authorityDTOSList.put("Transactions",transactionViewRole);
         authorityDTOSList.put("Trucks",trucksViewRole);
+        authorityDTOSList.put("Exit",exitRole);
 
         controller.createWindowAuthorities(authorityDTOSList.values().stream().toList());
     }
@@ -403,6 +419,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             tanks.setAuthority(authorityDTOSList.get("Tanks"));
             dashBoardButton.setAuthority(authorityDTOSList.get("Transactions"));
             trucks.setAuthority(authorityDTOSList.get("Trucks"));
+            exit.setAuthority(authorityDTOSList.get("Exit"));
         }
     }
 

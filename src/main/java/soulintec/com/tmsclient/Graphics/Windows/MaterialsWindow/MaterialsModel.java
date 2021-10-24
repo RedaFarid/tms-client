@@ -13,6 +13,7 @@ public class MaterialsModel {
     private final StringProperty modifyDate = new SimpleStringProperty();
     private final StringProperty creationDate = new SimpleStringProperty();
     private final StringProperty createdBy = new SimpleStringProperty();
+    private final StringProperty modifiedBy = new SimpleStringProperty();
     private final StringProperty onTerminal = new SimpleStringProperty();
 
     public long getMaterialId() {
@@ -87,6 +88,18 @@ public class MaterialsModel {
         this.createdBy.set(createdBy);
     }
 
+    public String getModifiedBy() {
+        return modifiedBy.get();
+    }
+
+    public StringProperty modifiedByProperty() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy.set(modifiedBy);
+    }
+
     public String getOnTerminal() {
         return onTerminal.get();
     }
@@ -106,15 +119,17 @@ public class MaterialsModel {
         private final ObjectProperty<LocalDateTime> creationDateColumn;
         private final ObjectProperty<LocalDateTime> modifyDateColumn;
         private final StringProperty createdByColumn;
+        private final StringProperty modifiedByColumn;
         private final StringProperty onTerminalColumn;
 
-        public TableObject(LongProperty materialIdColumn, StringProperty nameColumn, StringProperty descriptionColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn) {
+        public TableObject(LongProperty materialIdColumn, StringProperty nameColumn, StringProperty descriptionColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty modifiedByColumn, StringProperty onTerminalColumn) {
             this.materialIdColumn = materialIdColumn;
             this.nameColumn = nameColumn;
             this.descriptionColumn = descriptionColumn;
             this.creationDateColumn = creationDateColumn;
             this.modifyDateColumn = modifyDateColumn;
             this.createdByColumn = createdByColumn;
+            this.modifiedByColumn = modifiedByColumn;
             this.onTerminalColumn = onTerminalColumn;
         }
 
@@ -190,6 +205,18 @@ public class MaterialsModel {
             this.createdByColumn.set(createdByColumn);
         }
 
+        public String getModifiedByColumn() {
+            return modifiedByColumn.get();
+        }
+
+        public StringProperty modifiedByColumnProperty() {
+            return modifiedByColumn;
+        }
+
+        public void setModifiedByColumn(String modifiedByColumn) {
+            this.modifiedByColumn.set(modifiedByColumn);
+        }
+
         public String getOnTerminalColumn() {
             return onTerminalColumn.get();
         }
@@ -210,6 +237,7 @@ public class MaterialsModel {
                     new SimpleObjectProperty<>(materialDTO.getCreationDate()),
                     new SimpleObjectProperty<>(materialDTO.getModifyDate()),
                     new SimpleStringProperty(materialDTO.getCreatedBy()),
+                    new SimpleStringProperty(materialDTO.getLastModifiedBy()),
                     new SimpleStringProperty(materialDTO.getOnTerminal()));
         }
 
@@ -218,19 +246,21 @@ public class MaterialsModel {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             TableObject that = (TableObject) o;
-            return Objects.equal(materialIdColumn.getValue(), that.materialIdColumn.getValue()) &&
-                    Objects.equal(nameColumn.getValue(), that.nameColumn.getValue())
-                    && Objects.equal(descriptionColumn.getValue(), that.descriptionColumn.getValue()) &&
-                    Objects.equal(creationDateColumn.getValue(), that.creationDateColumn.getValue()) &&
-                    Objects.equal(modifyDateColumn.getValue(), that.modifyDateColumn.getValue()) &&
-                    Objects.equal(createdByColumn.getValue(), that.createdByColumn.getValue()) &&
-                    Objects.equal(onTerminalColumn.getValue(), that.onTerminalColumn.getValue());
+            return Objects.equal(materialIdColumn.getValue(), that.materialIdColumn.getValue());
+//&&
+//                    Objects.equal(nameColumn.getValue(), that.nameColumn.getValue())
+//                    && Objects.equal(descriptionColumn.getValue(), that.descriptionColumn.getValue()) &&
+//                    Objects.equal(creationDateColumn.getValue(), that.creationDateColumn.getValue()) &&
+//                    Objects.equal(modifyDateColumn.getValue(), that.modifyDateColumn.getValue()) &&
+//                    Objects.equal(createdByColumn.getValue(), that.createdByColumn.getValue()) &&
+//                    Objects.equal(onTerminalColumn.getValue(), that.onTerminalColumn.getValue());
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(materialIdColumn.getValue(), nameColumn.getValue(), descriptionColumn.getValue(),
-                    creationDateColumn.getValue(), modifyDateColumn.getValue(), createdByColumn.getValue(), onTerminalColumn.getValue());
+            return Objects.hashCode(materialIdColumn.getValue());
+//                    , nameColumn.getValue(), descriptionColumn.getValue(),
+//                    creationDateColumn.getValue(), modifyDateColumn.getValue(), createdByColumn.getValue(), onTerminalColumn.getValue());
         }
 
         @Override

@@ -49,7 +49,7 @@ public class TransactionService {
         HttpEntity request = new HttpEntity(transactionDTO, headers);
 
         try {
-            ResponseEntity<String> saveResponseEntity = restTemplate.postForEntity(Utilities.iP + "/saveTransaction", transactionDTO, String.class);
+            ResponseEntity<String> saveResponseEntity = restTemplate.exchange(Utilities.iP + "/saveTransaction", HttpMethod.POST, request, String.class);
             return saveResponseEntity.getBody();
         } catch (Exception e) {
             return e.getMessage();

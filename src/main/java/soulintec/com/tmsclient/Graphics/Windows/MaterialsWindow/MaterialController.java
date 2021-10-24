@@ -64,6 +64,7 @@ public class MaterialController {
                 model.setCreationDate(String.valueOf(tableObject.getCreationDateColumn()));
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
+                model.setModifiedBy(tableObject.getModifiedByColumn());
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Error, toString(), " Error getting material data"));
                 MainWindow.showErrorWindow("Data doesn't exist", "Error getting data for selected material");
@@ -172,6 +173,7 @@ public class MaterialController {
                 model.setCreationDate("");
                 model.setModifyDate("");
                 model.setOnTerminal("");
+                model.setModifiedBy("");
             } catch (Exception e) {
                 log.fatal(e);
             }
@@ -224,6 +226,7 @@ public class MaterialController {
                         item.setModifyDateColumn(materialDTO.getModifyDate());
                         item.setCreatedByColumn(materialDTO.getCreatedBy());
                         item.setOnTerminalColumn(materialDTO.getOnTerminal());
+                        item.setModifiedByColumn(materialDTO.getLastModifiedBy());
                     }
 
                 } catch (Exception e) {

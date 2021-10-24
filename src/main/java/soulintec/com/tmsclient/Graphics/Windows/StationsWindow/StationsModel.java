@@ -19,6 +19,7 @@ public class StationsModel {
     private final StringProperty modifyDate = new SimpleStringProperty();
     private final StringProperty creationDate = new SimpleStringProperty();
     private final StringProperty createdBy = new SimpleStringProperty();
+    private final StringProperty modifiedBy = new SimpleStringProperty();
     private final StringProperty onTerminal = new SimpleStringProperty();
 
     public long getStationId() {
@@ -117,6 +118,18 @@ public class StationsModel {
         this.createdBy.set(createdBy);
     }
 
+    public String getModifiedBy() {
+        return modifiedBy.get();
+    }
+
+    public StringProperty modifiedByProperty() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy.set(modifiedBy);
+    }
+
     public String getOnTerminal() {
         return onTerminal.get();
     }
@@ -138,9 +151,10 @@ public class StationsModel {
         private final ObjectProperty<LocalDateTime> creationDateColumn;
         private final ObjectProperty<LocalDateTime> modifyDateColumn;
         private final StringProperty createdByColumn;
+        private final StringProperty modifiedByColumn;
         private final StringProperty onTerminalColumn;
 
-        public TableObject(LongProperty stationIdColumn, StringProperty nameColumn, StringProperty locationColumn, ObjectProperty<String> computerNameColumn, StringProperty commentColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty onTerminalColumn) {
+        public TableObject(LongProperty stationIdColumn, StringProperty nameColumn, StringProperty locationColumn, ObjectProperty<String> computerNameColumn, StringProperty commentColumn, ObjectProperty<LocalDateTime> creationDateColumn, ObjectProperty<LocalDateTime> modifyDateColumn, StringProperty createdByColumn, StringProperty modifiedByColumn, StringProperty onTerminalColumn) {
             this.stationIdColumn = stationIdColumn;
             this.nameColumn = nameColumn;
             this.locationColumn = locationColumn;
@@ -149,6 +163,7 @@ public class StationsModel {
             this.creationDateColumn = creationDateColumn;
             this.modifyDateColumn = modifyDateColumn;
             this.createdByColumn = createdByColumn;
+            this.modifiedByColumn = modifiedByColumn;
             this.onTerminalColumn = onTerminalColumn;
         }
 
@@ -248,6 +263,18 @@ public class StationsModel {
             this.createdByColumn.set(createdByColumn);
         }
 
+        public String getModifiedByColumn() {
+            return modifiedByColumn.get();
+        }
+
+        public StringProperty modifiedByColumnProperty() {
+            return modifiedByColumn;
+        }
+
+        public void setModifiedByColumn(String modifiedByColumn) {
+            this.modifiedByColumn.set(modifiedByColumn);
+        }
+
         public String getOnTerminalColumn() {
             return onTerminalColumn.get();
         }
@@ -270,6 +297,7 @@ public class StationsModel {
                     new SimpleObjectProperty<>(stationDTO.getCreationDate()),
                     new SimpleObjectProperty<>(stationDTO.getModifyDate()),
                     new SimpleStringProperty(stationDTO.getCreatedBy()),
+                    new SimpleStringProperty(stationDTO.getLastModifiedBy()),
                     new SimpleStringProperty(stationDTO.getOnTerminal()));
         }
 

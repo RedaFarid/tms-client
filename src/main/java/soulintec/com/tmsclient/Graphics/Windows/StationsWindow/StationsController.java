@@ -61,9 +61,9 @@ public class StationsController {
         return computers;
     }
 
-    public void updateComputers(){
+    public void updateComputers() {
         List<String> collect = computersService.findAll().stream().map(ComputerDTO::getName).collect(Collectors.toList());
-        Platform.runLater(()-> {
+        Platform.runLater(() -> {
             computers.clear();
             computers.addAll(collect);
         });
@@ -83,7 +83,7 @@ public class StationsController {
                 model.setCreationDate(String.valueOf(tableObject.getCreationDateColumn()));
                 model.setModifyDate(String.valueOf(tableObject.getModifyDateColumn()));
                 model.setOnTerminal(tableObject.getOnTerminalColumn());
-
+                model.setModifiedBy(tableObject.getModifiedByColumn());
 
             }, () -> {
 //                logsService.save(new LogDTO(LogIdentifier.Error, toString(), "Error getting station data"));
@@ -116,6 +116,7 @@ public class StationsController {
                 stationDTO.setStationName(name);
                 stationDTO.setLocation(location);
                 stationDTO.setComputerName(computerName);
+                stationDTO.setComment(model.getComment());
 
                 String save = stationService.save(stationDTO);
                 if (save.equals("saved")) {
@@ -166,6 +167,7 @@ public class StationsController {
                 stationDTO.setStationName(name);
                 stationDTO.setLocation(location);
                 stationDTO.setComputerName(computerName);
+                stationDTO.setComment(model.getComment());
 
                 String save = stationService.save(stationDTO);
                 if (save.equals("saved")) {
@@ -255,7 +257,7 @@ public class StationsController {
                 model.setCreationDate("");
                 model.setModifyDate("");
                 model.setOnTerminal("");
-
+                model.setModifiedBy("");
             } catch (Exception e) {
                 log.fatal(e);
             }
@@ -278,10 +280,11 @@ public class StationsController {
                         item.setModifyDateColumn(stationDTO.getModifyDate());
                         item.setCreatedByColumn(stationDTO.getCreatedBy());
                         item.setOnTerminalColumn(stationDTO.getOnTerminal());
+                        item.setModifiedByColumn(stationDTO.getLastModifiedBy());
                     }
 
                 } catch (Exception e) {
-                    logsService.save(new LogDTO(LogIdentifier.Error , toString() , e.getMessage()));
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), e.getMessage()));
                     log.fatal(e);
                 }
             }
