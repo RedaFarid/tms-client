@@ -603,52 +603,52 @@ public class TransactionView implements ApplicationListener<ApplicationContext.A
         transactionsDataEntry.add(idLabel, 1, 1);
         transactionsDataEntry.add(transactionIdField, 2, 1);
 
-        transactionsDataEntry.add(materialLabel, 3, 1);
-        transactionsDataEntry.add(materialIdField, 4, 1);
+//        transactionsDataEntry.add(materialLabel, 3, 1);
+//        transactionsDataEntry.add(materialIdField, 4, 1);
+//
+//        transactionsDataEntry.add(stationLabel, 5, 1);
+//        transactionsDataEntry.add(stationIdField, 6, 1);
+//
+//        transactionsDataEntry.add(tankLabel, 7, 1);
+//        transactionsDataEntry.add(tankIdField, 8, 1);
 
-        transactionsDataEntry.add(stationLabel, 5, 1);
-        transactionsDataEntry.add(stationIdField, 6, 1);
-
-        transactionsDataEntry.add(tankLabel, 7, 1);
-        transactionsDataEntry.add(tankIdField, 8, 1);
-
-        transactionsDataEntry.add(qtyLabel, 9, 1);
-        transactionsDataEntry.add(qtyField, 10, 1);
-
-
-        transactionsDataEntry.add(driverLabel, 1, 2);
-        transactionsDataEntry.add(driverIdField, 2, 2);
-
-        transactionsDataEntry.add(truckTrailerLabel, 3, 2);
-        transactionsDataEntry.add(truckTrailerField, 4, 2);
-
-        transactionsDataEntry.add(truckContainerLabel, 5, 2);
-        transactionsDataEntry.add(truckContainerField, 6, 2);
-
-        transactionsDataEntry.add(clientLabel, 7, 2);
-        transactionsDataEntry.add(clientField, 8, 2);
+        transactionsDataEntry.add(qtyLabel, 3, 1);
+        transactionsDataEntry.add(qtyField, 4, 1);
 
 
-        transactionsDataEntry.add(operationTypeLabel, 1, 3);
-        transactionsDataEntry.add(operationTypeComboBox, 2, 3);
+//        transactionsDataEntry.add(driverLabel, 1, 2);
+//        transactionsDataEntry.add(driverIdField, 2, 2);
+//
+//        transactionsDataEntry.add(truckTrailerLabel, 3, 2);
+//        transactionsDataEntry.add(truckTrailerField, 4, 2);
+//
+//        transactionsDataEntry.add(truckContainerLabel, 5, 2);
+//        transactionsDataEntry.add(truckContainerField, 6, 2);
 
-        transactionsDataEntry.add(dateTimeLabel, 3, 3);
-        transactionsDataEntry.add(dateTimeField, 4, 3);
+//        transactionsDataEntry.add(clientLabel, 7, 2);
+//        transactionsDataEntry.add(clientField, 8, 2);
 
-        transactionsDataEntry.add(creationDateLabel, 1, 4);
-        transactionsDataEntry.add(creationDateField, 2, 4);
 
-        transactionsDataEntry.add(modificationLabel, 3, 4);
-        transactionsDataEntry.add(modificationDateField, 4, 4);
+        transactionsDataEntry.add(operationTypeLabel, 5, 1);
+        transactionsDataEntry.add(operationTypeComboBox, 6, 1);
 
-        transactionsDataEntry.add(createdByLabel, 5, 4);
-        transactionsDataEntry.add(createdByField, 6, 4);
+        transactionsDataEntry.add(dateTimeLabel, 7, 1);
+        transactionsDataEntry.add(dateTimeField, 8, 1);
 
-        transactionsDataEntry.add(modifiedByLabel, 7, 4);
-        transactionsDataEntry.add(modifiedByField, 8, 4);
+        transactionsDataEntry.add(creationDateLabel, 1, 2);
+        transactionsDataEntry.add(creationDateField, 2, 2);
 
-        transactionsDataEntry.add(onTerminalLabel, 1, 5);
-        transactionsDataEntry.add(onTerminalField, 2, 5);
+        transactionsDataEntry.add(modificationLabel, 3, 2);
+        transactionsDataEntry.add(modificationDateField, 4, 2);
+
+        transactionsDataEntry.add(createdByLabel, 5, 2);
+        transactionsDataEntry.add(createdByField, 6, 2);
+
+        transactionsDataEntry.add(modifiedByLabel, 7, 2);
+        transactionsDataEntry.add(modifiedByField, 8, 2);
+
+        transactionsDataEntry.add(onTerminalLabel, 1, 3);
+        transactionsDataEntry.add(onTerminalField, 2, 3);
 
         //table configuration
         transactionIdColumn.setCellValueFactory(new PropertyValueFactory<>("transactionIdColumn"));

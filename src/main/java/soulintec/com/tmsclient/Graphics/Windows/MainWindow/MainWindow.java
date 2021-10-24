@@ -78,7 +78,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
     private MainWindowController controller;
 
-    @Autowired
+    @Autowired(required = false)
     private Executor executor;
 
     private IconicButton Iconic = new IconicButton(Resources.getResource("Icons/maxminbuttons.png").toString());
