@@ -23,6 +23,8 @@ public class ReportsDataSetFactory {
             case "Materials" ->  new MaterialsDataSet(dataList);
             case "Clients" ->  new ClientsDataSet(dataList);
             case "Drivers" ->  new DriversDataSet(dataList);
+            case "Trailers" ->  new TrailersDataSet(dataList);
+            case "Containers" ->  new ContainersDataSet(dataList);
             default -> throw new IllegalStateException("Unexpected value: " + report);
         };
     }

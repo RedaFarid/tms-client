@@ -1,5 +1,6 @@
 package soulintec.com.tmsclient.Graphics.Windows.TruckWindow;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -7,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
@@ -305,10 +307,15 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         RoleDTO savingContainer = new RoleDTO("Save Truck Containers");
         RoleDTO deletingContainer = new RoleDTO("Delete Truck Containers");
 
+        RoleDTO reportingTrailer = new RoleDTO("Generate Reports for Truck Trailers");
+        RoleDTO reportingContainer = new RoleDTO("Generate Reports for Truck Containers");
+
         authorityDTOSList.add(savingTrailer);
         authorityDTOSList.add(deletingTrailer);
         authorityDTOSList.add(savingContainer);
         authorityDTOSList.add(deletingContainer);
+        authorityDTOSList.add(reportingTrailer);
+        authorityDTOSList.add(reportingContainer);
 
         mainWindowController.createWindowAuthorities(authorityDTOSList);
     }
@@ -318,10 +325,12 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
             insertTrailer.setAuthority(authorityDTOSList.get(0));
             updateTrailer.setAuthority(authorityDTOSList.get(0));
             deleteTrailer.setAuthority(authorityDTOSList.get(1));
+            trailerReport.setAuthority(authorityDTOSList.get(4));
 
             insertContainer.setAuthority(authorityDTOSList.get(2));
             updateContainer.setAuthority(authorityDTOSList.get(2));
             deleteContainer.setAuthority(authorityDTOSList.get(3));
+            containersReport.setAuthority(authorityDTOSList.get(5));
         }
     }
 
@@ -486,7 +495,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         trailersTableView.setItems(controller.getTruckTrailerDataList());
         trailerTableFilter = TableFilter.forTableView(trailersTableView).apply();
 
-        trailersHbox.getItems().addAll(insertTrailer, updateTrailer, deleteTrailer);
+        trailersHbox.getItems().addAll(insertTrailer, updateTrailer, deleteTrailer,new Separator(),trailerReport);
         trailersHbox.setPadding(new Insets(10, 10, 10, 10));
 
         trailersVbox.getChildren().addAll(trailersDataEntry, trailersHbox);
@@ -672,7 +681,7 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         containersTableView.setItems(controller.getTruckContainerDataList());
         containerTableFilter = TableFilter.forTableView(containersTableView).apply();
 
-        containersHbox.getItems().addAll(insertContainer, updateContainer, deleteContainer);
+        containersHbox.getItems().addAll(insertContainer, updateContainer, deleteContainer,new Separator(),containersReport);
         containersHbox.setPadding(new Insets(10, 10, 10, 10));
 
         containersVvox.getChildren().addAll(containersDataEntry, containersHbox);
@@ -714,6 +723,22 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         deleteTrailer.setOnMouseClicked(controller::onTrailerDelete);
         updateTrailer.setOnMouseClicked(controller::onUpdateTruckTrailer);
 
+        trailerReport.setOnAction(e -> {
+            controller.onTrailersReport(trailerTableFilter.getFilteredList()).whenComplete((pane, throwable) -> {
+                if (throwable != null) {
+                    MainWindow.showErrorWindowForException(throwable.getMessage(), throwable);
+                    return;
+                }
+                Platform.runLater(() -> {
+                    Stage stage = new Stage();
+                    stage.setScene(new Scene(pane));
+                    stage.setTitle("Truck Trailers Report");
+                    stage.initOwner(mainWindow);
+                    stage.setWidth(1300);
+                    stage.show();
+                });
+            });
+        });
         trailersTableView.setOnMouseClicked((a) -> {
             controller.onTruckTrailerTableSelection(trailersTableView.getSelectionModel().getSelectedItems());
         });
@@ -723,6 +748,23 @@ public class TruckView implements ApplicationListener<ApplicationContext.Applica
         insertContainer.setOnMouseClicked(controller::onInsertTruckContainer);
         deleteContainer.setOnMouseClicked(controller::onContainerDelete);
         updateContainer.setOnMouseClicked(controller::onUpdateTruckContainer);
+
+        containersReport.setOnAction(e -> {
+            controller.onContainersReport(containerTableFilter.getFilteredList()).whenComplete((pane, throwable) -> {
+                if (throwable != null) {
+                    MainWindow.showErrorWindowForException(throwable.getMessage(), throwable);
+                    return;
+                }
+                Platform.runLater(() -> {
+                    Stage stage = new Stage();
+                    stage.setScene(new Scene(pane));
+                    stage.setTitle("Truck Containers Report");
+                    stage.initOwner(mainWindow);
+                    stage.setWidth(1300);
+                    stage.show();
+                });
+            });
+        });
 
         containersTableView.setOnMouseClicked((a) -> {
             controller.onTruckContainerTableSelection(containersTableView.getSelectionModel().getSelectedItems());

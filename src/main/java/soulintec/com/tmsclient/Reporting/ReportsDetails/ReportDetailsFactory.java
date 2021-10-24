@@ -49,6 +49,8 @@ public class ReportDetailsFactory {
         reportsFiles.put("Materials", "/ReportsDesign/Materials.jrxml");
         reportsFiles.put("Clients", "/ReportsDesign/Clients.jrxml");
         reportsFiles.put("Drivers", "/ReportsDesign/Drivers.jrxml");
+        reportsFiles.put("Trailers", "/ReportsDesign/Trailers.jrxml");
+        reportsFiles.put("Containers", "/ReportsDesign/Containers.jrxml");
     }
 
     @Async("GPExecutor")

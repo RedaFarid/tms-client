@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,13 @@ import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.*;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsModel;
 import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.Containers;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.DTO;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.Materials;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.Trailers;
+import soulintec.com.tmsclient.Reporting.ReportsDetails.ReportDetailsFactory;
 import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.TransactionService;
 import soulintec.com.tmsclient.Services.TruckContainerService;
@@ -25,6 +32,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -57,6 +65,8 @@ public class TruckController {
 
     @Autowired(required = false)
     private Executor trailerExecutor;
+    @Autowired
+    private ReportDetailsFactory reportDetailsFactory;
 
     //Truck Container
     public TruckContainerModel getTruckContainerModel() {
@@ -544,6 +554,51 @@ public class TruckController {
             }
         });
     }
+
+
+    @Async
+    public CompletableFuture<Pane> onTrailersReport(List<TruckTrailerModel.TableObject> list) {
+        try {
+            List<DTO> collect = list.stream().map(listItem -> new Trailers(
+                            String.valueOf(listItem.getTruckTrailerIdColumn()),
+                            String.valueOf(listItem.getTrailerNumberColumn()),
+                            String.valueOf(listItem.getLicenseNumberColumn()),
+                            String.valueOf(listItem.getLicenceExpirationDateColumn()),
+                            listItem.getPermissionsColumn().name(),
+                            String.valueOf(listItem.getCommentColumn())
+                    )
+            ).collect(Collectors.toList());
+
+            Pane reportPane = reportDetailsFactory.getReportDetailsPaneFor("Trailers", collect);
+
+            return CompletableFuture.completedFuture(reportPane);
+        } catch (Exception e) {
+            return CompletableFuture.failedFuture(e);
+        }
+    }
+
+    @Async
+    public CompletableFuture<Pane> onContainersReport(List<TruckContainerModel.TableObject> list) {
+        try {
+            List<DTO> collect = list.stream().map(listItem -> new Containers(
+                            String.valueOf(listItem.getTruckContainerIdColumn()),
+                            String.valueOf(listItem.getContainerNumberColumn()),
+                            String.valueOf(listItem.getLicenseNumberColumn()),
+                            String.valueOf(listItem.getLicenceExpirationDateColumn()),
+                            String.valueOf(listItem.getMaximumWeightConstrainColumn()),
+                            listItem.getPermissionsColumn().name(),
+                            String.valueOf(listItem.getCommentColumn())
+                    )
+            ).collect(Collectors.toList());
+
+            Pane reportPane = reportDetailsFactory.getReportDetailsPaneFor("Containers", collect);
+
+            return CompletableFuture.completedFuture(reportPane);
+        } catch (Exception e) {
+            return CompletableFuture.failedFuture(e);
+        }
+    }
+
 
     @Override
     public String toString() {
