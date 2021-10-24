@@ -8,24 +8,32 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.LogDTO;
+import soulintec.com.tmsclient.Entities.MaterialDTO;
+import soulintec.com.tmsclient.Entities.StationDTO;
 import soulintec.com.tmsclient.Entities.TankDTO;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsModel;
 import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
-import soulintec.com.tmsclient.Services.*;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.DTO;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.Tanks;
+import soulintec.com.tmsclient.Reporting.ReportsDetails.ReportDetailsFactory;
 import soulintec.com.tmsclient.Services.GeneralServices.LoggingService.LoginService;
+import soulintec.com.tmsclient.Services.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -53,6 +61,19 @@ public class TanksController {
     private StationService stationService;
     @Autowired
     private LogsService logsService;
+    @Autowired
+    private ReportDetailsFactory reportDetailsFactory;
+
+    private final ObservableList<StationDTO> stationDTOS = FXCollections.observableArrayList();
+    private final ObservableList<MaterialDTO> materialDTOS = FXCollections.observableArrayList();
+
+    private void updateDTOS() {
+        stationDTOS.removeAll();
+        stationDTOS.addAll(stationService.findAll());
+
+        materialDTOS.removeAll();
+        materialDTOS.addAll(materialService.findAll());
+    }
 
     public TanksModel getModel() {
         return model;
@@ -412,6 +433,54 @@ public class TanksController {
             MainWindow.showErrorWindowForException("Error updating data", e);
         }
     }
+
+    @Async
+    public CompletableFuture<Pane> onReport(List<TanksModel.TableObject> list) {
+        updateDTOS();
+        try {
+            List<DTO> collect = list.stream().map(listItem -> new Tanks(
+                            String.valueOf(listItem.getTankIdColumn()),
+                            String.valueOf(listItem.getNameColumn()),
+                            getStationName(listItem.getStationColumn()),
+                            getStationLocation(listItem.getStationColumn()),
+                            getMaterialName(listItem.getMaterialIDColumn()),
+                            String.valueOf(listItem.getCapacityColumn()),
+                            String.valueOf(listItem.getQtyColumn()),
+                            String.valueOf(listItem.getCalculatedQtyColumn()),
+                            String.valueOf(listItem.getDateOfQtySetColumn()),
+                            String.valueOf(listItem.getUserOfQtySetColumn())
+                    )
+            ).collect(Collectors.toList());
+
+            Pane reportPane = reportDetailsFactory.getReportDetailsPaneFor("Tanks", collect);
+
+            return CompletableFuture.completedFuture(reportPane);
+        } catch (Exception e) {
+            return CompletableFuture.failedFuture(e);
+        }
+    }
+
+    private String getStationName(Long id) {
+        AtomicReference<String> stationName = new AtomicReference<>("");
+        stationDTOS.stream().filter(stationDTO -> stationDTO.getId().equals(id)).findFirst().map(StationDTO::getStationName).ifPresentOrElse(stationName::set
+                , () -> stationName.set(""));
+        return stationName.get();
+    }
+
+    private String getStationLocation(Long id) {
+        AtomicReference<String> stationLocation = new AtomicReference<>("");
+        stationDTOS.stream().filter(stationDTO -> stationDTO.getId().equals(id)).findFirst().map(StationDTO::getLocation).ifPresentOrElse(stationLocation::set
+                , () -> stationLocation.set(""));
+        return stationLocation.get();
+    }
+
+    private String getMaterialName(Long id) {
+        AtomicReference<String> materialName = new AtomicReference<>("");
+        materialDTOS.stream().filter(materialDTO -> materialDTO.getId().equals(id)).findFirst().map(MaterialDTO::getName).ifPresentOrElse(materialName::set
+                , () -> materialName.set(""));
+        return materialName.get();
+    }
+
 
     @Override
     public String toString() {

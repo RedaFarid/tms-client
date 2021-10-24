@@ -1,118 +1,107 @@
 package soulintec.com.tmsclient.Reporting.ReportsDTO;
 
 public class Tanks extends DTO {
-    private String batchCode;
-    private String actionName;
-    private String product;
-    private String source;
-    private String setPoint1;
-    private String measure1;
-    private String tolerance;
-    private String unit;
-    private String begin;
-    private String end;
-    private String productName;
+    private String id ;
+    private String name;
+    private String station;
+    private String location;
+    private String material;
+    private String capacity;
+    private String qty;
+    private String calcQty;
+    private String dateOfQtySet;
+    private String userOfQtySet;
 
-    public Tanks(String batchCode, String actionName, String product, String source, String setPoint1, String measure1, String tolerance, String unit, String begin, String end, String productName) {
-
-        this.batchCode = batchCode;
-        this.actionName = actionName;
-        this.product = product;
-        this.source = source;
-        this.setPoint1 = setPoint1;
-        this.measure1 = measure1;
-        this.tolerance = tolerance;
-        this.unit = unit;
-        this.begin = begin;
-        this.end = end;
-        this.productName = productName;
+    public Tanks(String id, String name, String station, String location, String material, String capacity, String qty, String calcQty, String dateOfQtySet, String userOfQtySet) {
+        this.id = id;
+        this.name = name;
+        this.station = station;
+        this.location = location;
+        this.material = material;
+        this.capacity = capacity;
+        this.qty = qty;
+        this.calcQty = calcQty;
+        this.dateOfQtySet = dateOfQtySet;
+        this.userOfQtySet = userOfQtySet;
     }
 
-    public String getBatchCode() {
-        return batchCode;
+    public String getId() {
+        return id;
     }
 
-    public void setBatchCode(String batchCode) {
-        this.batchCode = batchCode;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getActionName() {
-        return actionName;
+    public String getName() {
+        return name;
     }
 
-    public void setActionName(String actionName) {
-        this.actionName = actionName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getProduct() {
-        return product;
+    public String getStation() {
+        return station;
     }
 
-    public void setProduct(String product) {
-        this.product = product;
+    public void setStation(String station) {
+        this.station = station;
     }
 
-    public String getSource() {
-        return source;
+    public String getLocation() {
+        return location;
     }
 
-    public void setSource(String source) {
-        this.source = source;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
-    public String getSetPoint1() {
-        return setPoint1;
+    public String getMaterial() {
+        return material;
     }
 
-    public void setSetPoint1(String setPoint1) {
-        this.setPoint1 = setPoint1;
+    public void setMaterial(String material) {
+        this.material = material;
     }
 
-    public String getMeasure1() {
-        return measure1;
+    public String getCapacity() {
+        return capacity;
     }
 
-    public void setMeasure1(String measure1) {
-        this.measure1 = measure1;
+    public void setCapacity(String capacity) {
+        this.capacity = capacity;
     }
 
-    public String getTolerance() {
-        return tolerance;
+    public String getQty() {
+        return qty;
     }
 
-    public void setTolerance(String tolerance) {
-        this.tolerance = tolerance;
+    public void setQty(String qty) {
+        this.qty = qty;
     }
 
-    public String getUnit() {
-        return unit;
+    public String getCalcQty() {
+        return calcQty;
     }
 
-    public void setUnit(String unit) {
-        this.unit = unit;
+    public void setCalcQty(String calcQty) {
+        this.calcQty = calcQty;
     }
 
-    public String getBegin() {
-        return begin;
+    public String getDateOfQtySet() {
+        return dateOfQtySet;
     }
 
-    public void setBegin(String begin) {
-        this.begin = begin;
+    public void setDateOfQtySet(String dateOfQtySet) {
+        this.dateOfQtySet = dateOfQtySet;
     }
 
-    public String getEnd() {
-        return end;
+    public String getUserOfQtySet() {
+        return userOfQtySet;
     }
 
-    public void setEnd(String end) {
-        this.end = end;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setUserOfQtySet(String userOfQtySet) {
+        this.userOfQtySet = userOfQtySet;
     }
 }

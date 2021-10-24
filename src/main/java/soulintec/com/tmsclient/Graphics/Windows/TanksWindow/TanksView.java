@@ -181,10 +181,12 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         RoleDTO saving = new RoleDTO("Save " + this);
         RoleDTO deleting = new RoleDTO("Delete " + this);
         RoleDTO setQty = new RoleDTO("Set Quantity In " + this);
+        RoleDTO reporting = new RoleDTO("Generate Reports for " + this);
 
         authorityDTOSList.add(saving);
         authorityDTOSList.add(deleting);
         authorityDTOSList.add(setQty);
+        authorityDTOSList.add(reporting);
 
         mainWindowController.createWindowAuthorities(authorityDTOSList);
     }
@@ -195,6 +197,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
             updateTank.setAuthority(authorityDTOSList.get(0));
             deleteTank.setAuthority(authorityDTOSList.get(1));
             setQty.setAuthority(authorityDTOSList.get(2));
+            report.setAuthority(authorityDTOSList.get(3));
         }
     }
 
@@ -512,7 +515,7 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
         onTerminalColumn.prefWidthProperty().bind(tanksTableView.widthProperty().divide(32).multiply(3));
 
         //stage configuration
-        tanksHbox.getItems().addAll(insertTank, updateTank, deleteTank, new Separator(), setQty);
+        tanksHbox.getItems().addAll(insertTank, updateTank, deleteTank, new Separator(), setQty,new Separator(),report);
         tanksHbox.setPadding(new Insets(10, 10, 10, 10));
 
         tanksVbox.getChildren().addAll(contextProductsDataEntry, contextStationDataEntry, tanksDataEntry, tanksHbox);
@@ -716,6 +719,22 @@ public class TanksView implements ApplicationListener<ApplicationContext.Applica
             }
         });
 
+        report.setOnAction(e -> {
+            controller.onReport(tableFilter.getFilteredList()).whenComplete((pane, throwable) -> {
+                if (throwable != null) {
+                    MainWindow.showErrorWindowForException(throwable.getMessage(), throwable);
+                    return;
+                }
+                Platform.runLater(() -> {
+                    Stage stage = new Stage();
+                    stage.setScene(new Scene(pane));
+                    stage.setTitle("Tanks Report");
+                    stage.initOwner(mainWindow);
+                    stage.setWidth(1300);
+                    stage.show();
+                });
+            });
+        });
 
     }
 
