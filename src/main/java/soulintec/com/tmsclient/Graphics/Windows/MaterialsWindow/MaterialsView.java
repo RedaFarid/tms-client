@@ -1,15 +1,14 @@
 package soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.ToolBar;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -94,6 +93,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
     private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
 
     public List<RoleDTO> authorityDTOSList = new ArrayList<>();
+
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
         mainWindow = event.getStage();
@@ -293,14 +293,14 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         onTerminalColumn.setReorderable(false);
         modifiedByColumn.setReorderable(false);
 
-        table.getColumns().addAll(idColumn, nameColumn, descriptionColumn, creationDateColumn, modifyDateColumn, createdByColumn,modifiedByColumn, onTerminalColumn);
+        table.getColumns().addAll(idColumn, nameColumn, descriptionColumn, creationDateColumn, modifyDateColumn, createdByColumn, modifiedByColumn, onTerminalColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.prefHeightProperty().bind(root.heightProperty().subtract(dataEntryPartitionTitled.heightProperty().add(hbox.heightProperty())));
         table.setItems(controller.getDataList());
         tableFilter = TableFilter.forTableView(table).apply();
 
-        hbox.getItems().addAll(insert, update, delete
-//                ,report
+        hbox.getItems().addAll(insert, update, delete, new Separator()
+                , report
         );
         hbox.setPadding(new Insets(10, 10, 10, 10));
 
@@ -325,6 +325,23 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         insert.setOnMouseClicked(controller::onInsert);
         update.setOnMouseClicked(controller::onUpdate);
         delete.setOnMouseClicked(controller::onDelete);
+
+        report.setOnAction(e -> {
+            controller.onReport(tableFilter.getFilteredList()).whenComplete((pane, throwable) -> {
+                if (throwable != null) {
+                    MainWindow.showErrorWindowForException(throwable.getMessage(), throwable);
+                    return;
+                }
+                Platform.runLater(() -> {
+                    Stage stage = new Stage();
+                    stage.setScene(new Scene(pane));
+                    stage.setTitle("Materials Report");
+                    stage.initOwner(mainWindow);
+                    stage.setWidth(1300);
+                    stage.show();
+                });
+            });
+        });
 
         table.setOnMouseClicked((a) -> {
             controller.onTableSelection(table.getSelectionModel().getSelectedItems());

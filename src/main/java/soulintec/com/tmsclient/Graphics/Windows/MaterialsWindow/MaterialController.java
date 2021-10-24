@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.units.qual.A;
@@ -19,12 +20,17 @@ import soulintec.com.tmsclient.Entities.StationDTO;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.DTO;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.Materials;
+import soulintec.com.tmsclient.Reporting.ReportsDataSetFactory.MaterialsDataSet;
+import soulintec.com.tmsclient.Reporting.ReportsDetails.ReportDetailsFactory;
 import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.MaterialService;
 import soulintec.com.tmsclient.Services.TransactionService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -44,6 +50,8 @@ public class MaterialController {
     private TransactionService transactionService;
     @Autowired
     private LogsService logsService;
+    @Autowired
+    private ReportDetailsFactory reportDetailsFactory;
 
     public MaterialsModel getModel() {
         return model;
@@ -230,13 +238,31 @@ public class MaterialController {
                     }
 
                 } catch (Exception e) {
-                    logsService.save(new LogDTO(LogIdentifier.Error , toString() , e.getMessage()));
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), e.getMessage()));
                     log.fatal(e);
                 }
             }
         }
     }
 
+    @Async
+    public CompletableFuture<Pane> onReport(List<MaterialsModel.TableObject> list) {
+        try {
+            System.err.println(list);
+            List<DTO> collect = list.stream().map(listItem -> new Materials(
+                            String.valueOf(listItem.getMaterialIdColumn()),
+                            String.valueOf(listItem.getNameColumn()),
+                            String.valueOf(listItem.getDescriptionColumn())
+                    )
+            ).collect(Collectors.toList());
+
+            Pane reportPane = reportDetailsFactory.getReportDetailsPaneFor("Materials", collect);
+
+            return CompletableFuture.completedFuture(reportPane);
+        } catch (Exception e) {
+            return CompletableFuture.failedFuture(e);
+        }
+    }
 
     @Override
     public String toString() {
