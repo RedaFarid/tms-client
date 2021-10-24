@@ -248,7 +248,6 @@ public class MaterialController {
     @Async
     public CompletableFuture<Pane> onReport(List<MaterialsModel.TableObject> list) {
         try {
-            System.err.println(list);
             List<DTO> collect = list.stream().map(listItem -> new Materials(
                             String.valueOf(listItem.getMaterialIdColumn()),
                             String.valueOf(listItem.getNameColumn()),

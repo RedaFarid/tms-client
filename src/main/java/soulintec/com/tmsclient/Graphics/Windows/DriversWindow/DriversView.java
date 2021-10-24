@@ -8,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Background;
@@ -95,7 +96,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
     private EnhancedTextField licenceNumField;
     private DatePicker licenceExpiryField;
     private EnhancedTextField telNumField;
-    private ComboBox <Permissions>permissionsField;
+    private ComboBox<Permissions> permissionsField;
     private EnhancedTextField commentField;
     private EnhancedTextField creationDateField;
     private EnhancedTextField modificationDateField;
@@ -189,9 +190,11 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         //Authorities
         RoleDTO saving = new RoleDTO("Save " + this);
         RoleDTO deleting = new RoleDTO("Delete " + this);
+        RoleDTO reporting = new RoleDTO("Generate Reports for  " + this);
 
         authorityDTOSList.add(saving);
         authorityDTOSList.add(deleting);
+        authorityDTOSList.add(reporting);
 
         mainWindowController.createWindowAuthorities(authorityDTOSList);
     }
@@ -201,8 +204,10 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
             insert.setAuthority(authorityDTOSList.get(0));
             update.setAuthority(authorityDTOSList.get(0));
             delete.setAuthority(authorityDTOSList.get(1));
+            report.setAuthority(authorityDTOSList.get(2));
         }
     }
+
     private void graphicsBuilder() {
         headerLabel.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:white;-fx-font-size:25;");
         headerLabel.setAlignment(Pos.CENTER);
@@ -329,7 +334,7 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         dataEntryPartitionTitled.add(licenceExpiryField, 4, 2);
 
         dataEntryPartitionTitled.add(commentLabel, 5, 2);
-        dataEntryPartitionTitled.add(commentField, 6, 2,3,1);
+        dataEntryPartitionTitled.add(commentField, 6, 2, 3, 1);
 
         dataEntryPartitionTitled.add(creationDateLabel, 1, 3);
         dataEntryPartitionTitled.add(creationDateField, 2, 3);
@@ -362,13 +367,13 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
 
 
         table.getColumns().addAll(idColumn, nameColumn, licenceNumberColumn, licenceExpirationDateColumn,
-                mobileNumberColumn, permissionsColumn, commentColumn,creationDateColumn, modifyDateColumn, createdByColumn,modifiedByColumn, onTerminalColumn);
+                mobileNumberColumn, permissionsColumn, commentColumn, creationDateColumn, modifyDateColumn, createdByColumn, modifiedByColumn, onTerminalColumn);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         table.prefHeightProperty().bind(root.heightProperty().subtract(vbox.heightProperty()));
         table.setItems(controller.getDataList());
         tableFilter = TableFilter.forTableView(table).apply();
 
-        hbox.getItems().addAll(insert, update, delete);
+        hbox.getItems().addAll(insert, update, delete, new Separator(), report);
         hbox.setPadding(new Insets(10, 10, 10, 10));
 
         vbox.getChildren().addAll(dataEntryPartitionTitled, hbox);
@@ -399,6 +404,23 @@ public class DriversView implements ApplicationListener<ApplicationContext.Appli
         insert.setOnMouseClicked(controller::onInsert);
         delete.setOnMouseClicked(controller::onDelete);
         update.setOnMouseClicked(controller::onUpdate);
+
+        report.setOnAction(e -> {
+            controller.onReport(tableFilter.getFilteredList()).whenComplete((pane, throwable) -> {
+                if (throwable != null) {
+                    MainWindow.showErrorWindowForException(throwable.getMessage(), throwable);
+                    return;
+                }
+                Platform.runLater(() -> {
+                    Stage stage = new Stage();
+                    stage.setScene(new Scene(pane));
+                    stage.setTitle("Drivers Report");
+                    stage.initOwner(mainWindow);
+                    stage.setWidth(1300);
+                    stage.show();
+                });
+            });
+        });
 
         table.setOnMouseClicked((a) -> {
             controller.onTableSelection(table.getSelectionModel().getSelectedItems());

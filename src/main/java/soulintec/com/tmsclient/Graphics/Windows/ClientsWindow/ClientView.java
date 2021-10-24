@@ -1,11 +1,13 @@
 package soulintec.com.tmsclient.Graphics.Windows.ClientsWindow;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.*;
@@ -184,9 +186,11 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         //Authorities
         RoleDTO saving = new RoleDTO("Save " + this);
         RoleDTO deleting = new RoleDTO("Delete " + this);
+        RoleDTO reporting = new RoleDTO("Generate Reports for  " + this);
 
         authorityDTOSList.add(saving);
         authorityDTOSList.add(deleting);
+        authorityDTOSList.add(reporting);
 
         mainWindowController.createWindowAuthorities(authorityDTOSList);
     }
@@ -196,6 +200,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
             insertClient.setAuthority(authorityDTOSList.get(0));
             updateClient.setAuthority(authorityDTOSList.get(0));
             deleteClient.setAuthority(authorityDTOSList.get(1));
+            report.setAuthority(authorityDTOSList.get(2));
         }
     }
 
@@ -354,7 +359,7 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         dataEntryPartitionTitled.setVgap(5);
         dataEntryPartitionTitled.setHgap(5);
 
-        clientsHbox.getItems().addAll(insertClient, updateClient, deleteClient);
+        clientsHbox.getItems().addAll(insertClient, updateClient, deleteClient,new Separator(),report);
 
         clientsVbox.getChildren().addAll(dataEntryPartitionTitled, clientsHbox);
         clientsVbox.setPadding(new Insets(5));
@@ -382,6 +387,23 @@ public class ClientView implements ApplicationListener<ApplicationContext.Applic
         insertClient.setOnMouseClicked(controller::onInsert);
         deleteClient.setOnMouseClicked(controller::onDelete);
         updateClient.setOnMouseClicked(controller::onUpdate);
+
+        report.setOnAction(e -> {
+            controller.onReport(clientsTableFilter.getFilteredList()).whenComplete((pane, throwable) -> {
+                if (throwable != null) {
+                    MainWindow.showErrorWindowForException(throwable.getMessage(), throwable);
+                    return;
+                }
+                Platform.runLater(() -> {
+                    Stage stage = new Stage();
+                    stage.setScene(new Scene(pane));
+                    stage.setTitle("Clients Report");
+                    stage.initOwner(mainStage);
+                    stage.setWidth(1300);
+                    stage.show();
+                });
+            });
+        });
 
         table.setOnMouseClicked((a) -> {
             controller.onTableSelection(table.getSelectionModel().getSelectedItems());

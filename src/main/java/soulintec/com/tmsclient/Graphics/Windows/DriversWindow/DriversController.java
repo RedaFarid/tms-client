@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,12 @@ import soulintec.com.tmsclient.Entities.Permissions;
 import soulintec.com.tmsclient.Entities.StationDTO;
 import soulintec.com.tmsclient.Graphics.Windows.LogsWindow.LogIdentifier;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
+import soulintec.com.tmsclient.Graphics.Windows.MaterialsWindow.MaterialsModel;
 import soulintec.com.tmsclient.Graphics.Windows.StationsWindow.StationsModel;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.DTO;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.Drivers;
+import soulintec.com.tmsclient.Reporting.ReportsDTO.Materials;
+import soulintec.com.tmsclient.Reporting.ReportsDetails.ReportDetailsFactory;
 import soulintec.com.tmsclient.Services.DriverService;
 import soulintec.com.tmsclient.Services.LogsService;
 import soulintec.com.tmsclient.Services.TransactionService;
@@ -27,6 +33,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -44,6 +51,8 @@ public class DriversController {
     private TransactionService transactionService;
     @Autowired
     private LogsService logsService;
+    @Autowired
+    private ReportDetailsFactory reportDetailsFactory;
 
     @Autowired(required = false)
     private Executor executor;
@@ -224,6 +233,7 @@ public class DriversController {
         }
 
     }
+
     public synchronized Task<String> updateTask() {
         return new Task<>() {
             @Override
@@ -278,7 +288,7 @@ public class DriversController {
                     }
 
                 } catch (Exception e) {
-                    logsService.save(new LogDTO(LogIdentifier.Error , toString() , e.getMessage()));
+                    logsService.save(new LogDTO(LogIdentifier.Error, toString(), e.getMessage()));
                     log.fatal(e);
                 }
             }
@@ -304,6 +314,28 @@ public class DriversController {
                 log.fatal(e);
             }
         });
+    }
+
+    @Async
+    public CompletableFuture<Pane> onReport(List<DriversModel.TableObject> list) {
+        try {
+            List<DTO> collect = list.stream().map(listItem -> new Drivers(
+                            String.valueOf(listItem.getDriverIdColumn()),
+                            String.valueOf(listItem.getNameColumn()),
+                            String.valueOf(listItem.getLicenseNumberColumn()),
+                            String.valueOf(listItem.getLicenceExpirationDateColumn()),
+                            String.valueOf(listItem.getMobileNumberColumn()),
+                            listItem.getPermissionsColumn().name(),
+                            String.valueOf(listItem.getCommentColumn())
+                    )
+            ).collect(Collectors.toList());
+
+            Pane reportPane = reportDetailsFactory.getReportDetailsPaneFor("Drivers", collect);
+
+            return CompletableFuture.completedFuture(reportPane);
+        } catch (Exception e) {
+            return CompletableFuture.failedFuture(e);
+        }
     }
 
     @Override

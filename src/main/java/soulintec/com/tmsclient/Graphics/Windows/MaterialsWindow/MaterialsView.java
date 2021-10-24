@@ -162,9 +162,11 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
         //Authorities
         RoleDTO saving = new RoleDTO("Save " + this);
         RoleDTO deleting = new RoleDTO("Delete " + this);
+        RoleDTO reporting = new RoleDTO("Generate Reports for  " + this);
 
         authorityDTOSList.add(saving);
         authorityDTOSList.add(deleting);
+        authorityDTOSList.add(reporting);
 
         mainWindowController.createWindowAuthorities(authorityDTOSList);
     }
@@ -174,6 +176,7 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
             insert.setAuthority(authorityDTOSList.get(0));
             update.setAuthority(authorityDTOSList.get(0));
             delete.setAuthority(authorityDTOSList.get(1));
+            report.setAuthority(authorityDTOSList.get(2));
         }
     }
 
