@@ -40,10 +40,12 @@ public class LoginService {
     public void addObserver(Observer observer){
         userObject.add(observer);
     }
+
     public String login(String username, String password) {
         token = "";
         error = "";
         userObject.setUsername("");
+
         Platform.runLater(()->setObservedUsername("No logged in user"));
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", MediaType.APPLICATION_FORM_URLENCODED.toString());
@@ -71,6 +73,7 @@ public class LoginService {
     public void logOut() {
         token = "";
         error = "";
+        userObject.setUsername("");
         setObservedUsername("No logged in user");
     }
 

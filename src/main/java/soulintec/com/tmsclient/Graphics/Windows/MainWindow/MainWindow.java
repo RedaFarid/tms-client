@@ -96,10 +96,13 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private Image logoutimage = new Image(Resources.getResource("Icons/logout.png").toString());
     private Image dashboardimage = new Image(Resources.getResource("Icons/dashboard.png").toString());
     private Image exitimage = new Image(Resources.getResource("Icons/exit.png").toString());
+    private Image userImage = new Image(Resources.getResource("Icons/useradministration.png").toString());
+
     private ImageView loginview = new ImageView(loginImage);
     private ImageView logoutview = new ImageView(logoutimage);
     private ImageView dashboardview = new ImageView(dashboardimage);
     private ImageView exitview = new ImageView(exitimage);
+    private ImageView userAdminview = new ImageView(userImage);
 
     private Label currentUserLabel = new Label();
 
@@ -109,6 +112,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     private Button logOut = new Button("Log out", logoutview);
     private EnhancedButton dashBoardButton;
     private EnhancedButton exit;
+    private EnhancedButton userAdmin;
     private boolean IconicStatus = true;
 
     private final double SIDE_BAR_COLLAPSED_HEIGHT = 60;
@@ -179,14 +183,16 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         blankPane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
         blankPane.getChildren().addAll(baseIconView, mainLabel);
 
-        loginview.setFitWidth(20);
-        logoutview.setFitWidth(20);
-        dashboardview.setFitWidth(30);
-        exitview.setFitWidth(20);
-        loginview.setFitHeight(20);
-        logoutview.setFitHeight(20);
+        loginview.setFitWidth(25);
+        logoutview.setFitWidth(25);
+        dashboardview.setFitWidth(35);
+        exitview.setFitWidth(25);
+        userAdminview.setFitWidth(25);
+        loginview.setFitHeight(25);
+        logoutview.setFitHeight(25);
         dashboardview.setFitHeight(25);
-        exitview.setFitHeight(20);
+        exitview.setFitHeight(25);
+        userAdminview.setFitHeight(25);
 
         buttonsview.setMinWidth(SIDE_BAR_COLLAPSED_HEIGHT);
         buttonsview.setSpacing(0);
@@ -210,11 +216,13 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         logOut.setPrefWidth(120);
         exit.setPrefWidth(120);
         dashBoardButton.setPrefWidth(200);
+        userAdmin.setPrefWidth(250);
 
         logIn.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:black;-fx-font-size:18;");
         logOut.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:black;-fx-font-size:18;");
         exit.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:black;-fx-font-size:18;");
         dashBoardButton.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:black;-fx-font-size:18;");
+        userAdmin.setStyle("-fx-font-weight:bold;-fx-font-style:normal;-fx-text-fill:black;-fx-font-size:18;");
 
         currentUserLabel.setStyle("-fx-font-weight:normal;-fx-font-style:normal;-fx-text-fill:black;-fx-font-size:30;");
         currentUserLabel.setPrefWidth(1035);
@@ -225,10 +233,10 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         clock.setRunning(true);
 
         dashBoardButton.setGraphic(dashboardview);
-
         exit.setGraphic(exitview);
+        userAdmin.setGraphic(userAdminview);
 
-        fastActionsBar.getItems().addAll(logIn, logOut, new Separator(), dashBoardButton, new Separator(), exit, currentUserLabel, clock /*, clock */);
+        fastActionsBar.getItems().addAll(logIn, logOut,userAdmin,new Separator(), dashBoardButton, new Separator(), exit, currentUserLabel, clock);
         fastActionsBar.setBackground(new Background(new BackgroundFill(Color.CADETBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
         fastActionsBar.setBorder(new Border(new BorderStroke(Color.CADETBLUE.darker(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 0, 1, 0))));
 
@@ -342,12 +350,13 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
     private void onLogIn(MouseEvent mouseEvent) {
         root.setCenter(new ImageView(mainImage));
+        loginService.logOut();
         loginWindow.showAndReturnUser(window, executor).thenAccept(loginWindowReturnObject -> {
             if (loginWindowReturnObject.getStatus().equals(LoginWindow.LoginStatus.OK)) {
                 String login = loginService.login(loginWindowReturnObject.getUserName(), loginWindowReturnObject.getPassword());
 
                 if (!login.equals("")) {
-                    showErrorWindow("Login field", "Wrong username or password");
+                   showErrorWindow("Login field", "Wrong username or password");
                 }
             }
         });
@@ -369,6 +378,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     public void init() {
         dashBoardButton = new EnhancedButton("Dashboard");
         exit = new EnhancedButton("Exit");
+        userAdmin = new EnhancedButton("User administration");
         logger.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         trucks.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         tanks.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
@@ -395,6 +405,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         RoleDTO transactionViewRole = new RoleDTO("View Transactions");
         RoleDTO trucksViewRole = new RoleDTO("View Trucks");
         RoleDTO exitRole = new RoleDTO("Exit");
+        RoleDTO userRole = new RoleDTO("User Administration");
 
         authorityDTOSList.put("Clients",clientViewRole);
         authorityDTOSList.put("Drivers",driverViewRole);
@@ -405,6 +416,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         authorityDTOSList.put("Transactions",transactionViewRole);
         authorityDTOSList.put("Trucks",trucksViewRole);
         authorityDTOSList.put("Exit",exitRole);
+        authorityDTOSList.put("Users",userRole);
 
         controller.createWindowAuthorities(authorityDTOSList.values().stream().toList());
     }
@@ -420,6 +432,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             dashBoardButton.setAuthority(authorityDTOSList.get("Transactions"));
             trucks.setAuthority(authorityDTOSList.get("Trucks"));
             exit.setAuthority(authorityDTOSList.get("Exit"));
+            userAdmin.setAuthority(authorityDTOSList.get("Users"));
         }
     }
 

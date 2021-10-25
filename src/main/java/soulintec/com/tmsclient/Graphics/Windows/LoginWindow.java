@@ -9,6 +9,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
@@ -32,6 +34,10 @@ public class LoginWindow extends VBox {
 
     private static LoginWindow singleton = null;
     private Scene scene = new Scene(this);
+
+    private Image userImage = new Image(Resources.getResource("Icons/loginwindow.png").toString());
+
+    private ImageView userView = new ImageView(userImage);
 
     private final Button LogIn = new Button("Log in");
     private final Button Cancel = new Button("Cancel");
@@ -70,6 +76,9 @@ public class LoginWindow extends VBox {
         password.setMaxWidth(300);
         password.setPromptText("Password");
         password.setMinHeight(10);
+
+        userView.setFitWidth(40);
+        userView.setFitHeight(40);
 
         getChildren().addAll(mainLabel, username, password, new Pane(), LogIn, Cancel);
         setSpacing(5);
