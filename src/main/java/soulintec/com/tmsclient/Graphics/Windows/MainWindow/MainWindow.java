@@ -57,59 +57,54 @@ import java.util.concurrent.Executor;
 public class MainWindow implements ApplicationListener<ApplicationContext.ApplicationListener> {
 
     private static Stage window;
-    private BorderPane root = new BorderPane();
+    private BorderPane root;
     private Scene scene;
 
-    private Label loggedUser = new Label("No logged in user");
+    private Label loggedUser;
 
-    private ToolBar fastActionsBar = new ToolBar();
-    private StatusBar statusbar = new StatusBar();
+    private ToolBar fastActionsBar;
+    private StatusBar statusbar;
 
-    private Image baseIcon = new Image(Resources.getResource("Icons/Soulintec.png").toString());
-    private ImageView baseIconView = new ImageView(baseIcon);
-    private VBox blankPane = new VBox();
-    private Label mainLabel = new Label("Terminal management system\nSystem developed by SOULINTEC for integrated solutions");
+    private StringProperty tempStringProperty;
 
-    private StringProperty tempStringProperty = new SimpleStringProperty();
+    private Clock clock;
 
-    private Clock clock = new Clock();
-
-    public Map<String,RoleDTO> authorityDTOSList = new HashMap<>();
+    public Map<String, RoleDTO> authorityDTOSList;
 
     private MainWindowController controller;
 
     @Autowired(required = false)
     private Executor executor;
 
-    private IconicButton Iconic = new IconicButton(Resources.getResource("Icons/maxminbuttons.png").toString());
+    private IconicButton Iconic;
 
-    private windowReferenceNode logger = new windowReferenceNode(Resources.getResource("Icons/log.png").toString(), "Log", tempStringProperty);
-    private windowReferenceNode materials = new windowReferenceNode(Resources.getResource("Icons/stocks.png").toString(), "Materials", tempStringProperty);
-    private windowReferenceNode clients = new windowReferenceNode(Resources.getResource("Icons/clients.png").toString(), "Clients", tempStringProperty);
-    private windowReferenceNode drivers = new windowReferenceNode(Resources.getResource("Icons/drivers.png").toString(), "Drivers", tempStringProperty);
-    private windowReferenceNode tanks = new windowReferenceNode(Resources.getResource("Icons/tanks.png").toString(), "Tanks", tempStringProperty);
-    private windowReferenceNode trucks = new windowReferenceNode(Resources.getResource("Icons/trucks.png").toString(), "Trucks", tempStringProperty);
-    private windowReferenceNode stations = new windowReferenceNode(Resources.getResource("Icons/stations.png").toString(), "Stations", tempStringProperty);
+    private windowReferenceNode logger;
+    private windowReferenceNode materials;
+    private windowReferenceNode clients;
+    private windowReferenceNode drivers;
+    private windowReferenceNode tanks;
+    private windowReferenceNode trucks;
+    private windowReferenceNode stations;
 
-    private Image mainImage = new Image(Resources.getResource("Icons/SoulintecMain.png").toString());
-    private Image loginImage = new Image(Resources.getResource("Icons/login.png").toString());
-    private Image logoutimage = new Image(Resources.getResource("Icons/logout.png").toString());
-    private Image dashboardimage = new Image(Resources.getResource("Icons/dashboard.png").toString());
-    private Image exitimage = new Image(Resources.getResource("Icons/exit.png").toString());
-    private Image userImage = new Image(Resources.getResource("Icons/useradministration.png").toString());
+    private Image mainImage;
+    private Image loginImage;
+    private Image logoutimage;
+    private Image dashboardimage;
+    private Image exitimage;
+    private Image userImage;
 
-    private ImageView loginview = new ImageView(loginImage);
-    private ImageView logoutview = new ImageView(logoutimage);
-    private ImageView dashboardview = new ImageView(dashboardimage);
-    private ImageView exitview = new ImageView(exitimage);
-    private ImageView userAdminview = new ImageView(userImage);
+    private ImageView loginview;
+    private ImageView logoutview;
+    private ImageView dashboardview;
+    private ImageView exitview;
+    private ImageView userAdminview;
 
-    private Label currentUserLabel = new Label();
+    private Label currentUserLabel;
 
-    private VBox buttonsview = new VBox();
+    private VBox buttonsview;
 
-    private Button logIn = new Button("Log in", loginview);
-    private Button logOut = new Button("Log out", logoutview);
+    private Button logIn;
+    private Button logOut;
     private EnhancedButton dashBoardButton;
     private EnhancedButton exit;
     private EnhancedButton userAdmin;
@@ -175,14 +170,6 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
         root.setCenter(new ImageView(mainImage));
 
-        mainLabel.setStyle("-fx-font-weight:normal;-fx-font-style:italic;-fx-text-fill:Darkblue;-fx-font-size:20;");
-        mainLabel.setAlignment(Pos.CENTER);
-        mainLabel.setTextAlignment(TextAlignment.CENTER);
-
-        blankPane.setAlignment(Pos.CENTER);
-        blankPane.setBackground(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY)));
-        blankPane.getChildren().addAll(baseIconView, mainLabel);
-
         loginview.setFitWidth(25);
         logoutview.setFitWidth(25);
         dashboardview.setFitWidth(35);
@@ -236,7 +223,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         exit.setGraphic(exitview);
         userAdmin.setGraphic(userAdminview);
 
-        fastActionsBar.getItems().addAll(logIn, logOut,userAdmin,new Separator(), dashBoardButton, new Separator(), exit, currentUserLabel, clock);
+        fastActionsBar.getItems().addAll(logIn, logOut, userAdmin, new Separator(), dashBoardButton, new Separator(), exit, currentUserLabel, clock);
         fastActionsBar.setBackground(new Background(new BackgroundFill(Color.CADETBLUE, CornerRadii.EMPTY, Insets.EMPTY)));
         fastActionsBar.setBorder(new Border(new BorderStroke(Color.CADETBLUE.darker(), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(0, 0, 1, 0))));
 
@@ -356,7 +343,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
                 String login = loginService.login(loginWindowReturnObject.getUserName(), loginWindowReturnObject.getPassword());
 
                 if (!login.equals("")) {
-                   showErrorWindow("Login field", "Wrong username or password");
+                    showErrorWindow("Login field", "Wrong username or password");
                 }
             }
         });
@@ -376,9 +363,51 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
     }
 
     public void init() {
+        root = new BorderPane();
+        loggedUser = new Label("No logged in user");
+
+        fastActionsBar = new ToolBar();
+        statusbar = new StatusBar();
+
+        tempStringProperty = new SimpleStringProperty();
+
+        clock = new Clock();
+
+        authorityDTOSList = new HashMap<>();
+
+        Iconic = new IconicButton(Resources.getResource("Icons/maxminbuttons.png").toString());
+
+        logger = new windowReferenceNode(Resources.getResource("Icons/log.png").toString(), "Log", tempStringProperty);
+        materials = new windowReferenceNode(Resources.getResource("Icons/stocks.png").toString(), "Materials", tempStringProperty);
+        clients = new windowReferenceNode(Resources.getResource("Icons/clients.png").toString(), "Clients", tempStringProperty);
+        drivers = new windowReferenceNode(Resources.getResource("Icons/drivers.png").toString(), "Drivers", tempStringProperty);
+        tanks = new windowReferenceNode(Resources.getResource("Icons/tanks.png").toString(), "Tanks", tempStringProperty);
+        trucks = new windowReferenceNode(Resources.getResource("Icons/trucks.png").toString(), "Trucks", tempStringProperty);
+        stations = new windowReferenceNode(Resources.getResource("Icons/stations.png").toString(), "Stations", tempStringProperty);
+
+        mainImage = new Image(Resources.getResource("Icons/SoulintecMain.png").toString());
+        loginImage = new Image(Resources.getResource("Icons/login.png").toString());
+        logoutimage = new Image(Resources.getResource("Icons/logout.png").toString());
+        dashboardimage = new Image(Resources.getResource("Icons/dashboard.png").toString());
+        exitimage = new Image(Resources.getResource("Icons/exit.png").toString());
+        userImage = new Image(Resources.getResource("Icons/useradministration.png").toString());
+
+        loginview = new ImageView(loginImage);
+        logoutview = new ImageView(logoutimage);
+        dashboardview = new ImageView(dashboardimage);
+        exitview = new ImageView(exitimage);
+        userAdminview = new ImageView(userImage);
+
+        currentUserLabel = new Label();
+
+        buttonsview = new VBox();
+
+        logIn = new Button("Log in", loginview);
+        logOut = new Button("Log out", logoutview);
         dashBoardButton = new EnhancedButton("Dashboard");
         exit = new EnhancedButton("Exit");
         userAdmin = new EnhancedButton("User administration");
+
         logger.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         trucks.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
         tanks.getWindowInterface().setValue(WindowInterfaceMessages.EnableMonitoring.name());
@@ -407,16 +436,16 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         RoleDTO exitRole = new RoleDTO("Exit");
         RoleDTO userRole = new RoleDTO("User Administration");
 
-        authorityDTOSList.put("Clients",clientViewRole);
-        authorityDTOSList.put("Drivers",driverViewRole);
-        authorityDTOSList.put("Logs",logViewRole);
-        authorityDTOSList.put("Materials",materialViewRole);
-        authorityDTOSList.put("Stations",stationViewRole);
-        authorityDTOSList.put("Tanks",tankViewRole);
-        authorityDTOSList.put("Transactions",transactionViewRole);
-        authorityDTOSList.put("Trucks",trucksViewRole);
-        authorityDTOSList.put("Exit",exitRole);
-        authorityDTOSList.put("Users",userRole);
+        authorityDTOSList.put("Clients", clientViewRole);
+        authorityDTOSList.put("Drivers", driverViewRole);
+        authorityDTOSList.put("Logs", logViewRole);
+        authorityDTOSList.put("Materials", materialViewRole);
+        authorityDTOSList.put("Stations", stationViewRole);
+        authorityDTOSList.put("Tanks", tankViewRole);
+        authorityDTOSList.put("Transactions", transactionViewRole);
+        authorityDTOSList.put("Trucks", trucksViewRole);
+        authorityDTOSList.put("Exit", exitRole);
+        authorityDTOSList.put("Users", userRole);
 
         controller.createWindowAuthorities(authorityDTOSList.values().stream().toList());
     }
