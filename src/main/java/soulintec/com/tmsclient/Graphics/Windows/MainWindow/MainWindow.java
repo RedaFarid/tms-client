@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
 import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Graphics.Controls.EnhancedButton;
+import soulintec.com.tmsclient.Graphics.Windows.AuthorizationView.AuthorizationView;
 import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientView;
 import soulintec.com.tmsclient.Graphics.Windows.DriversWindow.DriversView;
 import soulintec.com.tmsclient.Graphics.Windows.LoginWindow;
@@ -119,29 +120,25 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
 
     @Autowired
     MaterialsView materialsView;
-
     @Autowired
     ClientView clientView;
-
     @Autowired
     DriversView driversView;
-
     @Autowired
     TanksView tanksView;
-
     @Autowired
     TruckView truckView;
-
     @Autowired
     StationView stationView;
-
     @Autowired
     TransactionView transactionView;
-
     @Autowired
     LogManagerView logView;
     @Autowired
+    AuthorizationView authorizationView;
+    @Autowired
     private LoginWindow loginWindow;
+
     private Notifications notifications;
 
     private Stage loginStage;
@@ -244,7 +241,7 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
         window.setHeight(1080);
         window.setMaximized(true);
         window.setTitle("Terminal management system");
-        window.getIcons().add(new Image(Resources.getResource("Icons/splash.png").toString()));
+        window.getIcons().add(new Image(Resources.getResource("Icons/1.png").toString()));
         window.setMinWidth(1900);
         window.setX(1920);
         window.setAlwaysOnTop(true);
@@ -331,7 +328,11 @@ public class MainWindow implements ApplicationListener<ApplicationContext.Applic
             logView.update();
             root.setCenter(logView.getRoot());
         });
-
+        userAdmin.setOnMouseClicked(action -> {
+            authorizationView.update();
+            root.setCenter(authorizationView.getTabContainer());
+            root.getStylesheets().add(Resources.getResource("Styles/MainWindowStyle.css").toString());
+        });
         userAuthorities();
     }
 

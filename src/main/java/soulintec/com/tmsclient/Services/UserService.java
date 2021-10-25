@@ -34,9 +34,29 @@ public class UserService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String save(AppUserDTO userDTO) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(userDTO, headers);
 
-        ResponseEntity<String> deleteResponseEntity = restTemplate.postForEntity(Utilities.iP + "/saveUser", userDTO, String.class);
-        return deleteResponseEntity.getBody();
+        try {
+            ResponseEntity<String> saveResponseEntity = restTemplate.exchange(Utilities.iP + "/saveUser", HttpMethod.POST, request, String.class);
+            return saveResponseEntity.getBody();
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    public String updateUsername(AppUserDTO userDTO) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(userDTO, headers);
+
+        try {
+            ResponseEntity<String> saveResponseEntity = restTemplate.exchange(Utilities.iP + "/updateUsername", HttpMethod.POST, request, String.class);
+            return saveResponseEntity.getBody();
+        } catch (Exception e) {
+            return e.getMessage();
+        }
     }
 
     public List<AppUserDTO> findAll() {
@@ -70,7 +90,6 @@ public class UserService {
 
     }
 
-    //TODO-- add exception
     public Optional<AppUserDTO> findById(Long id) {
         ResponseEntity<AppUserDTO> forEntity = restTemplate.getForEntity(Utilities.iP + "/userById/" + id, AppUserDTO.class);
 
@@ -84,8 +103,15 @@ public class UserService {
     }
 
     public String deleteById(Long id) {
-        ResponseEntity<String> deleteResponseEntity = restTemplate.postForEntity(Utilities.iP + "/deleteUserById", id, String.class);
-        return deleteResponseEntity.getBody();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(id, headers);
+        try {
+            ResponseEntity<String> deleteResponseEntity = restTemplate.exchange(Utilities.iP + "/deleteUserById/", HttpMethod.POST, request, String.class);
+            return deleteResponseEntity.getBody();
+        } catch (Exception e) {
+            return (e.getMessage());
+        }
     }
 
     @Data

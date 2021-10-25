@@ -86,9 +86,6 @@ public class MaterialsView implements ApplicationListener<ApplicationContext.App
     private EnhancedTextField modifiedByField;
     private EnhancedTextField onTerminalField;
 
-    @Autowired
-    private MaterialService materialService;
-
     private final ObjectProperty<Cursor> CURSOR_DEFAULT = new SimpleObjectProperty<>(Cursor.DEFAULT);
     private final ObjectProperty<Cursor> CURSOR_WAIT = new SimpleObjectProperty<>(Cursor.WAIT);
 
