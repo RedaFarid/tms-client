@@ -50,7 +50,6 @@ public class RoleRefService {
         }
     }
 
-
     public List<RoleRef> findAll() {
 //        // create headers
 //        HttpHeaders headers = new HttpHeaders();
@@ -95,7 +94,6 @@ public class RoleRefService {
 
     public Optional<RoleDTO> findByName(String name) {
         ResponseEntity<RoleDTO> forEntity = restTemplate.getForEntity(Utilities.iP + "/roleByName/" + name, RoleDTO.class);
-
         return Optional.ofNullable(forEntity.getBody());
     }
 
@@ -103,6 +101,19 @@ public class RoleRefService {
         ResponseEntity<String> deleteResponseEntity = restTemplate.postForEntity(Utilities.iP + "/deleteRoleById", id, String.class);
         return deleteResponseEntity.getBody();
     }
+
+    public String deleteByRoleRef(RoleRef roleRef) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + LoginService.getToken());
+        HttpEntity request = new HttpEntity(roleRef, headers);
+        try {
+            ResponseEntity<String> deleteResponseEntity = restTemplate.exchange(Utilities.iP + "/deleteByRoleRef/", HttpMethod.POST, request, String.class);
+            return deleteResponseEntity.getBody();
+        } catch (Exception e) {
+            return (e.getMessage());
+        }
+    }
+
 
     @Data
     @AllArgsConstructor

@@ -1,9 +1,7 @@
 package soulintec.com.tmsclient.Graphics.Windows.AuthorizationView;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.LongProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -20,12 +18,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
 import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Graphics.Controls.PasswordFieldTableCell;
-import soulintec.com.tmsclient.Graphics.Windows.ClientsWindow.ClientsModel;
+import soulintec.com.tmsclient.Graphics.Windows.AuthorizationView.old.AuthoraizationWindow.AuthorizationListView;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 
 import java.util.ArrayList;
@@ -57,6 +56,8 @@ public class AuthorizationView implements ApplicationListener<ApplicationContext
 
     public List<RoleDTO> authorityDTOSList = new ArrayList<>();
 
+    @Autowired
+    private AuthorizationListView authorizationListView;
     @Override
     public void onApplicationEvent(ApplicationContext.ApplicationListener event) {
         mainWindow = event.getStage();
@@ -119,7 +120,7 @@ public class AuthorizationView implements ApplicationListener<ApplicationContext
         vbox.setPadding(new Insets(10, 10, 10, 10));
         vbox.setSpacing(10);
 
-        root.getChildren().addAll(headerLabel, vbox);
+        root.getChildren().addAll(headerLabel, vbox,authorizationListView.getBorderPane());
         root.setPadding(new Insets(10));
 
     }
@@ -150,6 +151,10 @@ public class AuthorizationView implements ApplicationListener<ApplicationContext
         });
         userNameColumn.setOnEditCommit(this::onUserNameChanged);
         passwordColumn.setOnEditCommit(this::onPasswordChanged);
+
+        table.setOnMouseClicked((a) -> {
+            controller.onTableSelection(table.getSelectionModel().getSelectedItems());
+        });
 
     }
 
