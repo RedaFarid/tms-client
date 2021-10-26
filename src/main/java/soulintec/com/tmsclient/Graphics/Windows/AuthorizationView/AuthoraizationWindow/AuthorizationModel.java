@@ -1,4 +1,4 @@
-package soulintec.com.tmsclient.Graphics.Windows.AuthorizationView.old.AuthoraizationWindow;
+package soulintec.com.tmsclient.Graphics.Windows.AuthorizationView.AuthoraizationWindow;
 
 import com.google.common.base.Objects;
 

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import soulintec.com.tmsclient.Entities.Authorization.AppUserDTO;
 import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Entities.Authorization.RoleRef;
-import soulintec.com.tmsclient.Graphics.Windows.AuthorizationView.old.AuthoraizationWindow.AuthorizationModel;
+import soulintec.com.tmsclient.Graphics.Windows.AuthorizationView.AuthoraizationWindow.AuthorizationModel;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 import soulintec.com.tmsclient.Services.RoleRefService;
 import soulintec.com.tmsclient.Services.RolesService;

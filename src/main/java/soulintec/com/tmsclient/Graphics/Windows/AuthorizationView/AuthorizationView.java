@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import soulintec.com.tmsclient.ApplicationContext;
 import soulintec.com.tmsclient.Entities.Authorization.RoleDTO;
 import soulintec.com.tmsclient.Graphics.Controls.PasswordFieldTableCell;
-import soulintec.com.tmsclient.Graphics.Windows.AuthorizationView.old.AuthoraizationWindow.AuthorizationListView;
+import soulintec.com.tmsclient.Graphics.Windows.AuthorizationView.AuthoraizationWindow.AuthorizationListView;
 import soulintec.com.tmsclient.Graphics.Windows.MainWindow.MainWindow;
 
 import java.util.ArrayList;
